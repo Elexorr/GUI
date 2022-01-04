@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import LEFT
-from tkinter import RIGHT
 
 root = tk.Tk()
 root.title("CurVarEn")
