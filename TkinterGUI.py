@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import LEFT
 
 root = tk.Tk()
+root.title("CurVarEn")
 
 x = root.winfo_screenwidth()
 y = root.winfo_screenheight()
