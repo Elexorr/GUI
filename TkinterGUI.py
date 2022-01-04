@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import LEFT
+from tkinter import RIGHT
 
 root = tk.Tk()
 root.title("CurVarEn")
@@ -17,8 +18,6 @@ plocha.pack(fill = tk.BOTH, expand=True)
 frame1 = tk.Frame(master = root, width = x, height = y * 0.1, bg="grey")
 # frame1.place(x = 0, y = 0)
 frame1.pack(fill = tk.BOTH, expand=True)
-
-
 
 # frame3 = tk.Frame(master=window, width=50, bg="blue")
 # frame3.pack(fill=tk.Y, side=tk.LEFT)
@@ -42,6 +41,5 @@ frame1.pack(fill = tk.BOTH, expand=True)
 
 # text_box = tk.Text()
 # text_box.pack()
-
 
 root.mainloop()
