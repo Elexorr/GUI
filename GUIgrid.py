@@ -13,14 +13,14 @@ yy = root.winfo_screenheight()
 
 
 def select_file():
+    global lines
     filetypes = (('text files', '*.txt'), ('All files', '*.*'))
     filename = fd.askopenfilename(title='Open a file',
                                   initialdir='/', filetypes=filetypes)
+    f = open(filename)
+    lines = f.readlines()
     showinfo(title='Selected File', message=filename)
 
-
-open_button = ttk.Button(root, text='Open a File', command=select_file)
-open_button.pack(expand=True)
 
 # frame1 = tk.Frame(master=root, width=xx/2, height=yy/2, bg="yellow")
 window = tk.Canvas(width=xx - 153, height=yy - 150, bg="light grey")  # yy*0.9-80
@@ -32,5 +32,9 @@ window.grid(row=0, column=0, sticky=S)
 frame2.grid(row=0, column=1, sticky=S)
 frame3.grid(row=1, column=0, sticky=E)
 frame4.grid(row=1, column=1, sticky=W)
+
+open_button = ttk.Button(master=frame2, text='Open a File', command=select_file, width=15)
+open_button.place(x=24, y=10)
+# open_button.pack()
 
 root.mainloop()
