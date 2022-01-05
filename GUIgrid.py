@@ -101,24 +101,24 @@ def drawcurve():                # drawing axes, labels and curves
     window.create_text(102 + (xx - 290) * (JD[len(JD) - 1] - JD[0]) / timescale, yy-180, text=isotime[11:23])
 
     for i in range(0, len(JD)):
-        window.create_line(102 + 1140 * (JD[i] - JD[0]) / timescale,        # drawing error bar
-                           20 - error[i] * 1000 + 600 * (mag[i] - Minmagvalue) / magscale,
-                           102 + 1140 * (JD[i] - JD[0]) / timescale,
-                           25 + error[i] * 1000 + 600 * (mag[i] - Minmagvalue) / magscale,
+        window.create_line(102 + (xx - 290) * (JD[i] - JD[0]) / timescale,        # drawing error bar
+                           20 - error[i] * 1000 + (yy-250) * (mag[i] - Minmagvalue) / magscale,
+                           102 + (xx - 290) * (JD[i] - JD[0]) / timescale,
+                           25 + error[i] * 1000 + (yy-250) * (mag[i] - Minmagvalue) / magscale,
                            fill='red')
-        window.create_rectangle(100 + 1140 * (JD[i] - JD[0]) / timescale,   # drawing lightucrve
-                                20 + 600 * (mag[i] - Minmagvalue) / magscale,
-                                104 + 1140 * (JD[i] - JD[0]) / timescale,
-                                24 + 600 * (mag[i] - Minmagvalue) / magscale,
+        window.create_rectangle(100 + (xx - 290) * (JD[i] - JD[0]) / timescale,   # drawing lightucrve
+                                20 + (yy-250) * (mag[i] - Minmagvalue) / magscale,
+                                104 + (xx - 290) * (JD[i] - JD[0]) / timescale,
+                                24 + (yy-250) * (mag[i] - Minmagvalue) / magscale,
                                 fill='red', outline='red')
         if i % 10 == 0:                                                     # drawing point numbers
-            window.create_line(102 + 1140 * (JD[i] - JD[0]) / timescale,
-                               5 + 25 + error[i] * 1000 + 600 * (mag[i] - Minmagvalue) / magscale,
-                               102 + 1140 * (JD[i] - JD[0]) / timescale,
-                               40 + 25 + error[i] * 1000 + 600 * (mag[i] - Minmagvalue) / magscale,
-                               fill='pink')
-            window.create_text(102 + 1140 * (JD[i] - JD[0]) / timescale,
-                               50 + 25 + error[i] * 1000 + 600 * (mag[i] - Minmagvalue) / magscale,
+            window.create_line(102 + (xx - 290) * (JD[i] - JD[0]) / timescale,
+                               5 + 25 + error[i] * 1000 + (yy-250) * (mag[i] - Minmagvalue) / magscale,
+                               102 + (xx - 290) * (JD[i] - JD[0]) / timescale,
+                               40 + 25 + error[i] * 1000 + (yy-250) * (mag[i] - Minmagvalue) / magscale,
+                               fill='grey')
+            window.create_text(102 + (xx - 290) * (JD[i] - JD[0]) / timescale,
+                               50 + 25 + error[i] * 1000 + (yy-250) * (mag[i] - Minmagvalue) / magscale,
                                text=i + 1)
 
 
