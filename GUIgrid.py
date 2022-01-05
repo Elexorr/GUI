@@ -3,6 +3,8 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog as fd
 from tkinter.messagebox import showinfo
+from astropy.modeling import models, fitting
+from astropy.time import Time
 
 root = tk.Tk()
 root.title("GUI grid")
@@ -36,6 +38,10 @@ def select_file():
             JDstr.append(lines[i][0:15])        # julian dates
             magstr.append(lines[i][16:24])      # mags
             errstr.append(lines[i][25:32])      # error
+    separatenumericalvalues()
+    xyscale()
+    drawcurve()
+
     showinfo(title='Selected File', message=filename)
 
 
@@ -63,7 +69,59 @@ def xyscale():              # creating variables for scaling purposes
     timescale = round((JD[len(JD) - 1] - JD[0]), 7)
 
 
-# frame1 = tk.Frame(master=root, width=xx/2, height=yy/2, bg="yellow")
+def drawcurve():                # drawing axes, labels and curves
+    window.create_rectangle(80, 0, xx-150, yy-210)     # |^^^^^^^^^^^^^^^
+    window.create_text(20, 5, text='mag')               # |
+    window.create_text(15, yy-195, text='JD')           # |
+
+    window.create_line(75, 22 + (yy-250) * (Minmagvalue - Minmagvalue) / magscale,
+                       86, 22 + (yy-250) * (Minmagvalue - Minmagvalue) / magscale)
+    window.create_text(50, 22 + (yy-250) * (Minmagvalue - Minmagvalue) / magscale, text=Minmagvalue)
+    window.create_line(75, 22 + (yy-250) * (Maxmagvalue - Minmagvalue) / magscale,
+                       86, 22 + (yy-250) * (Maxmagvalue - Minmagvalue) / magscale)
+    window.create_text(50, 22 + (yy-250) * (Maxmagvalue - Minmagvalue) / magscale, text=Maxmagvalue)
+    window.create_text(50, yy-195, text=JDay + "+")
+
+    jtime = Time(JDstr[0], format='jd')
+    isotime = jtime.iso
+    window.create_text(38, yy-180, text=isotime[0:10])
+    window.create_text(102 + (xx - 290) * (JD[0] - JD[0]) / timescale, yy-180, text=isotime[11:23])
+
+    window.create_line(102 + (xx - 290) * (JD[0] - JD[0]) / timescale, yy-210-5,
+                       102 + (xx - 290) * (JD[0] - JD[0]) / timescale, yy-210+6)
+    window.create_text(102 + (xx - 290) * (JD[0] - JD[0]) / timescale, yy-195, text=JD[0])
+
+    window.create_line(102 + (xx - 290) * (JD[len(JD) - 1] - JD[0]) / timescale, yy-210-5,
+                       102 + (xx - 290) * (JD[len(JD) - 1] - JD[0]) / timescale, yy-210+6)
+    window.create_text(102 + (xx - 290) * (JD[len(JD) - 1] - JD[0]) / timescale, yy-195,
+                       text=JD[len(JD) - 1])
+
+    jtime = Time(JDstr[len(JDstr) - 1], format='jd')
+    isotime = jtime.iso
+    window.create_text(102 + (xx - 290) * (JD[len(JD) - 1] - JD[0]) / timescale, yy-180, text=isotime[11:23])
+
+    for i in range(0, len(JD)):
+        window.create_line(102 + 1140 * (JD[i] - JD[0]) / timescale,        # drawing error bar
+                           20 - error[i] * 1000 + 600 * (mag[i] - Minmagvalue) / magscale,
+                           102 + 1140 * (JD[i] - JD[0]) / timescale,
+                           25 + error[i] * 1000 + 600 * (mag[i] - Minmagvalue) / magscale,
+                           fill='red')
+        window.create_rectangle(100 + 1140 * (JD[i] - JD[0]) / timescale,   # drawing lightucrve
+                                20 + 600 * (mag[i] - Minmagvalue) / magscale,
+                                104 + 1140 * (JD[i] - JD[0]) / timescale,
+                                24 + 600 * (mag[i] - Minmagvalue) / magscale,
+                                fill='red', outline='red')
+        if i % 10 == 0:                                                     # drawing point numbers
+            window.create_line(102 + 1140 * (JD[i] - JD[0]) / timescale,
+                               5 + 25 + error[i] * 1000 + 600 * (mag[i] - Minmagvalue) / magscale,
+                               102 + 1140 * (JD[i] - JD[0]) / timescale,
+                               40 + 25 + error[i] * 1000 + 600 * (mag[i] - Minmagvalue) / magscale,
+                               fill='pink')
+            window.create_text(102 + 1140 * (JD[i] - JD[0]) / timescale,
+                               50 + 25 + error[i] * 1000 + 600 * (mag[i] - Minmagvalue) / magscale,
+                               text=i + 1)
+
+
 window = tk.Canvas(width=xx - 153, height=yy - 150, bg="light grey")  # yy*0.9-80
 frame2 = tk.Frame(master=root, width=150, height=yy - 146, bg="grey")  # yy*0.9-76
 frame3 = tk.Frame(master=root, width=xx - 149, height=83, bg="grey")  # yy*0.1
@@ -76,7 +134,6 @@ frame4.grid(row=1, column=1, sticky=W)
 
 open_button = ttk.Button(master=frame2, text='Open a File', command=select_file, width=15)
 open_button.place(x=24, y=10)
-# open_button.pack()
 
 
 root.mainloop()
