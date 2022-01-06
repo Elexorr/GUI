@@ -41,7 +41,7 @@ def select_file():
     separatenumericalvalues()
     xyscale()
     drawcurve()
-    showinfo(title='Selected File', message=filename)
+    # showinfo(title='Selected File', message=filename)
 
 
 def separatenumericalvalues():
@@ -141,8 +141,8 @@ fitentry1.place(x=27, y=300)
 fitentry2 = tk.Entry(master=frame2, justify=CENTER, width=5)
 fitentry2.place(x=86, y=300)
 
-Gaussian = IntVar() #"0"
-Lorentzian = IntVar() #"0"
+Gaussian = IntVar()
+Lorentzian = IntVar()
 
 checkboxGauss = tk.Checkbutton(master=frame2, text=' Gaussian',
                                variable=Gaussian, onvalue=1, offvalue=0, bg="grey")
@@ -166,10 +166,10 @@ def fitprocessing():
         fitted_g = fit_g(g_init, x, y)
         for i in range(0, len(x)):
             window.create_rectangle(100 + (xx - 290) * (x[i] - JD[0]) / timescale,
-                                        20 + (yy-250) * (fitted_g(x[i]) - Minmagvalue) / magscale,  # drawing
-                                        104 + (xx - 290) * (x[i] - JD[0]) / timescale,
-                                        24 + (yy-250) * (fitted_g(x[i]) - Minmagvalue) / magscale,  # graph
-                                        fill='blue', outline='blue')
+                                    20 + (yy-250) * (fitted_g(x[i]) - Minmagvalue) / magscale,  # drawing
+                                    104 + (xx - 290) * (x[i] - JD[0]) / timescale,
+                                    24 + (yy-250) * (fitted_g(x[i]) - Minmagvalue) / magscale,  # graph
+                                    fill='blue', outline='blue')
 
     if Lorentzian.get() == 1:        # fitting and drawing Lorentzian model
         locmin = Maxmagvalue
