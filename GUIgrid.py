@@ -192,4 +192,10 @@ def fitprocessing():
 fit_button = ttk.Button(master=frame2, text='Fit Curve', command=fitprocessing, width=14)
 fit_button.place(x=26, y=390)
 
+def clearwindow():
+    window.delete("all")
+
+clear_button = ttk.Button(master=frame2, text='Clear All', command=clearwindow, width=14)
+clear_button.place(x=26, y=410)
+
 root.mainloop()
