@@ -41,7 +41,6 @@ def select_file():
     separatenumericalvalues()
     xyscale()
     drawcurve()
-
     showinfo(title='Selected File', message=filename)
 
 
@@ -135,5 +134,62 @@ frame4.grid(row=1, column=1, sticky=W)
 open_button = ttk.Button(master=frame2, text='Open a File', command=select_file, width=15)
 open_button.place(x=24, y=10)
 
+
+fitentry1 = tk.Entry(master=frame2, justify=CENTER, width=5)
+fitentry1.place(x=27, y=300)
+
+fitentry2 = tk.Entry(master=frame2, justify=CENTER, width=5)
+fitentry2.place(x=86, y=300)
+
+Gaussian = IntVar() #"0"
+Lorentzian = IntVar() #"0"
+
+checkboxGauss = tk.Checkbutton(master=frame2, text=' Gaussian',
+                               variable=Gaussian, onvalue=1, offvalue=0, bg="grey")
+checkboxGauss.place(x=27, y=330)
+checkboxLorentz = tk.Checkbutton(master=frame2, text=' Lorentzian',
+                                 variable=Lorentzian, onvalue=1, offvalue=0, bg="grey")
+checkboxLorentz.place(x=27, y=350)
+
+
+def fitprocessing():
+    fstart = int(fitentry1.get())    # getting user starting and ending point
+    fend = int(fitentry2.get())        # of fitting
+    for i in range(fstart - 1, fend):                   # creating lists of chosen data
+        x.append(JD[i])
+        y.append(mag[i])
+
+    if Gaussian.get() == 1:          # fitting and drawing Gaussian model
+        sd = (JD[fend] - JD[fstart]) / 4
+        g_init = models.Gaussian1D(amplitude=magscale, mean=x[len(x) // 2], stddev=sd)
+        fit_g = fitting.LevMarLSQFitter()
+        fitted_g = fit_g(g_init, x, y)
+        for i in range(0, len(x)):
+            window.create_rectangle(100 + (xx - 290) * (x[i] - JD[0]) / timescale,
+                                        20 + (yy-250) * (fitted_g(x[i]) - Minmagvalue) / magscale,  # drawing
+                                        104 + (xx - 290) * (x[i] - JD[0]) / timescale,
+                                        24 + (yy-250) * (fitted_g(x[i]) - Minmagvalue) / magscale,  # graph
+                                        fill='blue', outline='blue')
+
+    if Lorentzian.get() == 1:        # fitting and drawing Lorentzian model
+        locmin = Maxmagvalue
+        index = 0
+        for i in range(0, len(y)):
+            if y[i] < locmin:
+                locmin = y[i]
+                index = i
+        l_init = models.Lorentz1D(amplitude=magscale, x_0=x[index], fwhm=(JD[fend - 1] - JD[fstart - 1]) / 2)
+        fit_l = fitting.LevMarLSQFitter()
+        fitted_l = fit_l(l_init, x, y)
+        for i in range(0, len(x)):
+            window.create_rectangle(100 + (xx - 290) * (x[i] - JD[0]) / timescale,
+                                    20 + (yy-250) * (fitted_l(x[i]) - Minmagvalue) / magscale,  # drawing
+                                    104 + (xx - 290) * (x[i] - JD[0]) / timescale,
+                                    24 + (yy-250) * (fitted_l(x[i]) - Minmagvalue) / magscale,  # graph
+                                    fill='brown', outline='brown')
+
+
+fit_button = ttk.Button(master=frame2, text='Fit Curve', command=fitprocessing, width=14)
+fit_button.place(x=26, y=390)
 
 root.mainloop()
