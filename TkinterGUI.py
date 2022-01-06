@@ -1,22 +1,31 @@
 import tkinter as tk
-from tkinter import LEFT
+from tkinter import TOP
+from tkinter import BOTTOM
 
 root = tk.Tk()
 root.title("CurVarEn")
 
-x = root.winfo_screenwidth()
-y = root.winfo_screenheight()
+xx = root.winfo_screenwidth()
+yy = root.winfo_screenheight()
 
-frame2 = tk.Frame(master = root, width = x/10, height = y * 0.9 - 80, bg="grey")
+geo = (str(xx) + "x" + str(yy))
+
+root.geometry(geo)
+
+for i in range(j):
+    for j in range(2):
+        frame = tk.Frame(master=window, relief=tk.RAISED, borderwidth=1)
+        frame.grid(row=i, column=j)
+
+plocha = tk.Canvas(master = root, width = xx - 200, height = yy - 200, bg ="red")
+plocha.pack(side = tk.LEFT, expand=True)
+
+frame1 = tk.Frame(master = root, width = 200, height = yy - 200, bg="grey")
 # frame2.place(x = 0, y = 200)
-frame2.pack(side = LEFT, fill = tk.BOTH, expand=True)
+frame1.pack(side = tk.RIGHT)
 
-plocha = tk.Canvas(width = x * 0.9, height = y * 0.9 - 80, bg ="red")
-plocha.pack(fill = tk.BOTH, expand=True)
-
-frame1 = tk.Frame(master = root, width = x, height = y * 0.1, bg="grey")
-# frame1.place(x = 0, y = 0)
-frame1.pack(fill = tk.BOTH, expand=True)
+frame2 = tk.Frame(master = root, width = xx, height = 200, bg="grey")
+frame2.pack(side = tk.BOTTOM)
 
 # frame3 = tk.Frame(master=window, width=50, bg="blue")
 # frame3.pack(fill=tk.Y, side=tk.LEFT)

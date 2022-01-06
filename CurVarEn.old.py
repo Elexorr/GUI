@@ -42,78 +42,78 @@ window.create_text(15, 655, text='JD')              # axes    640|
 #             magstr.append(lines[i][16:24])      # mags
 #             errstr.append(lines[i][25:32])      # error
 
-def separatenumericalvalues():
-    for i in range(0, len(JDstr)):                          # creating numerical data
-        JD.append(round(float(JDstr[i][0:15]) % 1, 7))      # julian dates
-        mag.append(round(float(magstr[i][0:8]), 5))         # mags
-        error.append(round(float(errstr[i][0:8]), 5))       # error
+# def separatenumericalvalues():
+#     for i in range(0, len(JDstr)):                          # creating numerical data
+#         JD.append(round(float(JDstr[i][0:15]) % 1, 7))      # julian dates
+#         mag.append(round(float(magstr[i][0:8]), 5))         # mags
+#         error.append(round(float(errstr[i][0:8]), 5))       # error
 
-def xyscale():              # creating variables for scaling purposes
-    global Maxmagvalue
-    global Minmagvalue
-    global magscale
-    global timescale
-    Maxmagvalue = 0
-    Minmagvalue = 100
-    magscale = 0
-    for i in range(0, len(mag)):
-        if mag[i] > Maxmagvalue:
-            Maxmagvalue = mag[i]
-        if mag[i] < Minmagvalue:
-            Minmagvalue = mag[i]
-        magscale = round(Maxmagvalue - Minmagvalue, 5)
-    timescale = round((JD[len(JD) - 1] - JD[0]), 7)
+# def xyscale():              # creating variables for scaling purposes
+#     global Maxmagvalue
+#     global Minmagvalue
+#     global magscale
+#     global timescale
+#     Maxmagvalue = 0
+#     Minmagvalue = 100
+#     magscale = 0
+#     for i in range(0, len(mag)):
+#         if mag[i] > Maxmagvalue:
+#             Maxmagvalue = mag[i]
+#         if mag[i] < Minmagvalue:
+#             Minmagvalue = mag[i]
+#         magscale = round(Maxmagvalue - Minmagvalue, 5)
+#     timescale = round((JD[len(JD) - 1] - JD[0]), 7)
 
 ##  print(JD[i], mag[i], error[i], "<", Minmagvalue, Maxmagvalue, ">", magscale, timescale)
 
-def drawcurve():                # drawing axes, labels and curves
-    window.create_line(75, 22 + 600 * (Minmagvalue - Minmagvalue) / magscale,
-                       86, 22 + 600 * (Minmagvalue - Minmagvalue) / magscale)
-    window.create_text(50, 22 + 600 * (Minmagvalue - Minmagvalue) / magscale, text=Minmagvalue)
-    window.create_line(75, 22 + 600 * (Maxmagvalue - Minmagvalue) / magscale,
-                       86, 22 + 600 * (Maxmagvalue - Minmagvalue) / magscale)
-    window.create_text(50, 22 + 600 * (Maxmagvalue - Minmagvalue) / magscale, text=Maxmagvalue)
-    window.create_text(50, 655, text=JDay + "+")
-
-    Jtime = Time(JDstr[0], format='jd')
-    ISOtime = Jtime.iso
-    window.create_text(38, 670, text=ISOtime[0:10])
-    window.create_text(102 + 1140 * (JD[0] - JD[0]) / timescale, 670, text=ISOtime[11:23])
-
-    window.create_line(102 + 1140 * (JD[0] - JD[0]) / timescale, 635,
-                       102 + 1140 * (JD[0] - JD[0]) / timescale, 646)
-    window.create_text(102 + 1140 * (JD[0] - JD[0]) / timescale, 655, text=JD[0])
-
-    window.create_line(102 + 1140 * (JD[len(JD) - 1] - JD[0]) / timescale, 635,
-                       102 + 1140 * (JD[len(JD) - 1] - JD[0]) / timescale, 646)
-    window.create_text(102 + 1140 * (JD[len(JD) - 1] - JD[0]) / timescale, 655,
-                       text=JD[len(JD) - 1])
-
-    Jtime = Time(JDstr[len(JDstr) - 1], format='jd')
-    ISOtime = Jtime.iso
-    window.create_text(102 + 1140 * (JD[len(JD) - 1] - JD[0]) / timescale, 670, text=ISOtime[11:23])
-
-    for i in range(0, len(JD)):
-        window.create_line(102 + 1140 * (JD[i] - JD[0]) / timescale,        # drawing error bar
-                           20 - error[i] * 1000 + 600 * (mag[i] - Minmagvalue) / magscale,
-                           102 + 1140 * (JD[i] - JD[0]) / timescale,
-                           25 + error[i] * 1000 + 600 * (mag[i] - Minmagvalue) / magscale,
-                           fill='red')
-        window.create_rectangle(100 + 1140 * (JD[i] - JD[0]) / timescale,   # drawing lightucrve
-                                20 + 600 * (mag[i] - Minmagvalue) / magscale,
-                                104 + 1140 * (JD[i] - JD[0]) / timescale,
-                                24 + 600 * (mag[i] - Minmagvalue) / magscale,
-                                fill='red', outline='red')
-        if i % 10 == 0:                                                     # drawing point numbers
-            window.create_line(102 + 1140 * (JD[i] - JD[0]) / timescale,
-                               5 + 25 + error[i] * 1000 + 600 * (mag[i] - Minmagvalue) / magscale,
-                               102 + 1140 * (JD[i] - JD[0]) / timescale,
-                               40 + 25 + error[i] * 1000 + 600 * (mag[i] - Minmagvalue) / magscale,
-                               fill='pink')
-            window.create_text(102 + 1140 * (JD[i] - JD[0]) / timescale,
-                               50 + 25 + error[i] * 1000 + 600 * (mag[i] - Minmagvalue) / magscale,
-                               text=i + 1)
-    window.update()
+# def drawcurve():                # drawing axes, labels and curves
+#     window.create_line(75, 22 + 600 * (Minmagvalue - Minmagvalue) / magscale,
+#                        86, 22 + 600 * (Minmagvalue - Minmagvalue) / magscale)
+#     window.create_text(50, 22 + 600 * (Minmagvalue - Minmagvalue) / magscale, text=Minmagvalue)
+#     window.create_line(75, 22 + 600 * (Maxmagvalue - Minmagvalue) / magscale,
+#                        86, 22 + 600 * (Maxmagvalue - Minmagvalue) / magscale)
+#     window.create_text(50, 22 + 600 * (Maxmagvalue - Minmagvalue) / magscale, text=Maxmagvalue)
+#     window.create_text(50, 655, text=JDay + "+")
+#
+#     Jtime = Time(JDstr[0], format='jd')
+#     ISOtime = Jtime.iso
+#     window.create_text(38, 670, text=ISOtime[0:10])
+#     window.create_text(102 + 1140 * (JD[0] - JD[0]) / timescale, 670, text=ISOtime[11:23])
+#
+#     window.create_line(102 + 1140 * (JD[0] - JD[0]) / timescale, 635,
+#                        102 + 1140 * (JD[0] - JD[0]) / timescale, 646)
+#     window.create_text(102 + 1140 * (JD[0] - JD[0]) / timescale, 655, text=JD[0])
+#
+#     window.create_line(102 + 1140 * (JD[len(JD) - 1] - JD[0]) / timescale, 635,
+#                        102 + 1140 * (JD[len(JD) - 1] - JD[0]) / timescale, 646)
+#     window.create_text(102 + 1140 * (JD[len(JD) - 1] - JD[0]) / timescale, 655,
+#                        text=JD[len(JD) - 1])
+#
+#     Jtime = Time(JDstr[len(JDstr) - 1], format='jd')
+#     ISOtime = Jtime.iso
+#     window.create_text(102 + 1140 * (JD[len(JD) - 1] - JD[0]) / timescale, 670, text=ISOtime[11:23])
+#
+#     for i in range(0, len(JD)):
+#         window.create_line(102 + 1140 * (JD[i] - JD[0]) / timescale,        # drawing error bar
+#                            20 - error[i] * 1000 + 600 * (mag[i] - Minmagvalue) / magscale,
+#                            102 + 1140 * (JD[i] - JD[0]) / timescale,
+#                            25 + error[i] * 1000 + 600 * (mag[i] - Minmagvalue) / magscale,
+#                            fill='red')
+#         window.create_rectangle(100 + 1140 * (JD[i] - JD[0]) / timescale,   # drawing lightucrve
+#                                 20 + 600 * (mag[i] - Minmagvalue) / magscale,
+#                                 104 + 1140 * (JD[i] - JD[0]) / timescale,
+#                                 24 + 600 * (mag[i] - Minmagvalue) / magscale,
+#                                 fill='red', outline='red')
+#         if i % 10 == 0:                                                     # drawing point numbers
+#             window.create_line(102 + 1140 * (JD[i] - JD[0]) / timescale,
+#                                5 + 25 + error[i] * 1000 + 600 * (mag[i] - Minmagvalue) / magscale,
+#                                102 + 1140 * (JD[i] - JD[0]) / timescale,
+#                                40 + 25 + error[i] * 1000 + 600 * (mag[i] - Minmagvalue) / magscale,
+#                                fill='pink')
+#             window.create_text(102 + 1140 * (JD[i] - JD[0]) / timescale,
+#                                50 + 25 + error[i] * 1000 + 600 * (mag[i] - Minmagvalue) / magscale,
+#                                text=i + 1)
+#     window.update()
 
 def fitprocessing():
     fstart = int(input("Enter starting point\n>> "))    # getting user starting and ending point
