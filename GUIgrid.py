@@ -136,7 +136,7 @@ open_button.place(x=24, y=10)
 
 
 fitentry1 = tk.Entry(master=frame2, justify=CENTER, width=5)
-fitentry1.place(x=27, y=300)
+fitentry1.place(x=26, y=300)
 
 fitentry2 = tk.Entry(master=frame2, justify=CENTER, width=5)
 fitentry2.place(x=86, y=300)
@@ -190,12 +190,41 @@ def fitprocessing():
 
 
 fit_button = ttk.Button(master=frame2, text='Fit Curve', command=fitprocessing, width=14)
-fit_button.place(x=26, y=390)
+fit_button.place(x=26, y=380)
+
+tintlabel = tk.Label(master=frame2, text='Time Interval', bg="grey")
+tintlabel.place(x=35, y=420)
+
+tintentry1 = tk.Entry(master=frame2, justify=CENTER, width=5)
+tintentry1.place(x=26, y=450)
+
+tintentry2 = tk.Entry(master=frame2, justify=CENTER, width=5)
+tintentry2.place(x=86, y=450)
+
+tint = ""
+
+
+def timeinterval():
+    tint = round(JD[int(tintentry2.get())-1] - JD[int(tintentry1.get())-1], 7)
+    tintoutput = tk.Label(master=frame2, text=str(tint)+ " d", font="Times 10 bold", bg="light grey", justify=CENTER, width=14)
+    tintoutput.place(x=22, y=511)
+
+
+tint_button = ttk.Button(master=frame2, text='Compute', command=timeinterval, width=15)
+tint_button.place(x=24, y=480)
+
+tintblacklabel = tk.Label(master=frame2, text=str(tint), bg="black", bd=3, width=14)
+tintblacklabel.place(x=21, y=510)
+
+tintoutput = tk.Label(master=frame2, text=str(tint), bg="light grey", width=14)
+tintoutput.place(x=22, y=511)
+
 
 def clearwindow():
     window.delete("all")
 
-clear_button = ttk.Button(master=frame2, text='Clear All', command=clearwindow, width=14)
-clear_button.place(x=26, y=410)
+
+clear_button = ttk.Button(master=frame2, text='Clear All', command=clearwindow, width=15)
+clear_button.place(x=24, y=50)
 
 root.mainloop()
