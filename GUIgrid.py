@@ -164,6 +164,10 @@ def fitprocessing():
         g_init = models.Gaussian1D(amplitude=magscale, mean=x[len(x) // 2], stddev=sd)
         fit_g = fitting.LevMarLSQFitter()
         fitted_g = fit_g(g_init, x, y)
+
+        window.create_line(102 + (xx - 290) * (fitted_g.mean - JD[0]) / timescale, yy-210-200,
+                           102 + (xx - 290) * (fitted_g.mean - JD[0]) / timescale, yy-210+201)
+
         for i in range(0, len(x)):
             window.create_rectangle(100 + (xx - 290) * (x[i] - JD[0]) / timescale,
                                     20 + (yy-250) * (fitted_g(x[i]) - Minmagvalue) / magscale,  # drawing
@@ -206,7 +210,8 @@ tint = ""
 
 def timeinterval():
     tint = round(JD[int(tintentry2.get())-1] - JD[int(tintentry1.get())-1], 7)
-    tintoutput = tk.Label(master=frame2, text=str(tint)+ " d", font="Times 10 bold", bg="light grey", justify=CENTER, width=14)
+    tintoutput = tk.Label(master=frame2, text=str(tint) + " d", font="Times 10 bold",
+                          bg="light grey", justify=CENTER, width=14)
     tintoutput.place(x=22, y=511)
 
 
