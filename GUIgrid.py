@@ -13,6 +13,7 @@ root.resizable(True, False)
 xx = root.winfo_screenwidth()
 yy = root.winfo_screenheight()
 
+
 JDstr = []      # julian date list / strings
 magstr = []     # mag list / strings
 errstr = []     # error list / strings
@@ -21,9 +22,12 @@ mag = []        # mag list / floats
 error = []      # error list / floats
 x = []
 y = []
+fopened = []
 
 
 def select_file():
+    if fopened != []:
+        clearwindow()
     filetypes = (('text files', '*.txt'), ('All files', '*.*'))
     filename = fd.askopenfilename(title='Open a file',
                                   initialdir='/', filetypes=filetypes)
@@ -42,6 +46,7 @@ def select_file():
     separatenumericalvalues()
     xyscale()
     drawcurve()
+    fopened.append(x)
     # showinfo(title='Selected File', message=filename)
 
 
@@ -246,6 +251,7 @@ def clearwindow():
     Minmagvalue = 0
     magscale = 0
     timescale = 0
+    fopened.clear()
     f.close()
 
 
