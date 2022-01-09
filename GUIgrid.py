@@ -24,10 +24,11 @@ y = []
 
 
 def select_file():
-    global lines
     filetypes = (('text files', '*.txt'), ('All files', '*.*'))
     filename = fd.askopenfilename(title='Open a file',
                                   initialdir='/', filetypes=filetypes)
+    global f
+    global lines
     f = open(filename)
     lines = f.readlines()
     global JDay
@@ -49,7 +50,6 @@ def separatenumericalvalues():
         JD.append(round(float(JDstr[i][0:15]) % 1, 7))      # julian dates
         mag.append(round(float(magstr[i][0:8]), 5))         # mags
         error.append(round(float(errstr[i][0:8]), 5))       # error
-
 
 def xyscale():              # creating variables for scaling purposes
     global Maxmagvalue
@@ -191,6 +191,8 @@ def fitprocessing():
                                     104 + (xx - 290) * (x[i] - JD[0]) / timescale,
                                     24 + (yy-250) * (fitted_l(x[i]) - Minmagvalue) / magscale,  # graph
                                     fill='brown', outline='brown')
+    x.clear()
+    y.clear()
 
 
 fit_button = ttk.Button(master=frame2, text='Fit Curve', command=fitprocessing, width=14)
@@ -226,7 +228,25 @@ tintoutput.place(x=22, y=511)
 
 
 def clearwindow():
+    fitentry1.delete(0, 'end')
+    fitentry2.delete(0, 'end')
+    tintentry1.delete(0, 'end')
+    tintentry2.delete(0, 'end')
+    checkboxGauss.deselect()
+    checkboxLorentz.deselect()
     window.delete("all")
+    lines.clear()
+    JDstr.clear()
+    magstr.clear()
+    errstr.clear()
+    JD.clear()
+    mag.clear()
+    error.clear()
+    Maxmagvalue = 0
+    Minmagvalue = 0
+    magscale = 0
+    timescale = 0
+    f.close()
 
 
 clear_button = ttk.Button(master=frame2, text='Clear All', command=clearwindow, width=15)
