@@ -217,6 +217,7 @@ tint = ""
 
 def timeinterval():
     tint = round(JD[int(tintentry2.get())-1] - JD[int(tintentry1.get())-1], 7)
+    global tintoutput
     tintoutput = tk.Label(master=frame2, text=str(tint) + " d", font="Times 10 bold",
                           bg="light grey", justify=CENTER, width=14)
     tintoutput.place(x=22, y=511)
@@ -240,6 +241,7 @@ def clearwindow():
     checkboxGauss.deselect()
     checkboxLorentz.deselect()
     window.delete("all")
+    tintoutput.destroy()
     lines.clear()
     JDstr.clear()
     magstr.clear()
