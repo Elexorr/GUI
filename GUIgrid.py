@@ -6,6 +6,11 @@ from tkinter.messagebox import showinfo
 from astropy.modeling import models, fitting
 from astropy.time import Time
 
+import os
+from io import BytesIO
+import rawpy
+from PIL import ImageTk, Image
+
 root = tk.Tk()
 root.title("GUI grid")
 root.resizable(True, False)
@@ -48,6 +53,43 @@ def select_file():
     drawcurve()
     fopened.append(x)
     # showinfo(title='Selected File', message=filename)
+
+
+def select_rawfile():
+    if fopened != []:
+        clearwindow()
+    filetypes = (('All files', '*.*'), ('RAW files', '*.CR2'))
+    raw_filename = fd.askopenfilename(title='Open a file',
+                                  initialdir='/', filetypes=filetypes)
+    print(raw_filename)
+    filename, _ = os.path.splitext(raw_filename)
+    with rawpy.imread(raw_filename) as raw:
+        try:
+            thumb = raw.extract_thumb()
+        except rawpy.LibRawNoThumbnailError:
+            print('no thumbnail found')
+
+        else:
+            if thumb.format in [rawpy.ThumbFormat.JPEG, rawpy.ThumbFormat.BITMAP]:
+                if thumb.format is rawpy.ThumbFormat.JPEG:
+                    thumb_filename = filename + '_thumb.jpg'
+                    with open(thumb_filename, 'wb') as f:
+                        f.write(thumb.data)
+                    thumb_rgb = Image.open(BytesIO(thumb.data))
+                else:
+                    thumb_filename = filename + '_thumb.tiff'
+                    thumb_rgb = Image.fromarray(thumb.data)
+                    thumb_rgb.save(filename, 'tiff')
+
+            # img = ImageTk.PhotoImage(Image.open(thumb_filename))
+            print(thumb_filename)
+            snimok = Image.open(thumb_filename)
+            resized = snimok.resize((int((4/3)*(yy - 150)), yy - 150))          #  width=xx - 153, height=yy - 150
+            img = ImageTk.PhotoImage(resized)
+            # window.create_image(int((4/3)*(yy - 150)), yy - 150, image=img) #anchor=SW
+            window.create_image(xx - 151 - (int((4/3)*(yy - 150)))/2, (yy - 150)/2 + 2, image=img) #anchor=SW
+
+            window.mainloop()
 
 
 def separatenumericalvalues():
@@ -138,6 +180,9 @@ frame4.grid(row=1, column=1, sticky=W)
 
 open_button = ttk.Button(master=frame2, text='Open a File', command=select_file, width=15)
 open_button.place(x=24, y=10)
+
+openraw_button = ttk.Button(master=frame3, text='Open RAW File', command=select_rawfile, width=15)
+openraw_button.place(x=24, y=10)
 
 
 fitentry1 = tk.Entry(master=frame2, justify=CENTER, width=5)
