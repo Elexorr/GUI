@@ -19,7 +19,6 @@ root.resizable(True, False)
 xx = root.winfo_screenwidth()
 yy = root.winfo_screenheight()
 
-
 JDstr = []      # julian date list / strings
 magstr = []     # mag list / strings
 errstr = []     # error list / strings
@@ -60,8 +59,7 @@ def select_rawfile():
     if fopened != []:
         clearwindow()
     filetypes = (('All files', '*.*'), ('RAW files', '*.CR2'))
-    raw_filename = fd.askopenfilename(title='Open a file',
-                                  initialdir='/', filetypes=filetypes)
+    raw_filename = fd.askopenfilename(title='Open a file', initialdir='/', filetypes=filetypes)
     global rawselected
     rawselected = raw_filename
     print(raw_filename)
@@ -71,7 +69,7 @@ def select_rawfile():
             thumb = raw.extract_thumb()
         except rawpy.LibRawNoThumbnailError:
             print('no thumbnail found')
-            showinfo(title='No Thumbnail Found', message=raw%filename)
+            showinfo(title='No Thumbnail Found', message=raw_filename)
 
         else:
             if thumb.format in [rawpy.ThumbFormat.JPEG, rawpy.ThumbFormat.BITMAP]:
@@ -96,26 +94,42 @@ def select_rawfile():
             thumbnaily = yy - 150
             thumbnailx = int(ratio * thumbnaily)
 
-            resized = snimok.resize((thumbnailx - 6, thumbnaily - 4)) # additional subtraction -6/-4 for correct display purposes
+            resized = snimok.resize((thumbnailx - 6, thumbnaily - 4))   # additional subtraction -6/-4
+            # for correct display purposes
             img = ImageTk.PhotoImage(resized)
-            window.create_image(xx - 151 - thumbnailx/2, thumbnaily/2 + 2, image=img) #anchor=SW
+            window.create_image(xx - 151 - thumbnailx/2, thumbnaily/2 + 2, image=img)  #anchor=SW
 
-            window.create_text(10, 20, text='RAW Type:', anchor=tk.W)  # raw type (flat or stack, e.g., Foveon sensor)
+            window.create_text(10, 20, text='RAW Type:', anchor=tk.W)
+            # raw type (flat or stack, e.g., Foveon sensor)
             window.create_text(150, 20, text=str(raw.raw_type), anchor=tk.W)
-            window.create_text(10, 40, text='Number of Colors:', anchor=tk.W)  # number of different color components, e.g., 3 for common RGB Bayer sensors with two green identical green sensors
+            window.create_text(10, 40, text='Number of Colors:', anchor=tk.W)
+            # number of different color components, e.g., 3 for common RGB Bayer sensors
+            # with two green identical green sensors
             window.create_text(150, 40, text=str(raw.num_colors), anchor=tk.W)
-            window.create_text(10, 60, text=f'Color Description:', anchor=tk.W)  # describes the various color components
+            window.create_text(10, 60, text=f'Color Description:', anchor=tk.W)
+            # describes the various color components
             window.create_text(150, 60, text=str(raw.color_desc), anchor=tk.W)
-            window.create_text(10, 80, text=f'RAW Pattern:', anchor=tk.W)  # decribes the pattern of the Bayer sensor
+            window.create_text(10, 80, text=f'RAW Pattern:', anchor=tk.W)
+            # decribes the pattern of the Bayer sensor
             window.create_text(150, 80, text=str(raw.raw_pattern.tolist()), anchor=tk.W)
-            window.create_text(10, 100, text=f'Black Levels:', anchor=tk.W)  # black level correction
+            window.create_text(10, 100, text=f'Black Levels:', anchor=tk.W)
+            # black level correction
             window.create_text(150, 100, text=str(raw.black_level_per_channel), anchor=tk.W)
-            window.create_text(10, 120, text=f'White Level:', anchor=tk.W)  # camera white level
+            window.create_text(10, 120, text=f'White Level:', anchor=tk.W)
+            # camera white level
             window.create_text(150, 120, text=str(raw.white_level), anchor=tk.W)
-            # window.create_text(20, 140, text=f'Color Matrix:                 {raw.color_matrix.tolist()}', anchor=tk.W)  # camera specific color matrix, usually obtained from a list in rawpy (not from the raw file)
-            # window.create_text(20, 160, text=f'XYZ to RGB Conversion Matrix: {raw.rgb_xyz_matrix.tolist()}', anchor=tk.W)  # camera specific XYZ to camara RGB conversion matrix
-            # window.create_text(20, 180, text=f'Camera White Balance:    {raw.camera_whitebalance}', anchor=tk.W)  # the picture's white balance as determined by the camera
-            # window.create_text(20, 200, text=f'Daylight White Balance:  {raw.daylight_whitebalance}', anchor=tk.W)  # the camera's daylight white balance
+            # window.create_text(20, 140,
+            # text=f'Color Matrix:                 {raw.color_matrix.tolist()}', anchor=tk.W)
+            # camera specific color matrix, usually obtained from a list in rawpy (not from the raw file)
+            # window.create_text(20, 160,
+            # text=f'XYZ to RGB Conversion Matrix: {raw.rgb_xyz_matrix.tolist()}', anchor=tk.W)
+            # camera specific XYZ to camara RGB conversion matrix
+            # window.create_text(20, 180,
+            # text=f'Camera White Balance:    {raw.camera_whitebalance}', anchor=tk.W)
+            # the picture's white balance as determined by the camera
+            # window.create_text(20, 200,
+            # text=f'Daylight White Balance:  {raw.daylight_whitebalance}', anchor=tk.W)
+            # the camera's daylight white balance
     window.mainloop()
 
 
@@ -142,13 +156,21 @@ def adumaxmin():
             xxx = int(xfactor*indexmax[1][i])
             yyy = int(yfactor*indexmax[0][i])
 
-            print(xxx, yyy)
+            window.create_line(xxx - 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy - 10 + 2, fill='yellow')
+            window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill='yellow')
+            window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill='yellow')
+            window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill='yellow')
 
-            window.create_line(xxx - 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy - 10 + 2, fill = 'yellow')
-            window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill = 'yellow')
-            window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill = 'yellow')
-            window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill = 'yellow')
-    print(indexmax)
+
+    for i in range(0, len(indexmin[1])):
+            xxx = int(xfactor * indexmin[1][i])
+            yyy = int(yfactor * indexmin[0][i])
+
+            window.create_line(xxx - 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy - 10 + 2, fill='brown')
+            window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill='brown')
+            window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill='brown')
+            window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill='brown')
+    # print(indexmax)
     # print(indexmin)
 
 
