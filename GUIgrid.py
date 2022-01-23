@@ -5,6 +5,7 @@ from tkinter import filedialog as fd
 from tkinter.messagebox import showinfo
 from astropy.modeling import models, fitting
 from astropy.time import Time
+import numpy as np
 
 import os
 from io import BytesIO
@@ -52,7 +53,7 @@ def select_file():
     xyscale()
     drawcurve()
     fopened.append(x)
-    # showinfo(title='Selected File', message=filename)
+    showinfo(title='Selected File', message=filename)
 
 
 def select_rawfile():
@@ -61,6 +62,8 @@ def select_rawfile():
     filetypes = (('All files', '*.*'), ('RAW files', '*.CR2'))
     raw_filename = fd.askopenfilename(title='Open a file',
                                   initialdir='/', filetypes=filetypes)
+    global rawselected
+    rawselected = raw_filename
     print(raw_filename)
     filename, _ = os.path.splitext(raw_filename)
     with rawpy.imread(raw_filename) as raw:
@@ -68,6 +71,7 @@ def select_rawfile():
             thumb = raw.extract_thumb()
         except rawpy.LibRawNoThumbnailError:
             print('no thumbnail found')
+            showinfo(title='No Thumbnail Found', message=raw%filename)
 
         else:
             if thumb.format in [rawpy.ThumbFormat.JPEG, rawpy.ThumbFormat.BITMAP]:
@@ -81,15 +85,71 @@ def select_rawfile():
                     thumb_rgb = Image.fromarray(thumb.data)
                     thumb_rgb.save(filename, 'tiff')
 
-            # img = ImageTk.PhotoImage(Image.open(thumb_filename))
             print(thumb_filename)
             snimok = Image.open(thumb_filename)
-            resized = snimok.resize((int((4/3)*(yy - 150)), yy - 150))          #  width=xx - 153, height=yy - 150
-            img = ImageTk.PhotoImage(resized)
-            # window.create_image(int((4/3)*(yy - 150)), yy - 150, image=img) #anchor=SW
-            window.create_image(xx - 151 - (int((4/3)*(yy - 150)))/2, (yy - 150)/2 + 2, image=img) #anchor=SW
+            global thumbnailx
+            global thumbnaily
+            global ratio
 
-            window.mainloop()
+            # ratio = round(raw.sizes.width/raw.sizes.height, 3)
+            ratio = round(raw.sizes.width/raw.sizes.height, 3)
+            thumbnaily = yy - 150
+            thumbnailx = int(ratio * thumbnaily)
+
+            resized = snimok.resize((thumbnailx - 6, thumbnaily - 4)) # additional subtraction -6/-4 for correct display purposes
+            img = ImageTk.PhotoImage(resized)
+            window.create_image(xx - 151 - thumbnailx/2, thumbnaily/2 + 2, image=img) #anchor=SW
+
+            window.create_text(10, 20, text='RAW Type:', anchor=tk.W)  # raw type (flat or stack, e.g., Foveon sensor)
+            window.create_text(150, 20, text=str(raw.raw_type), anchor=tk.W)
+            window.create_text(10, 40, text='Number of Colors:', anchor=tk.W)  # number of different color components, e.g., 3 for common RGB Bayer sensors with two green identical green sensors
+            window.create_text(150, 40, text=str(raw.num_colors), anchor=tk.W)
+            window.create_text(10, 60, text=f'Color Description:', anchor=tk.W)  # describes the various color components
+            window.create_text(150, 60, text=str(raw.color_desc), anchor=tk.W)
+            window.create_text(10, 80, text=f'RAW Pattern:', anchor=tk.W)  # decribes the pattern of the Bayer sensor
+            window.create_text(150, 80, text=str(raw.raw_pattern.tolist()), anchor=tk.W)
+            window.create_text(10, 100, text=f'Black Levels:', anchor=tk.W)  # black level correction
+            window.create_text(150, 100, text=str(raw.black_level_per_channel), anchor=tk.W)
+            window.create_text(10, 120, text=f'White Level:', anchor=tk.W)  # camera white level
+            window.create_text(150, 120, text=str(raw.white_level), anchor=tk.W)
+            # window.create_text(20, 140, text=f'Color Matrix:                 {raw.color_matrix.tolist()}', anchor=tk.W)  # camera specific color matrix, usually obtained from a list in rawpy (not from the raw file)
+            # window.create_text(20, 160, text=f'XYZ to RGB Conversion Matrix: {raw.rgb_xyz_matrix.tolist()}', anchor=tk.W)  # camera specific XYZ to camara RGB conversion matrix
+            # window.create_text(20, 180, text=f'Camera White Balance:    {raw.camera_whitebalance}', anchor=tk.W)  # the picture's white balance as determined by the camera
+            # window.create_text(20, 200, text=f'Daylight White Balance:  {raw.daylight_whitebalance}', anchor=tk.W)  # the camera's daylight white balance
+    window.mainloop()
+
+
+def adumaxmin():
+    print(rawselected)
+    path = rawselected
+    rawfile = rawpy.imread(path)
+    print(rawfile.sizes)
+    maxvalue = np.amax(rawfile.raw_image_visible)
+    indexmax = np.where(rawfile.raw_image_visible == maxvalue)
+    minvalue = np.amin(rawfile.raw_image_visible)
+    indexmin = np.where(rawfile.raw_image_visible == minvalue)
+
+    window.create_text(10, 160, text=f'Max. Pixel Value:', anchor=tk.W)  # camera white level
+    window.create_text(150, 160, text=maxvalue, anchor=tk.W)
+    window.create_text(10, 180, text=f'Min. Pixel Value:', anchor=tk.W)  # camera white level
+    window.create_text(150, 180, text=minvalue, anchor=tk.W)
+
+    xshift = xx - 151 - thumbnailx + 1  # additional + 1 for correct display purposes
+    xfactor = thumbnailx/rawfile.sizes.width
+    yfactor = thumbnaily/rawfile.sizes.height
+
+    for i in range (0, len(indexmax[1])):
+            xxx = int(xfactor*indexmax[1][i])
+            yyy = int(yfactor*indexmax[0][i])
+
+            print(xxx, yyy)
+
+            window.create_line(xxx - 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy - 10 + 2, fill = 'yellow')
+            window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill = 'yellow')
+            window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill = 'yellow')
+            window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill = 'yellow')
+    print(indexmax)
+    # print(indexmin)
 
 
 def separatenumericalvalues():
@@ -97,6 +157,7 @@ def separatenumericalvalues():
         JD.append(round(float(JDstr[i][0:15]) % 1, 7))      # julian dates
         mag.append(round(float(magstr[i][0:8]), 5))         # mags
         error.append(round(float(errstr[i][0:8]), 5))       # error
+
 
 def xyscale():              # creating variables for scaling purposes
     global Maxmagvalue
@@ -183,6 +244,9 @@ open_button.place(x=24, y=10)
 
 openraw_button = ttk.Button(master=frame3, text='Open RAW File', command=select_rawfile, width=15)
 openraw_button.place(x=24, y=10)
+
+rawmaxmin_button = ttk.Button(master=frame3, text='Max./Min. ADU', command=adumaxmin, width=15)
+rawmaxmin_button.place(x=146, y=10)
 
 
 fitentry1 = tk.Entry(master=frame2, justify=CENTER, width=5)
