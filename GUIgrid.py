@@ -174,6 +174,66 @@ def adumaxmin():
     # print(indexmin)
 
 
+def adufromlimit():
+    print(rawselected)
+    path = rawselected
+    rawfile = rawpy.imread(path)
+    print(rawfile.sizes)
+    fromlimit = int(adulimitentry1.get())    # getting user starting and ending point
+    maxvalue = np.amax(rawfile.raw_image_visible)
+    minvalue = np.amin(rawfile.raw_image_visible)
+
+    indexfrom = np.where(rawfile.raw_image_visible > fromlimit)
+
+    xshift = xx - 151 - thumbnailx + 1  # additional + 1 for correct display purposes
+    xfactor = thumbnailx/rawfile.sizes.width
+    yfactor = thumbnaily/rawfile.sizes.height
+
+    if fromlimit <= maxvalue and fromlimit >= minvalue:
+        for i in range (0, len(indexfrom[1])):
+                xxx = int(xfactor*indexfrom[1][i])
+                yyy = int(yfactor*indexfrom[0][i])
+
+                window.create_line(xxx - 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy - 10 + 2, fill='red')
+                window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill='red')
+                window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill='red')
+                window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill='red')
+    else:
+        showinfo(title='Error', message='Invalid limit set')
+    # print(indexmax)
+    # print(indexmin)
+
+
+def aduuptolimit():
+    print(rawselected)
+    path = rawselected
+    rawfile = rawpy.imread(path)
+    print(rawfile.sizes)
+    uptolimit = int(adulimitentry2.get())        # of fitting
+    maxvalue = np.amax(rawfile.raw_image_visible)
+    minvalue = np.amin(rawfile.raw_image_visible)
+
+    indexupto = np.where(rawfile.raw_image_visible < uptolimit)
+
+    xshift = xx - 151 - thumbnailx + 1  # additional + 1 for correct display purposes
+    xfactor = thumbnailx/rawfile.sizes.width
+    yfactor = thumbnaily/rawfile.sizes.height
+
+    if uptolimit >= minvalue and uptolimit <= maxvalue:
+        for i in range(0, len(indexupto[1])):
+                xxx = int(xfactor * indexupto[1][i])
+                yyy = int(yfactor * indexupto[0][i])
+
+                window.create_line(xxx - 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy - 10 + 2, fill='grey')
+                window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill='grey')
+                window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill='grey')
+                window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill='grey')
+    else:
+        showinfo(title='Error', message='Invalid limit set')
+        # print(indexmax)
+        # print(indexmin)
+
+
 def separatenumericalvalues():
     for i in range(0, len(JDstr)):                          # creating numerical data
         JD.append(round(float(JDstr[i][0:15]) % 1, 7))      # julian dates
@@ -270,7 +330,6 @@ openraw_button.place(x=24, y=10)
 rawmaxmin_button = ttk.Button(master=frame3, text='Max./Min. ADU', command=adumaxmin, width=15)
 rawmaxmin_button.place(x=146, y=10)
 
-
 fitentry1 = tk.Entry(master=frame2, justify=CENTER, width=5)
 fitentry1.place(x=26, y=300)
 
@@ -280,10 +339,10 @@ fitentry2.place(x=86, y=300)
 adulimitlabel = tk.Label(master=frame3, text='Show pixels', bg="grey")
 adulimitlabel.place(x=285, y=0)
 
-aduminbutton = ttk.Button(master=frame3, text='From:', command=adumaxmin, width=8)
+aduminbutton = ttk.Button(master=frame3, text='From:', command=adufromlimit, width=8)
 aduminbutton.place(x=260, y=20)
 
-adumaxbutton = ttk.Button(master=frame3, text='Up to:', command=adumaxmin, width=8)
+adumaxbutton = ttk.Button(master=frame3, text='Up to:', command=aduuptolimit, width=8)
 adumaxbutton.place(x=260, y=50)
 
 adulimitentry1 = tk.Entry(master=frame3, justify=CENTER, width=8)
