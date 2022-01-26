@@ -277,6 +277,21 @@ fitentry1.place(x=26, y=300)
 fitentry2 = tk.Entry(master=frame2, justify=CENTER, width=5)
 fitentry2.place(x=86, y=300)
 
+adulimitlabel = tk.Label(master=frame3, text='Show pixels', bg="grey")
+adulimitlabel.place(x=285, y=0)
+
+aduminbutton = ttk.Button(master=frame3, text='From:', command=adumaxmin, width=8)
+aduminbutton.place(x=260, y=20)
+
+adumaxbutton = ttk.Button(master=frame3, text='Up to:', command=adumaxmin, width=8)
+adumaxbutton.place(x=260, y=50)
+
+adulimitentry1 = tk.Entry(master=frame3, justify=CENTER, width=8)
+adulimitentry1.place(x=325, y=23)
+
+adulimitentry2 = tk.Entry(master=frame3, justify=CENTER, width=8)
+adulimitentry2.place(x=325, y=53)
+
 Gaussian = IntVar()
 Lorentzian = IntVar()
 
