@@ -109,9 +109,24 @@ def select_rawfile():
             window.create_text(10, 60, text=f'Color Description:', anchor=tk.W)
             # describes the various color components
             window.create_text(150, 60, text=str(raw.color_desc), anchor=tk.W)
+            if str(raw.color_desc)=="b'RGBG'" and str(raw.raw_pattern.tolist())=='[[0, 1], [3, 2]]':
+                rgbgshift = xx - 151 - thumbnailx - 45
+                window.create_rectangle(rgbgshift,10,
+                                        rgbgshift+20,30, fill='red', outline='')
+                window.create_text(rgbgshift + 10, 20, text='0')
+                window.create_rectangle(rgbgshift+20,10,
+                                        rgbgshift+40,30, fill='green', outline='')
+                window.create_text(rgbgshift + 30, 20, text='1')
+                window.create_rectangle(rgbgshift,30,
+                                        rgbgshift+20,50, fill='green', outline='')
+                window.create_text(rgbgshift + 10, 40, text='3')
+                window.create_rectangle(rgbgshift+20,30,
+                                        rgbgshift+40,50, fill='blue', outline='')
+                window.create_text(rgbgshift + 30, 40, text='2')
+
             window.create_text(10, 80, text=f'RAW Pattern:', anchor=tk.W)
             # decribes the pattern of the Bayer sensor
-            window.create_text(150, 80, text=str(raw.raw_pattern.tolist()), anchor=tk.W)
+            window.create_text(150, 80, text=str(raw.raw_pattern.tolist()), anchor=tk.W) #
             window.create_text(10, 100, text=f'Black Levels:', anchor=tk.W)
             # black level correction
             window.create_text(150, 100, text=str(raw.black_level_per_channel), anchor=tk.W)
