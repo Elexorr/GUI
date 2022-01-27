@@ -84,6 +84,7 @@ def select_rawfile():
                     thumb_rgb.save(filename, 'tiff')
 
             print(thumb_filename)
+            print(raw.sizes)
             snimok = Image.open(thumb_filename)
             global thumbnailx
             global thumbnaily
@@ -94,7 +95,7 @@ def select_rawfile():
             thumbnaily = yy - 150
             thumbnailx = int(ratio * thumbnaily)
 
-            resized = snimok.resize((thumbnailx - 6, thumbnaily - 4))   # additional subtraction -6/-4
+            resized = snimok.resize((thumbnailx - 2, thumbnaily - 1))   # additional subtraction -6/-4
             # for correct display purposes
             img = ImageTk.PhotoImage(resized)
             window.create_image(xx - 151 - thumbnailx/2, thumbnaily/2 + 2, image=img)  #anchor=SW
@@ -140,7 +141,7 @@ def select_rawfile():
                     window.create_text(rgbgshift + 30, 40, text='1')
 
             window.create_text(10, 80, text=f'RAW Pattern:', anchor=tk.W)
-            # decribes the pattern of the Bayer sensor
+            # describes the pattern of the Bayer sensor
             window.create_text(150, 80, text=str(raw.raw_pattern.tolist()), anchor=tk.W) #
             window.create_text(10, 100, text=f'Black Levels:', anchor=tk.W)
             # black level correction
@@ -270,6 +271,54 @@ def aduuptolimit():
         # print(indexmin)
 
 
+def pixelprop():
+    path = rawselected
+    rawfile = rawpy.imread(path)
+    pixr=int(pixelrentry.get())
+    pixc=int(pixelcentry.get())
+    value=rawfile.raw_value_visible(pixr,pixc)
+    if str(rawfile.color_desc) == "b'RGBG'":
+        if str(rawfile.raw_pattern.tolist()) == '[[0, 1], [3, 2]]':
+            if rawfile.raw_colors_visible[pixr][pixc] == 0:
+                pixproplabel = tk.Label(master=frame3, text=value, fg='yellow', bg="red", width=11)
+                pixproplabel.place(x=162, y=52)
+            if rawfile.raw_colors_visible[pixr][pixc] == 1:
+                pixproplabel = tk.Label(master=frame3, text=value, fg='yellow', bg="green", width=11)
+                pixproplabel.place(x=162, y=52)
+            if rawfile.raw_colors_visible[pixr][pixc] == 2:
+                pixproplabel = tk.Label(master=frame3, text=value, fg='yellow', bg="blue", width=11)
+                pixproplabel.place(x=162, y=52)
+            if rawfile.raw_colors_visible[pixr][pixc] == 3:
+                pixproplabel = tk.Label(master=frame3, text=value, fg='yellow', bg="green", width=11)
+                pixproplabel.place(x=162, y=52)
+        if str(rawfile.raw_pattern.tolist()) == '[[3, 2], [0, 1]]':
+            if rawfile.raw_colors_visible[pixr][pixc] == 0:
+                pixproplabel = tk.Label(master=frame3, text=value, fg='yellow', bg="blue", width=11)
+                pixproplabel.place(x=162, y=52)
+            if rawfile.raw_colors_visible[pixr][pixc] == 1:
+                pixproplabel = tk.Label(master=frame3, text=value, fg='yellow', bg="green", width=11)
+                pixproplabel.place(x=162, y=52)
+            if rawfile.raw_colors_visible[pixr][pixc] == 2:
+                pixproplabel = tk.Label(master=frame3, text=value, fg='yellow', bg="blue",  width=11)
+                pixproplabel.place(x=162, y=52)
+            if rawfile.raw_colors_visible[pixr][pixc] == 3:
+                pixproplabel = tk.Label(master=frame3, text=value, fg='yellow', bg="red",  width=11)
+                pixproplabel.place(x=162, y=52)
+    xshift = xx - 151 - thumbnailx + 1  # additional + 1 for correct display purposes
+    xfactor = thumbnailx / rawfile.sizes.width
+    yfactor = thumbnaily / rawfile.sizes.height
+    xxx = int(xfactor * pixc)
+    yyy = int(yfactor * pixr)
+    window.create_line(xxx - 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy - 10 + 2, fill='white')
+    window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill='white')
+    window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill='white')
+    window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill='white')
+    window.create_line(xxx - 7 + xshift, yyy - 7 + 2, xxx + 7 + xshift, yyy - 7 + 2, fill='white')
+    window.create_line(xxx + 7 + xshift, yyy - 7 + 2, xxx + 7 + xshift, yyy + 7 + 2, fill='white')
+    window.create_line(xxx + 7 + xshift, yyy + 7 + 2, xxx - 7 + xshift, yyy + 7 + 2, fill='white')
+    window.create_line(xxx - 7 + xshift, yyy + 7 + 2, xxx - 7 + xshift, yyy - 7 + 2, fill='white')
+
+
 def separatenumericalvalues():
     for i in range(0, len(JDstr)):                          # creating numerical data
         JD.append(round(float(JDstr[i][0:15]) % 1, 7))      # julian dates
@@ -389,6 +438,27 @@ adulimitentry1.place(x=325, y=23)
 
 adulimitentry2 = tk.Entry(master=frame3, justify=CENTER, width=8)
 adulimitentry2.place(x=325, y=53)
+
+pixelrlabel = tk.Label(master=frame3, text='Row', bg="grey")
+pixelrlabel.place(x=30, y=35)
+
+pixelclabel = tk.Label(master=frame3, text='Col.', bg="grey")
+pixelclabel.place(x=78, y=35)
+
+pixelrentry = tk.Entry(master=frame3, justify=CENTER, width=6)
+pixelrentry.place(x=23, y=53)
+
+pixelcentry = tk.Entry(master=frame3, justify=CENTER, width=6)
+pixelcentry.place(x=71, y=53)
+
+pixelpropbutton = ttk.Button(master=frame3, text='>>', command=pixelprop, width=3)
+pixelpropbutton.place(x=122, y=50)
+
+pixpropblacklabel = tk.Label(master=frame3, text='', bg="black", bd=3, width=11)
+pixpropblacklabel.place(x=161, y=51)
+
+pixproplabel = tk.Label(master=frame3, text='', bg="light grey", width=11)
+pixproplabel.place(x=162, y=52)
 
 Gaussian = IntVar()
 Lorentzian = IntVar()
