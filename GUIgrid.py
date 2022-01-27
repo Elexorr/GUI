@@ -133,6 +133,12 @@ def select_rawfile():
     window.mainloop()
 
 
+def selectmultipleraws():
+    filetypes = (('All files', '*.*'), ('RAW files', '*.CR2'))
+    raw_filenames = fd.askopenfilenames(title='Open multiple files', initialdir='/', filetypes=filetypes)
+    print(raw_filenames)
+
+
 def adumaxmin():
     print(rawselected)
     path = rawselected
@@ -326,6 +332,9 @@ open_button.place(x=24, y=10)
 
 openraw_button = ttk.Button(master=frame3, text='Open RAW File', command=select_rawfile, width=15)
 openraw_button.place(x=24, y=10)
+
+openmultiraw_button = ttk.Button(master=frame3, text='Open Multiple RAW', command=selectmultipleraws, width=18)
+openmultiraw_button.place(x=390, y=10)
 
 rawmaxmin_button = ttk.Button(master=frame3, text='Max./Min. ADU', command=adumaxmin, width=15)
 rawmaxmin_button.place(x=146, y=10)
