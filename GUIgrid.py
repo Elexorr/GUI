@@ -151,10 +151,10 @@ def select_rawfile():
             window.create_text(150, 120, text=str(raw.white_level), anchor=tk.W)
             # window.create_text(20, 140, text=f'Color Matrix:                 {raw.color_matrix.tolist()}', anchor=tk.W)
             # camera specific color matrix, usually obtained from a list in rawpy (not from the raw file)
-            window.create_text(10,160, text='Visible area:', anchor=tk.W)
-            window.create_text(150,160, text= str(raw.sizes.height)+' x '+str(raw.sizes.width), anchor=tk.W)
-            window.create_text(10,180, text='Center:', anchor=tk.W)
-            window.create_text(150,180, text= str(raw.sizes.height//2)+' x '+str(raw.sizes.width//2), anchor=tk.W)
+            window.create_text(10,140, text='Visible area:', anchor=tk.W)
+            window.create_text(150,140, text= str(raw.sizes.height)+' x '+str(raw.sizes.width), anchor=tk.W)
+            window.create_text(10,160, text='Center:', anchor=tk.W)
+            window.create_text(150,160, text= str(raw.sizes.height//2)+' x '+str(raw.sizes.width//2), anchor=tk.W)
 
             # window.create_text(20, 160,
             # text=f'XYZ to RGB Conversion Matrix: {raw.rgb_xyz_matrix.tolist()}', anchor=tk.W)
@@ -184,14 +184,16 @@ def adumaxmin():
     minvalue = np.amin(rawfile.raw_image_visible)
     indexmin = np.where(rawfile.raw_image_visible == minvalue)
 
-    window.create_text(10, 160, text=f'Max. Pixel Value:', anchor=tk.W)  # camera white level
-    window.create_text(150, 160, text=maxvalue, anchor=tk.W)
-    window.create_text(10, 180, text=f'Min. Pixel Value:', anchor=tk.W)  # camera white level
-    window.create_text(150, 180, text=minvalue, anchor=tk.W)
+    window.create_text(10, 190, text=f'Max. Pixel Value:', anchor=tk.W)  # camera white level
+    window.create_text(150, 190, text=maxvalue, anchor=tk.W)
+    window.create_text(10, 210, text=f'Min. Pixel Value:', anchor=tk.W)  # camera white level
+    window.create_text(150, 210, text=minvalue, anchor=tk.W)
 
     xshift = xx - 151 - thumbnailx + 1  # additional + 1 for correct display purposes
     xfactor = thumbnailx/rawfile.sizes.width
     yfactor = thumbnaily/rawfile.sizes.height
+
+
 
     for i in range (0, len(indexmax[1])):
             xxx = int(xfactor*indexmax[1][i])
