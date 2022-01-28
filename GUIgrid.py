@@ -149,9 +149,13 @@ def select_rawfile():
             window.create_text(10, 120, text=f'White Level:', anchor=tk.W)
             # camera white level
             window.create_text(150, 120, text=str(raw.white_level), anchor=tk.W)
-            # window.create_text(20, 140,
-            # text=f'Color Matrix:                 {raw.color_matrix.tolist()}', anchor=tk.W)
+            # window.create_text(20, 140, text=f'Color Matrix:                 {raw.color_matrix.tolist()}', anchor=tk.W)
             # camera specific color matrix, usually obtained from a list in rawpy (not from the raw file)
+            window.create_text(10,160, text='Visible area:', anchor=tk.W)
+            window.create_text(150,160, text= str(raw.sizes.height)+' x '+str(raw.sizes.width), anchor=tk.W)
+            window.create_text(10,180, text='Center:', anchor=tk.W)
+            window.create_text(150,180, text= str(raw.sizes.height//2)+' x '+str(raw.sizes.width//2), anchor=tk.W)
+
             # window.create_text(20, 160,
             # text=f'XYZ to RGB Conversion Matrix: {raw.rgb_xyz_matrix.tolist()}', anchor=tk.W)
             # camera specific XYZ to camara RGB conversion matrix
@@ -277,32 +281,41 @@ def pixelprop():
     pixr=int(pixelrentry.get())
     pixc=int(pixelcentry.get())
     value=rawfile.raw_value_visible(pixr,pixc)
+    pixcolorindex=rawfile.raw_colors_visible[pixr][pixc]
     if str(rawfile.color_desc) == "b'RGBG'":
         if str(rawfile.raw_pattern.tolist()) == '[[0, 1], [3, 2]]':
-            if rawfile.raw_colors_visible[pixr][pixc] == 0:
-                pixproplabel = tk.Label(master=frame3, text=value, fg='yellow', bg="red", width=11)
+            if pixcolorindex == 0:
+                pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
+                                        fg='yellow', bg="red", width=11)
                 pixproplabel.place(x=162, y=52)
-            if rawfile.raw_colors_visible[pixr][pixc] == 1:
-                pixproplabel = tk.Label(master=frame3, text=value, fg='yellow', bg="green", width=11)
+            if pixcolorindex == 1:
+                pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
+                                        fg='yellow', bg="green", width=11)
                 pixproplabel.place(x=162, y=52)
-            if rawfile.raw_colors_visible[pixr][pixc] == 2:
-                pixproplabel = tk.Label(master=frame3, text=value, fg='yellow', bg="blue", width=11)
+            if pixcolorindex == 2:
+                pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
+                                        fg='yellow', bg="blue", width=11)
                 pixproplabel.place(x=162, y=52)
-            if rawfile.raw_colors_visible[pixr][pixc] == 3:
-                pixproplabel = tk.Label(master=frame3, text=value, fg='yellow', bg="green", width=11)
+            if pixcolorindex == 3:
+                pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
+                                        fg='yellow', bg="green", width=11)
                 pixproplabel.place(x=162, y=52)
         if str(rawfile.raw_pattern.tolist()) == '[[3, 2], [0, 1]]':
-            if rawfile.raw_colors_visible[pixr][pixc] == 0:
-                pixproplabel = tk.Label(master=frame3, text=value, fg='yellow', bg="blue", width=11)
+            if pixcolorindex == 0:
+                pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
+                                        fg='yellow', bg="blue", width=11)
                 pixproplabel.place(x=162, y=52)
-            if rawfile.raw_colors_visible[pixr][pixc] == 1:
-                pixproplabel = tk.Label(master=frame3, text=value, fg='yellow', bg="green", width=11)
+            if pixcolorindex == 1:
+                pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
+                                        fg='yellow', bg="green", width=11)
                 pixproplabel.place(x=162, y=52)
-            if rawfile.raw_colors_visible[pixr][pixc] == 2:
-                pixproplabel = tk.Label(master=frame3, text=value, fg='yellow', bg="blue",  width=11)
+            if pixcolorindex == 2:
+                pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
+                                        fg='yellow', bg="blue",  width=11)
                 pixproplabel.place(x=162, y=52)
-            if rawfile.raw_colors_visible[pixr][pixc] == 3:
-                pixproplabel = tk.Label(master=frame3, text=value, fg='yellow', bg="red",  width=11)
+            if pixcolorindex == 3:
+                pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
+                                        fg='yellow', bg="red",  width=11)
                 pixproplabel.place(x=162, y=52)
     xshift = xx - 151 - thumbnailx + 1  # additional + 1 for correct display purposes
     xfactor = thumbnailx / rawfile.sizes.width
