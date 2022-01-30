@@ -1,11 +1,13 @@
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
+import exifread
 from tkinter import filedialog as fd
 from tkinter.messagebox import showinfo
 from astropy.modeling import models, fitting
 from astropy.time import Time
 import numpy as np
+from fractions import Fraction
 
 import os
 from io import BytesIO
@@ -28,6 +30,7 @@ error = []      # error list / floats
 x = []
 y = []
 fopened = []
+raw_filenames = []
 
 
 def select_file():
@@ -151,10 +154,12 @@ def select_rawfile():
             window.create_text(150, 120, text=str(raw.white_level), anchor=tk.W)
             # window.create_text(20, 140, text=f'Color Matrix:                 {raw.color_matrix.tolist()}', anchor=tk.W)
             # camera specific color matrix, usually obtained from a list in rawpy (not from the raw file)
-            window.create_text(10,140, text='Visible area:', anchor=tk.W)
-            window.create_text(150,140, text= str(raw.sizes.height)+' x '+str(raw.sizes.width), anchor=tk.W)
-            window.create_text(10,160, text='Center:', anchor=tk.W)
-            window.create_text(150,160, text= str(raw.sizes.height//2)+' x '+str(raw.sizes.width//2), anchor=tk.W)
+            window.create_text(10,140, text='Visible area (in pixels):', anchor=tk.W)
+            window.create_text(150,140, text= str(raw.sizes.height)+' x ' + str(raw.sizes.width), anchor=tk.W)
+            window.create_text(10, 160, text='Coordinates range:', anchor=tk.W)
+            window.create_text(150, 160, text='0-' + str(raw.sizes.height-1) + ', ' + '0-' + str(raw.sizes.width-1), anchor=tk.W)
+            window.create_text(10,180, text='Center coordinates:', anchor=tk.W)
+            window.create_text(150,180, text= str(raw.sizes.height//2-1)+' x '+str(raw.sizes.width//2-1), anchor=tk.W)
 
             # window.create_text(20, 160,
             # text=f'XYZ to RGB Conversion Matrix: {raw.rgb_xyz_matrix.tolist()}', anchor=tk.W)
@@ -173,6 +178,20 @@ def selectmultipleraws():
     raw_filenames = fd.askopenfilenames(title='Open multiple files', initialdir='/', filetypes=filetypes)
     print(raw_filenames)
 
+    for j in range (0,len(raw_filenames)):
+        f = open(raw_filenames[j], 'rb')
+        tags = exifread.process_file(f)
+        data = list(tags.items())
+        an_array = np.array(data)
+        for i in range(0, len(an_array)):
+            if an_array[i][0] == 'EXIF ExposureTime':
+                print(an_array[i][1])
+                time = str(an_array[i][1])
+                # print(float(sum(Fraction(time) for time in time.split())))
+                timetime = float(sum(Fraction(time) for time in time.split()))
+                timetime = round(timetime, 4)
+                print(timetime)
+
 
 def adumaxmin():
     print(rawselected)
@@ -184,16 +203,14 @@ def adumaxmin():
     minvalue = np.amin(rawfile.raw_image_visible)
     indexmin = np.where(rawfile.raw_image_visible == minvalue)
 
-    window.create_text(10, 190, text=f'Max. Pixel Value:', anchor=tk.W)  # camera white level
-    window.create_text(150, 190, text=maxvalue, anchor=tk.W)
-    window.create_text(10, 210, text=f'Min. Pixel Value:', anchor=tk.W)  # camera white level
-    window.create_text(150, 210, text=minvalue, anchor=tk.W)
+    window.create_text(10, 200, text=f'Max. Pixel Value:', anchor=tk.W)  # camera white level
+    window.create_text(150, 200, text=maxvalue, anchor=tk.W)
+    window.create_text(10, 220, text=f'Min. Pixel Value:', anchor=tk.W)  # camera white level
+    window.create_text(150, 220, text=minvalue, anchor=tk.W)
 
     xshift = xx - 151 - thumbnailx + 1  # additional + 1 for correct display purposes
     xfactor = thumbnailx/rawfile.sizes.width
     yfactor = thumbnaily/rawfile.sizes.height
-
-
 
     for i in range (0, len(indexmax[1])):
             xxx = int(xfactor*indexmax[1][i])
@@ -203,7 +220,12 @@ def adumaxmin():
             window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill='yellow')
             window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill='yellow')
             window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill='yellow')
-
+            window.create_text(xxx + xshift, yyy - 20 + 2,
+                               text = str(rawfile.raw_image_visible[indexmax[0][i]][indexmax[1][i]]), fill='white' )
+            window.create_text(xxx + xshift - 25, yyy + 2,
+                               text=str(indexmax[0][i]), fill='yellow')
+            window.create_text(xxx + xshift, yyy + 20 + 2,
+                               text=str(indexmax[1][i]), fill='yellow')
 
     for i in range(0, len(indexmin[1])):
             xxx = int(xfactor * indexmin[1][i])
@@ -332,6 +354,7 @@ def pixelprop():
     window.create_line(xxx + 7 + xshift, yyy - 7 + 2, xxx + 7 + xshift, yyy + 7 + 2, fill='white')
     window.create_line(xxx + 7 + xshift, yyy + 7 + 2, xxx - 7 + xshift, yyy + 7 + 2, fill='white')
     window.create_line(xxx - 7 + xshift, yyy + 7 + 2, xxx - 7 + xshift, yyy - 7 + 2, fill='white')
+    selectsample()
 
 
 def separatenumericalvalues():
@@ -560,6 +583,78 @@ tintblacklabel.place(x=21, y=510)
 
 tintoutput = tk.Label(master=frame2, text=str(tint), bg="light grey", width=14)
 tintoutput.place(x=22, y=511)
+
+def selectsample():
+    path = rawselected
+    rawfile = rawpy.imread(path)
+    pixr=int(pixelrentry.get())
+    pixc=int(pixelcentry.get())
+    samplefield = []
+    samplefield.append(rawfile.raw_image_visible[pixr-3][pixc-3])
+    print(rawfile.raw_image_visible[pixr-3][pixc-3], rawfile.raw_colors_visible[pixr-3][pixc-3])
+    samplefield.append(rawfile.raw_image_visible[pixr-3][pixc-1])
+    print(rawfile.raw_image_visible[pixr-3][pixc-1], rawfile.raw_colors_visible[pixr-3][pixc-1])
+    samplefield.append(rawfile.raw_image_visible[pixr-3][pixc+1])
+    print(rawfile.raw_image_visible[pixr-3][pixc+1], rawfile.raw_colors_visible[pixr-3][pixc+1])
+    samplefield.append(rawfile.raw_image_visible[pixr-3][pixc+3])
+    print(rawfile.raw_image_visible[pixr-3][pixc+3], rawfile.raw_colors_visible[pixr-3][pixc+3])
+
+    samplefield.append(rawfile.raw_image_visible[pixr-2][pixc-2])
+    print(rawfile.raw_image_visible[pixr-2][pixc-2], rawfile.raw_colors_visible[pixr-2][pixc-2])
+    samplefield.append(rawfile.raw_image_visible[pixr-2][pixc])
+    print(rawfile.raw_image_visible[pixr-2][pixc], rawfile.raw_colors_visible[pixr-2][pixc])
+    samplefield.append(rawfile.raw_image_visible[pixr-2][pixc+2])
+    print(rawfile.raw_image_visible[pixr-2][pixc+2], rawfile.raw_colors_visible[pixr-2][pixc+2])
+
+    samplefield.append(rawfile.raw_image_visible[pixr-1][pixc-3])
+    print(rawfile.raw_image_visible[pixr-1][pixc-3], rawfile.raw_colors_visible[pixr-1][pixc-3])
+    samplefield.append(rawfile.raw_image_visible[pixr-1][pixc-1])
+    print(rawfile.raw_image_visible[pixr-1][pixc-1], rawfile.raw_colors_visible[pixr-1][pixc-1])
+    samplefield.append(rawfile.raw_image_visible[pixr-1][pixc+1])
+    print(rawfile.raw_image_visible[pixr-1][pixc+1], rawfile.raw_colors_visible[pixr-1][pixc+1])
+    samplefield.append(rawfile.raw_image_visible[pixr-1][pixc+3])
+    print(rawfile.raw_image_visible[pixr-1][pixc+3], rawfile.raw_colors_visible[pixr-1][pixc+3])
+
+    samplefield.append(rawfile.raw_image_visible[pixr][pixc-2])
+    print(rawfile.raw_image_visible[pixr][pixc-2], rawfile.raw_colors_visible[pixr][pixc-2])
+    samplefield.append(rawfile.raw_image_visible[pixr][pixc])
+    print(rawfile.raw_image_visible[pixr][pixc], rawfile.raw_colors_visible[pixr][pixc])
+    samplefield.append(rawfile.raw_image_visible[pixr][pixc+2])
+    print(rawfile.raw_image_visible[pixr][pixc+2], rawfile.raw_colors_visible[pixr][pixc+2])
+
+    samplefield.append(rawfile.raw_image_visible[pixr+1][pixc-3])
+    print(rawfile.raw_image_visible[pixr+1][pixc-3], rawfile.raw_colors_visible[pixr+1][pixc-3])
+    samplefield.append(rawfile.raw_image_visible[pixr+1][pixc-1])
+    print(rawfile.raw_image_visible[pixr+1][pixc-1], rawfile.raw_colors_visible[pixr+1][pixc-1])
+    samplefield.append(rawfile.raw_image_visible[pixr+1][pixc+1])
+    print(rawfile.raw_image_visible[pixr+1][pixc+1], rawfile.raw_colors_visible[pixr+1][pixc+1])
+    samplefield.append(rawfile.raw_image_visible[pixr+1][pixc+3])
+    print(rawfile.raw_image_visible[pixr+1][pixc+3], rawfile.raw_colors_visible[pixr+1][pixc+3])
+
+    samplefield.append(rawfile.raw_image_visible[pixr+2][pixc-2])
+    print(rawfile.raw_image_visible[pixr+2][pixc-2], rawfile.raw_colors_visible[pixr+2][pixc-2])
+    samplefield.append(rawfile.raw_image_visible[pixr+2][pixc])
+    print(rawfile.raw_image_visible[pixr+2][pixc], rawfile.raw_colors_visible[pixr+2][pixc])
+    samplefield.append(rawfile.raw_image_visible[pixr+2][pixc+2])
+    print(rawfile.raw_image_visible[pixr+2][pixc+2], rawfile.raw_colors_visible[pixr+2][pixc+2])
+
+    samplefield.append(rawfile.raw_image_visible[pixr+3][pixc-3])
+    print(rawfile.raw_image_visible[pixr+3][pixc-3], rawfile.raw_colors_visible[pixr+3][pixc-3])
+    samplefield.append(rawfile.raw_image_visible[pixr+3][pixc-1])
+    print(rawfile.raw_image_visible[pixr+3][pixc-1], rawfile.raw_colors_visible[pixr+3][pixc-1])
+    samplefield.append(rawfile.raw_image_visible[pixr+3][pixc+1])
+    print(rawfile.raw_image_visible[pixr+3][pixc+1], rawfile.raw_colors_visible[pixr+3][pixc+1])
+    samplefield.append(rawfile.raw_image_visible[pixr+3][pixc+3])
+    print(rawfile.raw_image_visible[pixr+3][pixc+3], rawfile.raw_colors_visible[pixr+3][pixc+3])
+    samplemaxvalue = np.amax(samplefield)
+    sampleminvalue = np.amin(samplefield)
+    samplerange = samplemaxvalue+sampleminvalue
+    shiftx = xx - 403 - thumbnailx
+    shifty = yy - 151
+    window.create_rectangle(shiftx,shifty,shiftx+250,shifty-200, fill='white', outline='black')
+    for i in range(0, len(samplefield)):
+        columnscale = samplefield[i]/samplerange
+        window.create_rectangle(shiftx+10*i, shifty, shiftx+10+10*i, shifty-int(columnscale*200), fill = "orange", tags="column")
 
 
 def clearwindow():
