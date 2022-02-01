@@ -30,8 +30,8 @@ error = []      # error list / floats
 x = []
 y = []
 fopened = []
-# raw_filenames = []
 linearity = [[],[]]
+mrawopen = []
 
 
 def select_file():
@@ -62,8 +62,9 @@ def select_file():
 def select_rawfile():
     if fopened != []:
         clearwindow()
-    filetypes = (('All files', '*.*'), ('RAW files', '*.CR2'))
-    raw_filename = fd.askopenfilename(title='Open a file', initialdir='/', filetypes=filetypes)
+    # filetypes = (('All files', '*.*'), ('RAW files', '*.CR2'))
+    raw_filename = fd.askopenfilename(title='Open a file', initialdir='/', filetypes=[('RAW files', '*.CRW *.CR2 *CR3 *.NEF *.ARW')])
+    window.delete("all")
     global rawselected
     rawselected = raw_filename
     print(raw_filename)
@@ -175,82 +176,88 @@ def select_rawfile():
 
 
 def selectmultipleraws():
-    filetypes = (('All files', '*.*'), ('RAW files', '*.CR2'))
+    filetypes = ('RAW files', '*.CRW *.CR2 *CR3 *.NEF *.ARW')
     global raw_filenames
-    raw_filenames = fd.askopenfilenames(title='Open multiple files', initialdir='/', filetypes=filetypes)
+    # raw_filenames = fd.askopenfilenames(title='Open multiple files', initialdir='/', filetypes=filetypes)
+    raw_filenames = fd.askopenfilenames(title='Open multiple files', initialdir='/', filetypes=[('RAW files', '*.CRW *.CR2 *CR3 *.NEF *.ARW')])
     print(raw_filenames)
+    mrawopen.append('1')
+
 
 def checklinearity():
-    print(raw_filenames)
+    print(mrawopen)
     window.delete("all")
-    for j in range (0,len(raw_filenames)):
-        f = open(raw_filenames[j], 'rb')
-        tags = exifread.process_file(f)
-        data = list(tags.items())
-        an_array = np.array(data)
-        pixr = int(pixelrentry.get())
-        pixc = int(pixelcentry.get())
+    if mrawopen == []:
+        showinfo(title='Error', message='No Multiple RAW to Check')
+    elif pixelrentry.get() == '' or pixelcentry.get() == '':
+        showinfo(title='Error', message='No Pixel Coordinates to Check')
+    else:
+        for j in range (0,len(raw_filenames)):
+            f = open(raw_filenames[j], 'rb')
+            tags = exifread.process_file(f)
+            f.close()
+            data = list(tags.items())
+            an_array = np.array(data)
+            pixr = int(pixelrentry.get())
+            pixc = int(pixelcentry.get())
 
-        samplefield = []
+            samplefield = []
 
-        with rawpy.imread(raw_filenames[j]) as raw:
-            samplefield.append(raw.raw_image_visible[pixr - 3][pixc - 3])
-            samplefield.append(raw.raw_image_visible[pixr - 3][pixc - 1])
-            samplefield.append(raw.raw_image_visible[pixr - 3][pixc + 1])
-            samplefield.append(raw.raw_image_visible[pixr - 3][pixc + 3])
-            samplefield.append(raw.raw_image_visible[pixr - 2][pixc - 2])
-            samplefield.append(raw.raw_image_visible[pixr - 2][pixc])
-            samplefield.append(raw.raw_image_visible[pixr - 2][pixc + 2])
-            samplefield.append(raw.raw_image_visible[pixr - 1][pixc - 3])
-            samplefield.append(raw.raw_image_visible[pixr - 1][pixc - 1])
-            samplefield.append(raw.raw_image_visible[pixr - 1][pixc + 1])
-            samplefield.append(raw.raw_image_visible[pixr - 1][pixc + 3])
-            samplefield.append(raw.raw_image_visible[pixr][pixc - 2])
-            samplefield.append(raw.raw_image_visible[pixr][pixc])
-            samplefield.append(raw.raw_image_visible[pixr][pixc + 2])
-            samplefield.append(raw.raw_image_visible[pixr + 1][pixc - 3])
-            samplefield.append(raw.raw_image_visible[pixr + 1][pixc - 1])
-            samplefield.append(raw.raw_image_visible[pixr + 1][pixc + 1])
-            samplefield.append(raw.raw_image_visible[pixr + 1][pixc + 3])
-            samplefield.append(raw.raw_image_visible[pixr + 2][pixc - 2])
-            samplefield.append(raw.raw_image_visible[pixr + 2][pixc])
-            samplefield.append(raw.raw_image_visible[pixr + 2][pixc + 2])
-            samplefield.append(raw.raw_image_visible[pixr + 3][pixc - 3])
-            samplefield.append(raw.raw_image_visible[pixr + 3][pixc - 1])
-            samplefield.append(raw.raw_image_visible[pixr + 3][pixc + 1])
-            samplefield.append(raw.raw_image_visible[pixr + 3][pixc + 3])
+            with rawpy.imread(raw_filenames[j]) as raw:
+                samplefield.append(raw.raw_image_visible[pixr - 3][pixc - 3])
+                samplefield.append(raw.raw_image_visible[pixr - 3][pixc - 1])
+                samplefield.append(raw.raw_image_visible[pixr - 3][pixc + 1])
+                samplefield.append(raw.raw_image_visible[pixr - 3][pixc + 3])
+                samplefield.append(raw.raw_image_visible[pixr - 2][pixc - 2])
+                samplefield.append(raw.raw_image_visible[pixr - 2][pixc])
+                samplefield.append(raw.raw_image_visible[pixr - 2][pixc + 2])
+                samplefield.append(raw.raw_image_visible[pixr - 1][pixc - 3])
+                samplefield.append(raw.raw_image_visible[pixr - 1][pixc - 1])
+                samplefield.append(raw.raw_image_visible[pixr - 1][pixc + 1])
+                samplefield.append(raw.raw_image_visible[pixr - 1][pixc + 3])
+                samplefield.append(raw.raw_image_visible[pixr][pixc - 2])
+                samplefield.append(raw.raw_image_visible[pixr][pixc])
+                samplefield.append(raw.raw_image_visible[pixr][pixc + 2])
+                samplefield.append(raw.raw_image_visible[pixr + 1][pixc - 3])
+                samplefield.append(raw.raw_image_visible[pixr + 1][pixc - 1])
+                samplefield.append(raw.raw_image_visible[pixr + 1][pixc + 1])
+                samplefield.append(raw.raw_image_visible[pixr + 1][pixc + 3])
+                samplefield.append(raw.raw_image_visible[pixr + 2][pixc - 2])
+                samplefield.append(raw.raw_image_visible[pixr + 2][pixc])
+                samplefield.append(raw.raw_image_visible[pixr + 2][pixc + 2])
+                samplefield.append(raw.raw_image_visible[pixr + 3][pixc - 3])
+                samplefield.append(raw.raw_image_visible[pixr + 3][pixc - 1])
+                samplefield.append(raw.raw_image_visible[pixr + 3][pixc + 1])
+                samplefield.append(raw.raw_image_visible[pixr + 3][pixc + 3])
 
-        for i in range(0, len(an_array)-1):
-            if an_array[i][0] == 'EXIF ExposureTime':
-                # print(an_array[i][1])
-                time = str(an_array[i][1])
-                # print(float(sum(Fraction(time) for time in time.split())))
-                timetime = float(sum(Fraction(time) for time in time.split()))
-                timetime = round(timetime, 4)
+            for i in range(0, len(an_array) - 1):
+                if an_array[i][0] == 'EXIF ExposureTime':
+                    # print(an_array[i][1])
+                    time = str(an_array[i][1])
+                    # print(float(sum(Fraction(time) for time in time.split())))
+                    timetime = float(sum(Fraction(time) for time in time.split()))
+                    timetime = round(timetime, 4)
 
-        # print(timetime, np.mean(samplefield))
-        # linearity.append[timetime][np.mean(samplefield)]
-        linearity[0].append(timetime)
-        linearity[1].append(np.mean(samplefield))
-        samplefield.clear()
-        raw.close
-    print(linearity)
-    maxtime = np.amax(linearity[0])
-    maxadu = np.amax(linearity[1])
-    minadu = np.amin(linearity[1])
-    aduscale = (yy-210)/(minadu+maxadu)
-    timescale = (xx-150)/(maxtime*1.05)
-    print(maxtime, maxadu, minadu)
-    window.create_rectangle(80, 0, xx - 150, yy - 210)
-    for i in range (0,len(linearity[0])-1):
-        timeshift=int(float(linearity[0][i])*timescale)
-        adushift=int(float(linearity[1][i])*aduscale)
-
-        # print(linearity[0][i], linearity[1][i])
-
-        print(timeshift,adushift)
-        window.create_rectangle(80+timeshift-2, yy-210-adushift-2,
-                                80+timeshift+2, yy-210-adushift+2, fill='blue')
+            # print(timetime, np.mean(samplefield))
+            # linearity.append[timetime][np.mean(samplefield)]
+            linearity[0].append(timetime)
+            linearity[1].append(np.mean(samplefield))
+            samplefield.clear()
+            # raw.close
+        # print(linearity)
+        maxtime = np.amax(linearity[0])
+        maxadu = np.amax(linearity[1])
+        minadu = np.amin(linearity[1])
+        aduscale = (yy-210)/(minadu+maxadu)
+        timescale = (xx-150)/(maxtime*1.05)
+        # print(maxtime, maxadu, minadu)
+        window.create_rectangle(80, 0, xx - 150, yy - 210)
+        for i in range (0,len(linearity[0])-1):
+            timeshift=int(float(linearity[0][i])*timescale)
+            adushift=int(float(linearity[1][i])*aduscale)
+            # print(timeshift,adushift)
+            window.create_rectangle(80+timeshift-2, yy-210-adushift-2,
+                                    80+timeshift+2, yy-210-adushift+2, fill='blue')
 
 
 def adumaxmin():
