@@ -265,7 +265,7 @@ def checklinearity():
 
 def adumaxmin():
     if rawopen == []:
-        showinfo(title='Error', message='No RAW File Opened to Check')
+        showinfo(title='Error', message='No RAW File to Check')
     else:
         print(rawselected)
         path = rawselected
@@ -320,12 +320,15 @@ def adumaxmin():
 
 def adufromlimit():
     if rawopen == []:
-        showinfo(title='Error', message='No RAW File Opened to Check')
+        showinfo(title='Error', message='No RAW File to Check')
+    elif adulimitentry1.get() == '':
+        showinfo(title='Error', message='No Limit Set')
     else:
         print(rawselected)
         path = rawselected
         rawfile = rawpy.imread(path)
         print(rawfile.sizes)
+
         fromlimit = int(adulimitentry1.get())    # getting user starting and ending point
         maxvalue = np.amax(rawfile.raw_image_visible)
         minvalue = np.amin(rawfile.raw_image_visible)
@@ -353,7 +356,9 @@ def adufromlimit():
 
 def aduuptolimit():
     if rawopen == []:
-        showinfo(title='Error', message='No RAW File Opened to Check')
+        showinfo(title='Error', message='No RAW File to Check')
+    elif adulimitentry2.get() == '':
+        showinfo(title='Error', message='No Limit Set')
     else:
         print(rawselected)
         path = rawselected
@@ -385,61 +390,64 @@ def aduuptolimit():
 
 
 def pixelprop():
-    path = rawselected
-    rawfile = rawpy.imread(path)
-    pixr=int(pixelrentry.get())
-    pixc=int(pixelcentry.get())
-    value=rawfile.raw_value_visible(pixr,pixc)
-    pixcolorindex=rawfile.raw_colors_visible[pixr][pixc]
-    if str(rawfile.color_desc) == "b'RGBG'":
-        if str(rawfile.raw_pattern.tolist()) == '[[0, 1], [3, 2]]':
-            if pixcolorindex == 0:
-                pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
-                                        fg='yellow', bg="red", width=11)
-                pixproplabel.place(x=411, y=22)
-            if pixcolorindex == 1:
-                pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
-                                        fg='yellow', bg="green", width=11)
-                pixproplabel.place(x=411, y=22)
-            if pixcolorindex == 2:
-                pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
-                                        fg='yellow', bg="blue", width=11)
-                pixproplabel.place(x=411, y=22)
-            if pixcolorindex == 3:
-                pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
-                                        fg='yellow', bg="green", width=11)
-                pixproplabel.place(x=411, y=22)
-        if str(rawfile.raw_pattern.tolist()) == '[[3, 2], [0, 1]]':
-            if pixcolorindex == 0:
-                pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
-                                        fg='yellow', bg="blue", width=11)
-                pixproplabel.place(x=411, y=22)
-            if pixcolorindex == 1:
-                pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
-                                        fg='yellow', bg="green", width=11)
-                pixproplabel.place(x=411, y=22)
-            if pixcolorindex == 2:
-                pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
-                                        fg='yellow', bg="blue",  width=11)
-                pixproplabel.place(x=411, y=22)
-            if pixcolorindex == 3:
-                pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
-                                        fg='yellow', bg="red",  width=11)
-                pixproplabel.place(x=411, y=22)
-    xshift = xx - 151 - thumbnailx + 1  # additional + 1 for correct display purposes
-    xfactor = thumbnailx / rawfile.sizes.width
-    yfactor = thumbnaily / rawfile.sizes.height
-    xxx = int(xfactor * pixc)
-    yyy = int(yfactor * pixr)
-    window.create_line(xxx - 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy - 10 + 2, fill='white')
-    window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill='white')
-    window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill='white')
-    window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill='white')
-    window.create_line(xxx - 7 + xshift, yyy - 7 + 2, xxx + 7 + xshift, yyy - 7 + 2, fill='white')
-    window.create_line(xxx + 7 + xshift, yyy - 7 + 2, xxx + 7 + xshift, yyy + 7 + 2, fill='white')
-    window.create_line(xxx + 7 + xshift, yyy + 7 + 2, xxx - 7 + xshift, yyy + 7 + 2, fill='white')
-    window.create_line(xxx - 7 + xshift, yyy + 7 + 2, xxx - 7 + xshift, yyy - 7 + 2, fill='white')
-    selectsample()
+    if pixelrentry.get() == '' or pixelcentry.get() == '':
+        showinfo(title='Error', message='No Pixel Coordinates to Check')
+    else:
+        path = rawselected
+        rawfile = rawpy.imread(path)
+        pixr=int(pixelrentry.get())
+        pixc=int(pixelcentry.get())
+        value=rawfile.raw_value_visible(pixr,pixc)
+        pixcolorindex=rawfile.raw_colors_visible[pixr][pixc]
+        if str(rawfile.color_desc) == "b'RGBG'":
+            if str(rawfile.raw_pattern.tolist()) == '[[0, 1], [3, 2]]':
+                if pixcolorindex == 0:
+                    pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
+                                            fg='yellow', bg="red", width=11)
+                    pixproplabel.place(x=411, y=22)
+                if pixcolorindex == 1:
+                    pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
+                                            fg='yellow', bg="green", width=11)
+                    pixproplabel.place(x=411, y=22)
+                if pixcolorindex == 2:
+                    pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
+                                            fg='yellow', bg="blue", width=11)
+                    pixproplabel.place(x=411, y=22)
+                if pixcolorindex == 3:
+                    pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
+                                            fg='yellow', bg="green", width=11)
+                    pixproplabel.place(x=411, y=22)
+            if str(rawfile.raw_pattern.tolist()) == '[[3, 2], [0, 1]]':
+                if pixcolorindex == 0:
+                    pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
+                                            fg='yellow', bg="blue", width=11)
+                    pixproplabel.place(x=411, y=22)
+                if pixcolorindex == 1:
+                    pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
+                                            fg='yellow', bg="green", width=11)
+                    pixproplabel.place(x=411, y=22)
+                if pixcolorindex == 2:
+                    pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
+                                            fg='yellow', bg="blue",  width=11)
+                    pixproplabel.place(x=411, y=22)
+                if pixcolorindex == 3:
+                    pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
+                                            fg='yellow', bg="red",  width=11)
+                    pixproplabel.place(x=411, y=22)
+        xshift = xx - 151 - thumbnailx + 1  # additional + 1 for correct display purposes
+        xfactor = thumbnailx / rawfile.sizes.width
+        yfactor = thumbnaily / rawfile.sizes.height
+        xxx = int(xfactor * pixc)
+        yyy = int(yfactor * pixr)
+        window.create_line(xxx - 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy - 10 + 2, fill='white')
+        window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill='white')
+        window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill='white')
+        window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill='white')
+        window.create_line(xxx - 7 + xshift, yyy - 7 + 2, xxx + 7 + xshift, yyy - 7 + 2, fill='white')
+        window.create_line(xxx + 7 + xshift, yyy - 7 + 2, xxx + 7 + xshift, yyy + 7 + 2, fill='white')
+        window.create_line(xxx + 7 + xshift, yyy + 7 + 2, xxx - 7 + xshift, yyy + 7 + 2, fill='white')
+        window.create_line(xxx - 7 + xshift, yyy + 7 + 2, xxx - 7 + xshift, yyy - 7 + 2, fill='white')
+        selectsample()
 
 
 def separatenumericalvalues():
