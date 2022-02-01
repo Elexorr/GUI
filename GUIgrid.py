@@ -29,8 +29,9 @@ mag = []        # mag list / floats
 error = []      # error list / floats
 x = []
 y = []
-fopened = []
 linearity = [[],[]]
+fopened = []
+rawopen = []
 mrawopen = []
 
 
@@ -68,6 +69,7 @@ def select_rawfile():
     global rawselected
     rawselected = raw_filename
     print(raw_filename)
+    rawopen.append('1')
     filename, _ = os.path.splitext(raw_filename)
     with rawpy.imread(raw_filename) as raw:
         try:
@@ -179,9 +181,11 @@ def selectmultipleraws():
     filetypes = ('RAW files', '*.CRW *.CR2 *CR3 *.NEF *.ARW')
     global raw_filenames
     # raw_filenames = fd.askopenfilenames(title='Open multiple files', initialdir='/', filetypes=filetypes)
-    raw_filenames = fd.askopenfilenames(title='Open multiple files', initialdir='/', filetypes=[('RAW files', '*.CRW *.CR2 *CR3 *.NEF *.ARW')])
+    raw_filenames = fd.askopenfilenames(title='Open Multiple RAW', initialdir='/', filetypes=[('RAW files', '*.CRW *.CR2 *CR3 *.NEF *.ARW')])
     print(raw_filenames)
-    mrawopen.append('1')
+    if len(raw_filenames) > 1:
+        mrawopen.append('1')
+        showinfo(title='Open Multiple RAW', message= str(len(raw_filenames)) + ' RAW Files Opened')
 
 
 def checklinearity():
@@ -229,7 +233,6 @@ def checklinearity():
                 samplefield.append(raw.raw_image_visible[pixr + 3][pixc - 1])
                 samplefield.append(raw.raw_image_visible[pixr + 3][pixc + 1])
                 samplefield.append(raw.raw_image_visible[pixr + 3][pixc + 3])
-
             for i in range(0, len(an_array) - 1):
                 if an_array[i][0] == 'EXIF ExposureTime':
                     # print(an_array[i][1])
@@ -261,109 +264,124 @@ def checklinearity():
 
 
 def adumaxmin():
-    print(rawselected)
-    path = rawselected
-    rawfile = rawpy.imread(path)
-    print(rawfile.sizes)
-    maxvalue = np.amax(rawfile.raw_image_visible)
-    indexmax = np.where(rawfile.raw_image_visible == maxvalue)
-    minvalue = np.amin(rawfile.raw_image_visible)
-    indexmin = np.where(rawfile.raw_image_visible == minvalue)
+    if rawopen == []:
+        showinfo(title='Error', message='No RAW File Opened to Check')
+    else:
+        print(rawselected)
+        path = rawselected
+        rawfile = rawpy.imread(path)
+        print(rawfile.sizes)
+        maxvalue = np.amax(rawfile.raw_image_visible)
+        indexmax = np.where(rawfile.raw_image_visible == maxvalue)
+        minvalue = np.amin(rawfile.raw_image_visible)
+        indexmin = np.where(rawfile.raw_image_visible == minvalue)
 
-    window.create_text(10, 200, text=f'Max. Pixel Value:', anchor=tk.W)  # camera white level
-    window.create_text(150, 200, text=maxvalue, anchor=tk.W)
-    window.create_text(10, 220, text=f'Min. Pixel Value:', anchor=tk.W)  # camera white level
-    window.create_text(150, 220, text=minvalue, anchor=tk.W)
+        window.create_text(10, 200, text=f'Max. Pixel Value:', anchor=tk.W)  # camera white level
+        window.create_text(150, 200, text=maxvalue, anchor=tk.W)
+        window.create_text(10, 220, text=f'Min. Pixel Value:', anchor=tk.W)  # camera white level
+        window.create_text(150, 220, text=minvalue, anchor=tk.W)
 
-    xshift = xx - 151 - thumbnailx + 1  # additional + 1 for correct display purposes
-    xfactor = thumbnailx/rawfile.sizes.width
-    yfactor = thumbnaily/rawfile.sizes.height
+        xshift = xx - 151 - thumbnailx + 1  # additional + 1 for correct display purposes
+        xfactor = thumbnailx/rawfile.sizes.width
+        yfactor = thumbnaily/rawfile.sizes.height
 
-    for i in range (0, len(indexmax[1])):
-            xxx = int(xfactor*indexmax[1][i])
-            yyy = int(yfactor*indexmax[0][i])
+        for i in range (0, len(indexmax[1])):
+                xxx = int(xfactor*indexmax[1][i])
+                yyy = int(yfactor*indexmax[0][i])
 
-            window.create_line(xxx - 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy - 10 + 2, fill='yellow')
-            window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill='yellow')
-            window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill='yellow')
-            window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill='yellow')
-            window.create_text(xxx + xshift, yyy - 20 + 2,
-                               text = str(rawfile.raw_image_visible[indexmax[0][i]][indexmax[1][i]]), fill='white' )
-            window.create_text(xxx + xshift - 25, yyy + 2,
-                               text=str(indexmax[0][i]), fill='yellow')
-            window.create_text(xxx + xshift, yyy + 20 + 2,
-                               text=str(indexmax[1][i]), fill='yellow')
+                window.create_line(xxx - 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy - 10 + 2, fill='yellow')
+                window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill='yellow')
+                window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill='yellow')
+                window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill='yellow')
+                window.create_text(xxx + xshift, yyy - 20 + 2,
+                                   text = str(rawfile.raw_image_visible[indexmax[0][i]][indexmax[1][i]]), fill='white' )
+                window.create_text(xxx + xshift - 25, yyy + 2,
+                                   text=str(indexmax[0][i]), fill='yellow')
+                window.create_text(xxx + xshift, yyy + 20 + 2,
+                                   text=str(indexmax[1][i]), fill='yellow')
 
-    for i in range(0, len(indexmin[1])):
-            xxx = int(xfactor * indexmin[1][i])
-            yyy = int(yfactor * indexmin[0][i])
+        for i in range(0, len(indexmin[1])):
+                xxx = int(xfactor * indexmin[1][i])
+                yyy = int(yfactor * indexmin[0][i])
 
-            window.create_line(xxx - 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy - 10 + 2, fill='brown')
-            window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill='brown')
-            window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill='brown')
-            window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill='brown')
-    # print(indexmax)
-    # print(indexmin)
+                window.create_line(xxx - 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy - 10 + 2, fill='brown')
+                window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill='brown')
+                window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill='brown')
+                window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill='brown')
+                window.create_text(xxx + xshift, yyy - 20 + 2,
+                                   text=str(rawfile.raw_image_visible[indexmin[0][i]][indexmin[1][i]]), fill='white')
+                window.create_text(xxx + xshift - 25, yyy + 2,
+                                   text=str(indexmin[0][i]), fill='brown')
+                window.create_text(xxx + xshift, yyy + 20 + 2,
+                                   text=str(indexmin[1][i]), fill='brown')
+        # print(indexmax)
+        # print(indexmin)
 
 
 def adufromlimit():
-    print(rawselected)
-    path = rawselected
-    rawfile = rawpy.imread(path)
-    print(rawfile.sizes)
-    fromlimit = int(adulimitentry1.get())    # getting user starting and ending point
-    maxvalue = np.amax(rawfile.raw_image_visible)
-    minvalue = np.amin(rawfile.raw_image_visible)
-
-    indexfrom = np.where(rawfile.raw_image_visible > fromlimit)
-
-    xshift = xx - 151 - thumbnailx + 1  # additional + 1 for correct display purposes
-    xfactor = thumbnailx/rawfile.sizes.width
-    yfactor = thumbnaily/rawfile.sizes.height
-
-    if fromlimit <= maxvalue and fromlimit >= minvalue:
-        for i in range (0, len(indexfrom[1])):
-                xxx = int(xfactor*indexfrom[1][i])
-                yyy = int(yfactor*indexfrom[0][i])
-
-                window.create_line(xxx - 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy - 10 + 2, fill='red')
-                window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill='red')
-                window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill='red')
-                window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill='red')
+    if rawopen == []:
+        showinfo(title='Error', message='No RAW File Opened to Check')
     else:
-        showinfo(title='Error', message='Invalid limit set')
-    # print(indexmax)
-    # print(indexmin)
+        print(rawselected)
+        path = rawselected
+        rawfile = rawpy.imread(path)
+        print(rawfile.sizes)
+        fromlimit = int(adulimitentry1.get())    # getting user starting and ending point
+        maxvalue = np.amax(rawfile.raw_image_visible)
+        minvalue = np.amin(rawfile.raw_image_visible)
+
+        indexfrom = np.where(rawfile.raw_image_visible > fromlimit)
+
+        xshift = xx - 151 - thumbnailx + 1  # additional + 1 for correct display purposes
+        xfactor = thumbnailx/rawfile.sizes.width
+        yfactor = thumbnaily/rawfile.sizes.height
+
+        if fromlimit <= maxvalue and fromlimit >= minvalue:
+            for i in range (0, len(indexfrom[1])):
+                    xxx = int(xfactor*indexfrom[1][i])
+                    yyy = int(yfactor*indexfrom[0][i])
+
+                    window.create_line(xxx - 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy - 10 + 2, fill='red')
+                    window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill='red')
+                    window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill='red')
+                    window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill='red')
+        else:
+            showinfo(title='Error', message='Invalid limit set')
+        # print(indexmax)
+        # print(indexmin)
 
 
 def aduuptolimit():
-    print(rawselected)
-    path = rawselected
-    rawfile = rawpy.imread(path)
-    print(rawfile.sizes)
-    uptolimit = int(adulimitentry2.get())        # of fitting
-    maxvalue = np.amax(rawfile.raw_image_visible)
-    minvalue = np.amin(rawfile.raw_image_visible)
-
-    indexupto = np.where(rawfile.raw_image_visible < uptolimit)
-
-    xshift = xx - 151 - thumbnailx + 1  # additional + 1 for correct display purposes
-    xfactor = thumbnailx/rawfile.sizes.width
-    yfactor = thumbnaily/rawfile.sizes.height
-
-    if uptolimit >= minvalue and uptolimit <= maxvalue:
-        for i in range(0, len(indexupto[1])):
-                xxx = int(xfactor * indexupto[1][i])
-                yyy = int(yfactor * indexupto[0][i])
-
-                window.create_line(xxx - 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy - 10 + 2, fill='grey')
-                window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill='grey')
-                window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill='grey')
-                window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill='grey')
+    if rawopen == []:
+        showinfo(title='Error', message='No RAW File Opened to Check')
     else:
-        showinfo(title='Error', message='Invalid limit set')
-        # print(indexmax)
-        # print(indexmin)
+        print(rawselected)
+        path = rawselected
+        rawfile = rawpy.imread(path)
+        print(rawfile.sizes)
+        uptolimit = int(adulimitentry2.get())        # of fitting
+        maxvalue = np.amax(rawfile.raw_image_visible)
+        minvalue = np.amin(rawfile.raw_image_visible)
+
+        indexupto = np.where(rawfile.raw_image_visible < uptolimit)
+
+        xshift = xx - 151 - thumbnailx + 1  # additional + 1 for correct display purposes
+        xfactor = thumbnailx/rawfile.sizes.width
+        yfactor = thumbnaily/rawfile.sizes.height
+
+        if uptolimit >= minvalue and uptolimit <= maxvalue:
+            for i in range(0, len(indexupto[1])):
+                    xxx = int(xfactor * indexupto[1][i])
+                    yyy = int(yfactor * indexupto[0][i])
+
+                    window.create_line(xxx - 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy - 10 + 2, fill='grey')
+                    window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill='grey')
+                    window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill='grey')
+                    window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill='grey')
+        else:
+            showinfo(title='Error', message='Invalid Limit Set')
+            # print(indexmax)
+            # print(indexmin)
 
 
 def pixelprop():
@@ -378,36 +396,36 @@ def pixelprop():
             if pixcolorindex == 0:
                 pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
                                         fg='yellow', bg="red", width=11)
-                pixproplabel.place(x=162, y=52)
+                pixproplabel.place(x=411, y=22)
             if pixcolorindex == 1:
                 pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
                                         fg='yellow', bg="green", width=11)
-                pixproplabel.place(x=162, y=52)
+                pixproplabel.place(x=411, y=22)
             if pixcolorindex == 2:
                 pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
                                         fg='yellow', bg="blue", width=11)
-                pixproplabel.place(x=162, y=52)
+                pixproplabel.place(x=411, y=22)
             if pixcolorindex == 3:
                 pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
                                         fg='yellow', bg="green", width=11)
-                pixproplabel.place(x=162, y=52)
+                pixproplabel.place(x=411, y=22)
         if str(rawfile.raw_pattern.tolist()) == '[[3, 2], [0, 1]]':
             if pixcolorindex == 0:
                 pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
                                         fg='yellow', bg="blue", width=11)
-                pixproplabel.place(x=162, y=52)
+                pixproplabel.place(x=411, y=22)
             if pixcolorindex == 1:
                 pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
                                         fg='yellow', bg="green", width=11)
-                pixproplabel.place(x=162, y=52)
+                pixproplabel.place(x=411, y=22)
             if pixcolorindex == 2:
                 pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
                                         fg='yellow', bg="blue",  width=11)
-                pixproplabel.place(x=162, y=52)
+                pixproplabel.place(x=411, y=22)
             if pixcolorindex == 3:
                 pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
                                         fg='yellow', bg="red",  width=11)
-                pixproplabel.place(x=162, y=52)
+                pixproplabel.place(x=411, y=22)
     xshift = xx - 151 - thumbnailx + 1  # additional + 1 for correct display purposes
     xfactor = thumbnailx / rawfile.sizes.width
     yfactor = thumbnaily / rawfile.sizes.height
@@ -518,13 +536,13 @@ openraw_button = ttk.Button(master=frame3, text='Open RAW File', command=select_
 openraw_button.place(x=24, y=10)
 
 openmultiraw_button = ttk.Button(master=frame3, text='Open Multiple RAW', command=selectmultipleraws, width=18)
-openmultiraw_button.place(x=390, y=10)
+openmultiraw_button.place(x=510, y=10)
 
 checklinearity_button = ttk.Button(master=frame3, text='Check Linearity', command=checklinearity, width=18)
-checklinearity_button.place(x=390, y=40)
+checklinearity_button.place(x=510, y=40)
 
 rawmaxmin_button = ttk.Button(master=frame3, text='Max./Min. ADU', command=adumaxmin, width=15)
-rawmaxmin_button.place(x=146, y=10)
+rawmaxmin_button.place(x=24, y=40)
 
 fitentry1 = tk.Entry(master=frame2, justify=CENTER, width=5)
 fitentry1.place(x=26, y=300)
@@ -532,41 +550,44 @@ fitentry1.place(x=26, y=300)
 fitentry2 = tk.Entry(master=frame2, justify=CENTER, width=5)
 fitentry2.place(x=86, y=300)
 
-adulimitlabel = tk.Label(master=frame3, text='Show pixels', bg="grey")
-adulimitlabel.place(x=285, y=0)
+adulimitlabel = tk.Label(master=frame3, text='Show Pixels', bg="grey")
+adulimitlabel.place(x=165, y=0)
 
 aduminbutton = ttk.Button(master=frame3, text='From:', command=adufromlimit, width=8)
-aduminbutton.place(x=260, y=20)
+aduminbutton.place(x=140, y=20)
 
 adumaxbutton = ttk.Button(master=frame3, text='Up to:', command=aduuptolimit, width=8)
-adumaxbutton.place(x=260, y=50)
+adumaxbutton.place(x=140, y=50)
 
 adulimitentry1 = tk.Entry(master=frame3, justify=CENTER, width=8)
-adulimitentry1.place(x=325, y=23)
+adulimitentry1.place(x=205, y=23)
 
 adulimitentry2 = tk.Entry(master=frame3, justify=CENTER, width=8)
-adulimitentry2.place(x=325, y=53)
+adulimitentry2.place(x=205, y=53)
 
 pixelrlabel = tk.Label(master=frame3, text='Row', bg="grey")
-pixelrlabel.place(x=30, y=35)
+pixelrlabel.place(x=280, y=5)
 
 pixelclabel = tk.Label(master=frame3, text='Col.', bg="grey")
-pixelclabel.place(x=78, y=35)
+pixelclabel.place(x=328, y=5)
 
 pixelrentry = tk.Entry(master=frame3, justify=CENTER, width=6)
-pixelrentry.place(x=23, y=53)
+pixelrentry.place(x=273, y=23)
 
 pixelcentry = tk.Entry(master=frame3, justify=CENTER, width=6)
-pixelcentry.place(x=71, y=53)
+pixelcentry.place(x=321, y=23)
+
+adulimitlabel = tk.Label(master=frame3, text='Col. Index/ADU', bg="grey")
+adulimitlabel.place(x=409, y=0)
 
 pixelpropbutton = ttk.Button(master=frame3, text='>>', command=pixelprop, width=3)
-pixelpropbutton.place(x=122, y=50)
+pixelpropbutton.place(x=371, y=20)
 
 pixpropblacklabel = tk.Label(master=frame3, text='', bg="black", bd=3, width=11)
-pixpropblacklabel.place(x=161, y=51)
+pixpropblacklabel.place(x=410, y=21)
 
 pixproplabel = tk.Label(master=frame3, text='', bg="light grey", width=11)
-pixproplabel.place(x=162, y=52)
+pixproplabel.place(x=411, y=22)
 
 Gaussian = IntVar()
 Lorentzian = IntVar()
