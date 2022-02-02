@@ -190,7 +190,6 @@ def selectmultipleraws():
 
 def checklinearity():
     print(mrawopen)
-
     if mrawopen == []:
         showinfo(title='Error', message='No Multiple RAW to Check')
     elif pixelrentry.get() == '' or pixelcentry.get() == '':
@@ -249,6 +248,10 @@ def checklinearity():
             samplefield.clear()
             # raw.close
         # print(linearity)
+        filelinearity = open("linearity.txt", "w")
+        for l in range (0, len(linearity[1])-1):
+            filelinearity.write(str(linearity[0][l])+' '+str(linearity[1][l])+'\n')
+        filelinearity.close()
         maxtime = np.amax(linearity[0])
         maxadu = np.amax(linearity[1])
         minadu = np.amin(linearity[1])
