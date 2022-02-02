@@ -160,9 +160,9 @@ def select_rawfile():
             # camera specific color matrix, usually obtained from a list in rawpy (not from the raw file)
             window.create_text(10,140, text='Visible area (in pixels):', anchor=tk.W)
             window.create_text(150,140, text= str(raw.sizes.height)+' x ' + str(raw.sizes.width), anchor=tk.W)
-            window.create_text(10, 160, text='Coordinates range:', anchor=tk.W)
+            window.create_text(10, 160, text='Coordinates Range:', anchor=tk.W)
             window.create_text(150, 160, text='0-' + str(raw.sizes.height-1) + ', ' + '0-' + str(raw.sizes.width-1), anchor=tk.W)
-            window.create_text(10,180, text='Center coordinates:', anchor=tk.W)
+            window.create_text(10,180, text='Center Coordinates:', anchor=tk.W)
             window.create_text(150,180, text= str(raw.sizes.height//2-1)+' x '+str(raw.sizes.width//2-1), anchor=tk.W)
 
             # window.create_text(20, 160,
@@ -349,6 +349,14 @@ def adufromlimit():
                     window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill='red', tags = "square2")
                     window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill='red', tags = "square2")
                     window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill='red', tags = "square2")
+
+                    window.create_text(xxx + xshift, yyy - 20 + 2,
+                                       text=str(rawfile.raw_image_visible[indexfrom[0][i]][indexfrom[1][i]]),
+                                       fill='red', tags = "square2")
+                    window.create_text(xxx + xshift - 25, yyy + 2,
+                                       text=str(indexfrom[0][i]), fill='red', tags = "square2")
+                    window.create_text(xxx + xshift, yyy + 20 + 2,
+                                       text=str(indexfrom[1][i]), fill='red', tags = "square2")
         else:
             showinfo(title='Error', message='Invalid limit set')
         # print(indexmax)
@@ -384,6 +392,14 @@ def aduuptolimit():
                     window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill='grey', tags = "square2")
                     window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill='grey', tags = "square2")
                     window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill='grey', tags = "square2")
+
+                    window.create_text(xxx + xshift, yyy - 20 + 2,
+                                       text=str(rawfile.raw_image_visible[indexupto[0][i]][indexupto[1][i]]),
+                                       fill='grey', tags = "square2")
+                    window.create_text(xxx + xshift - 25, yyy + 2,
+                                       text=str(indexupto[0][i]), fill='grey', tags = "square2")
+                    window.create_text(xxx + xshift, yyy + 20 + 2,
+                                       text=str(indexupto[1][i]), fill='grey', tags = "square2")
         else:
             showinfo(title='Error', message='Invalid Limit Set')
             # print(indexmax)
