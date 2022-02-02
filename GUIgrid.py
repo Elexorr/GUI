@@ -712,6 +712,7 @@ tintoutput = tk.Label(master=frame2, text=str(tint), bg="light grey", width=14)
 tintoutput.place(x=22, y=511)
 
 def selectsample():
+    window.delete('samprop')
     path = rawselected
     rawfile = rawpy.imread(path)
     pixr=int(pixelrentry.get())
@@ -775,13 +776,25 @@ def selectsample():
     # print(rawfile.raw_image_visible[pixr+3][pixc+3], rawfile.raw_colors_visible[pixr+3][pixc+3])
     samplemaxvalue = np.amax(samplefield)
     sampleminvalue = np.amin(samplefield)
+    samplemean=np.mean(samplefield)
+
     samplerange = samplemaxvalue+sampleminvalue
     shiftx = xx - 403 - thumbnailx
     shifty = yy - 151
-    window.create_rectangle(shiftx,shifty,shiftx+250,shifty-200, fill='white', outline='black')
+    window.create_rectangle(shiftx,shifty,shiftx+250,shifty-200, fill='white', outline='black', tags="samprop")
     for i in range(0, len(samplefield)):
         columnscale = samplefield[i]/samplerange
-        window.create_rectangle(shiftx+10*i, shifty, shiftx+10+10*i, shifty-int(columnscale*200), fill = "orange", tags="column")
+        window.create_rectangle(shiftx+10*i, shifty, shiftx+10+10*i, shifty-int(columnscale*200),
+                                fill = "orange", tags="samprop")
+    window.create_line(shiftx-3,shifty-int(rawfile.raw_image_visible[pixr][pixc]*200/samplerange),
+                       shiftx+250, shifty-int(rawfile.raw_image_visible[pixr][pixc]*200/samplerange),
+                       width = 2, stipple='gray25', tags="samprop")
+    if rawfile.raw_image_visible[pixr][pixc]/samplemean > 1.1 or rawfile.raw_image_visible[pixr][pixc]/samplemean < 0.9:
+        window.create_text(shiftx-30, shifty-int(rawfile.raw_image_visible[pixr][pixc]*200/samplerange),
+                           text = str(rawfile.raw_image_visible[pixr][pixc]), tags="samprop")
+    window.create_line(shiftx-3,shifty-int(samplemean*200/samplerange),
+                       shiftx+250, shifty-int(samplemean*200/samplerange), width = 2, stipple='gray25', tags="samprop")
+    window.create_text(shiftx-30, shifty-int(samplemean*200/samplerange), text = str(samplemean), tags="samprop")
 
 def clearwindow():
     fitentry1.delete(0, 'end')
