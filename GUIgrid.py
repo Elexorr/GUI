@@ -38,8 +38,8 @@ mrawopen = []
 def select_file():
     if fopened != []:
         clearwindow()
-    filetypes = (('text files', '*.txt'), ('All files', '*.*'))
-    filename = fd.askopenfilename(title='Open a file',
+    filetypes = (('Text Files', '*.txt'), ('All Files', '*.*'))
+    filename = fd.askopenfilename(title='Open a File',
                                   initialdir='/', filetypes=filetypes)
     global f
     global lines
@@ -57,7 +57,7 @@ def select_file():
     xyscale()
     drawcurve()
     fopened.append(x)
-    showinfo(title='Selected File', message=filename)
+    showinfo(title='Open a File', message= 'File Selected: ' + filename)
 
 
 def select_rawfile():
@@ -167,7 +167,7 @@ def select_rawfile():
 
             # window.create_text(20, 160,
             # text=f'XYZ to RGB Conversion Matrix: {raw.rgb_xyz_matrix.tolist()}', anchor=tk.W)
-            # camera specific XYZ to camara RGB conversion matrix
+            # camera specific XYZ to camera RGB conversion matrix
             # window.create_text(20, 180,
             # text=f'Camera White Balance:    {raw.camera_whitebalance}', anchor=tk.W)
             # the picture's white balance as determined by the camera
@@ -190,12 +190,13 @@ def selectmultipleraws():
 
 def checklinearity():
     print(mrawopen)
-    window.delete("all")
+
     if mrawopen == []:
         showinfo(title='Error', message='No Multiple RAW to Check')
     elif pixelrentry.get() == '' or pixelcentry.get() == '':
         showinfo(title='Error', message='No Pixel Coordinates to Check')
     else:
+        window.delete("all")
         for j in range (0,len(raw_filenames)):
             f = open(raw_filenames[j], 'rb')
             tags = exifread.process_file(f)
@@ -344,10 +345,10 @@ def adufromlimit():
                     xxx = int(xfactor*indexfrom[1][i])
                     yyy = int(yfactor*indexfrom[0][i])
 
-                    window.create_line(xxx - 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy - 10 + 2, fill='red')
-                    window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill='red')
-                    window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill='red')
-                    window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill='red')
+                    window.create_line(xxx - 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy - 10 + 2, fill='red', tags = "square2")
+                    window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill='red', tags = "square2")
+                    window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill='red', tags = "square2")
+                    window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill='red', tags = "square2")
         else:
             showinfo(title='Error', message='Invalid limit set')
         # print(indexmax)
@@ -379,17 +380,22 @@ def aduuptolimit():
                     xxx = int(xfactor * indexupto[1][i])
                     yyy = int(yfactor * indexupto[0][i])
 
-                    window.create_line(xxx - 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy - 10 + 2, fill='grey')
-                    window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill='grey')
-                    window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill='grey')
-                    window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill='grey')
+                    window.create_line(xxx - 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy - 10 + 2, fill='grey', tags = "square2")
+                    window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill='grey', tags = "square2")
+                    window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill='grey', tags = "square2")
+                    window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill='grey', tags = "square2")
         else:
             showinfo(title='Error', message='Invalid Limit Set')
             # print(indexmax)
             # print(indexmin)
 
 
+def clearsquares():
+    window.delete("square2")
+
+
 def pixelprop():
+    window.delete("square")
     if pixelrentry.get() == '' or pixelcentry.get() == '':
         showinfo(title='Error', message='No Pixel Coordinates to Check')
     else:
@@ -439,14 +445,14 @@ def pixelprop():
         yfactor = thumbnaily / rawfile.sizes.height
         xxx = int(xfactor * pixc)
         yyy = int(yfactor * pixr)
-        window.create_line(xxx - 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy - 10 + 2, fill='white')
-        window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill='white')
-        window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill='white')
-        window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill='white')
-        window.create_line(xxx - 7 + xshift, yyy - 7 + 2, xxx + 7 + xshift, yyy - 7 + 2, fill='white')
-        window.create_line(xxx + 7 + xshift, yyy - 7 + 2, xxx + 7 + xshift, yyy + 7 + 2, fill='white')
-        window.create_line(xxx + 7 + xshift, yyy + 7 + 2, xxx - 7 + xshift, yyy + 7 + 2, fill='white')
-        window.create_line(xxx - 7 + xshift, yyy + 7 + 2, xxx - 7 + xshift, yyy - 7 + 2, fill='white')
+        window.create_line(xxx - 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy - 10 + 2, fill='white', tags = 'square')
+        window.create_line(xxx + 10 + xshift, yyy - 10 + 2, xxx + 10 + xshift, yyy + 10 + 2, fill='white', tags = 'square')
+        window.create_line(xxx + 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy + 10 + 2, fill='white', tags = 'square')
+        window.create_line(xxx - 10 + xshift, yyy + 10 + 2, xxx - 10 + xshift, yyy - 10 + 2, fill='white', tags = 'square')
+        window.create_line(xxx - 7 + xshift, yyy - 7 + 2, xxx + 7 + xshift, yyy - 7 + 2, fill='white', tags = 'square')
+        window.create_line(xxx + 7 + xshift, yyy - 7 + 2, xxx + 7 + xshift, yyy + 7 + 2, fill='white', tags = 'square')
+        window.create_line(xxx + 7 + xshift, yyy + 7 + 2, xxx - 7 + xshift, yyy + 7 + 2, fill='white', tags = 'square')
+        window.create_line(xxx - 7 + xshift, yyy + 7 + 2, xxx - 7 + xshift, yyy - 7 + 2, fill='white', tags = 'square')
         selectsample()
 
 
@@ -566,6 +572,9 @@ aduminbutton.place(x=140, y=20)
 
 adumaxbutton = ttk.Button(master=frame3, text='Up to:', command=aduuptolimit, width=8)
 adumaxbutton.place(x=140, y=50)
+
+clearsquaresbutton = ttk.Button(master=frame3, text='Clear', command=clearsquares, width=8)
+clearsquaresbutton.place(x=274, y=50)
 
 adulimitentry1 = tk.Entry(master=frame3, justify=CENTER, width=8)
 adulimitentry1.place(x=205, y=23)
@@ -690,61 +699,61 @@ def selectsample():
     pixc=int(pixelcentry.get())
     samplefield = []
     samplefield.append(rawfile.raw_image_visible[pixr-3][pixc-3])
-    print(rawfile.raw_image_visible[pixr-3][pixc-3], rawfile.raw_colors_visible[pixr-3][pixc-3])
+    # print(rawfile.raw_image_visible[pixr-3][pixc-3], rawfile.raw_colors_visible[pixr-3][pixc-3])
     samplefield.append(rawfile.raw_image_visible[pixr-3][pixc-1])
-    print(rawfile.raw_image_visible[pixr-3][pixc-1], rawfile.raw_colors_visible[pixr-3][pixc-1])
+    # print(rawfile.raw_image_visible[pixr-3][pixc-1], rawfile.raw_colors_visible[pixr-3][pixc-1])
     samplefield.append(rawfile.raw_image_visible[pixr-3][pixc+1])
-    print(rawfile.raw_image_visible[pixr-3][pixc+1], rawfile.raw_colors_visible[pixr-3][pixc+1])
+    # print(rawfile.raw_image_visible[pixr-3][pixc+1], rawfile.raw_colors_visible[pixr-3][pixc+1])
     samplefield.append(rawfile.raw_image_visible[pixr-3][pixc+3])
-    print(rawfile.raw_image_visible[pixr-3][pixc+3], rawfile.raw_colors_visible[pixr-3][pixc+3])
+    # print(rawfile.raw_image_visible[pixr-3][pixc+3], rawfile.raw_colors_visible[pixr-3][pixc+3])
 
     samplefield.append(rawfile.raw_image_visible[pixr-2][pixc-2])
-    print(rawfile.raw_image_visible[pixr-2][pixc-2], rawfile.raw_colors_visible[pixr-2][pixc-2])
+    # print(rawfile.raw_image_visible[pixr-2][pixc-2], rawfile.raw_colors_visible[pixr-2][pixc-2])
     samplefield.append(rawfile.raw_image_visible[pixr-2][pixc])
-    print(rawfile.raw_image_visible[pixr-2][pixc], rawfile.raw_colors_visible[pixr-2][pixc])
+    # print(rawfile.raw_image_visible[pixr-2][pixc], rawfile.raw_colors_visible[pixr-2][pixc])
     samplefield.append(rawfile.raw_image_visible[pixr-2][pixc+2])
-    print(rawfile.raw_image_visible[pixr-2][pixc+2], rawfile.raw_colors_visible[pixr-2][pixc+2])
+    # print(rawfile.raw_image_visible[pixr-2][pixc+2], rawfile.raw_colors_visible[pixr-2][pixc+2])
 
     samplefield.append(rawfile.raw_image_visible[pixr-1][pixc-3])
-    print(rawfile.raw_image_visible[pixr-1][pixc-3], rawfile.raw_colors_visible[pixr-1][pixc-3])
+    # print(rawfile.raw_image_visible[pixr-1][pixc-3], rawfile.raw_colors_visible[pixr-1][pixc-3])
     samplefield.append(rawfile.raw_image_visible[pixr-1][pixc-1])
-    print(rawfile.raw_image_visible[pixr-1][pixc-1], rawfile.raw_colors_visible[pixr-1][pixc-1])
+    # print(rawfile.raw_image_visible[pixr-1][pixc-1], rawfile.raw_colors_visible[pixr-1][pixc-1])
     samplefield.append(rawfile.raw_image_visible[pixr-1][pixc+1])
-    print(rawfile.raw_image_visible[pixr-1][pixc+1], rawfile.raw_colors_visible[pixr-1][pixc+1])
+    # print(rawfile.raw_image_visible[pixr-1][pixc+1], rawfile.raw_colors_visible[pixr-1][pixc+1])
     samplefield.append(rawfile.raw_image_visible[pixr-1][pixc+3])
-    print(rawfile.raw_image_visible[pixr-1][pixc+3], rawfile.raw_colors_visible[pixr-1][pixc+3])
+    # print(rawfile.raw_image_visible[pixr-1][pixc+3], rawfile.raw_colors_visible[pixr-1][pixc+3])
 
     samplefield.append(rawfile.raw_image_visible[pixr][pixc-2])
-    print(rawfile.raw_image_visible[pixr][pixc-2], rawfile.raw_colors_visible[pixr][pixc-2])
+    # print(rawfile.raw_image_visible[pixr][pixc-2], rawfile.raw_colors_visible[pixr][pixc-2])
     samplefield.append(rawfile.raw_image_visible[pixr][pixc])
-    print(rawfile.raw_image_visible[pixr][pixc], rawfile.raw_colors_visible[pixr][pixc])
+    # print(rawfile.raw_image_visible[pixr][pixc], rawfile.raw_colors_visible[pixr][pixc])
     samplefield.append(rawfile.raw_image_visible[pixr][pixc+2])
-    print(rawfile.raw_image_visible[pixr][pixc+2], rawfile.raw_colors_visible[pixr][pixc+2])
+    # print(rawfile.raw_image_visible[pixr][pixc+2], rawfile.raw_colors_visible[pixr][pixc+2])
 
     samplefield.append(rawfile.raw_image_visible[pixr+1][pixc-3])
-    print(rawfile.raw_image_visible[pixr+1][pixc-3], rawfile.raw_colors_visible[pixr+1][pixc-3])
+    # print(rawfile.raw_image_visible[pixr+1][pixc-3], rawfile.raw_colors_visible[pixr+1][pixc-3])
     samplefield.append(rawfile.raw_image_visible[pixr+1][pixc-1])
-    print(rawfile.raw_image_visible[pixr+1][pixc-1], rawfile.raw_colors_visible[pixr+1][pixc-1])
+    # print(rawfile.raw_image_visible[pixr+1][pixc-1], rawfile.raw_colors_visible[pixr+1][pixc-1])
     samplefield.append(rawfile.raw_image_visible[pixr+1][pixc+1])
-    print(rawfile.raw_image_visible[pixr+1][pixc+1], rawfile.raw_colors_visible[pixr+1][pixc+1])
+    # print(rawfile.raw_image_visible[pixr+1][pixc+1], rawfile.raw_colors_visible[pixr+1][pixc+1])
     samplefield.append(rawfile.raw_image_visible[pixr+1][pixc+3])
-    print(rawfile.raw_image_visible[pixr+1][pixc+3], rawfile.raw_colors_visible[pixr+1][pixc+3])
+    # print(rawfile.raw_image_visible[pixr+1][pixc+3], rawfile.raw_colors_visible[pixr+1][pixc+3])
 
     samplefield.append(rawfile.raw_image_visible[pixr+2][pixc-2])
-    print(rawfile.raw_image_visible[pixr+2][pixc-2], rawfile.raw_colors_visible[pixr+2][pixc-2])
+    # print(rawfile.raw_image_visible[pixr+2][pixc-2], rawfile.raw_colors_visible[pixr+2][pixc-2])
     samplefield.append(rawfile.raw_image_visible[pixr+2][pixc])
-    print(rawfile.raw_image_visible[pixr+2][pixc], rawfile.raw_colors_visible[pixr+2][pixc])
+    # print(rawfile.raw_image_visible[pixr+2][pixc], rawfile.raw_colors_visible[pixr+2][pixc])
     samplefield.append(rawfile.raw_image_visible[pixr+2][pixc+2])
-    print(rawfile.raw_image_visible[pixr+2][pixc+2], rawfile.raw_colors_visible[pixr+2][pixc+2])
+    # print(rawfile.raw_image_visible[pixr+2][pixc+2], rawfile.raw_colors_visible[pixr+2][pixc+2])
 
     samplefield.append(rawfile.raw_image_visible[pixr+3][pixc-3])
-    print(rawfile.raw_image_visible[pixr+3][pixc-3], rawfile.raw_colors_visible[pixr+3][pixc-3])
+    # print(rawfile.raw_image_visible[pixr+3][pixc-3], rawfile.raw_colors_visible[pixr+3][pixc-3])
     samplefield.append(rawfile.raw_image_visible[pixr+3][pixc-1])
-    print(rawfile.raw_image_visible[pixr+3][pixc-1], rawfile.raw_colors_visible[pixr+3][pixc-1])
+    # print(rawfile.raw_image_visible[pixr+3][pixc-1], rawfile.raw_colors_visible[pixr+3][pixc-1])
     samplefield.append(rawfile.raw_image_visible[pixr+3][pixc+1])
-    print(rawfile.raw_image_visible[pixr+3][pixc+1], rawfile.raw_colors_visible[pixr+3][pixc+1])
+    # print(rawfile.raw_image_visible[pixr+3][pixc+1], rawfile.raw_colors_visible[pixr+3][pixc+1])
     samplefield.append(rawfile.raw_image_visible[pixr+3][pixc+3])
-    print(rawfile.raw_image_visible[pixr+3][pixc+3], rawfile.raw_colors_visible[pixr+3][pixc+3])
+    # print(rawfile.raw_image_visible[pixr+3][pixc+3], rawfile.raw_colors_visible[pixr+3][pixc+3])
     samplemaxvalue = np.amax(samplefield)
     sampleminvalue = np.amin(samplefield)
     samplerange = samplemaxvalue+sampleminvalue
@@ -755,7 +764,6 @@ def selectsample():
         columnscale = samplefield[i]/samplerange
         window.create_rectangle(shiftx+10*i, shifty, shiftx+10+10*i, shifty-int(columnscale*200), fill = "orange", tags="column")
 
-
 def clearwindow():
     fitentry1.delete(0, 'end')
     fitentry2.delete(0, 'end')
@@ -764,8 +772,11 @@ def clearwindow():
     checkboxGauss.deselect()
     checkboxLorentz.deselect()
     window.delete("all")
-    tintoutput.destroy()
-    lines.clear()
+    # tintoutput.destroy()
+    tintoutput = tk.Label(master=frame2, text='', bg="light grey", width=14)
+    tintoutput.place(x=22, y=511)
+    if 'lines' in globals():
+        lines.clear()
     JDstr.clear()
     magstr.clear()
     errstr.clear()
@@ -777,7 +788,8 @@ def clearwindow():
     magscale = 0
     timescale = 0
     fopened.clear()
-    f.close()
+    if 'f' in locals():
+        f.close()
 
 
 clear_button = ttk.Button(master=frame2, text='Clear All', command=clearwindow, width=15)
