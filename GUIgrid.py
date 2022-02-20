@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 import exifread
+import exiftool
 from tkinter import filedialog as fd
 from tkinter.messagebox import showinfo
 from astropy.modeling import models, fitting
@@ -249,7 +250,7 @@ def checklinearity():
             # raw.close
         # print(linearity)
         filelinearity = open("linearity.txt", "w")
-        for l in range (0, len(linearity[1])-1):
+        for l in range (0, len(linearity[0])):
             filelinearity.write(str(linearity[0][l])+' '+str(linearity[1][l])+'\n')
         filelinearity.close()
         maxtime = np.amax(linearity[0])
@@ -265,6 +266,35 @@ def checklinearity():
             # print(timeshift,adushift)
             window.create_rectangle(80+timeshift-2, yy-210-adushift-2,
                                     80+timeshift+2, yy-210-adushift+2, fill='blue')
+
+
+def checktemperature():
+    # print(mrawopen)
+    if mrawopen == []:
+        showinfo(title='Error', message='No Multiple RAW to Check')
+    else:
+        files = [raw_filenames]
+        # with exiftool.ExifTool() as et:
+        #     metadata = et.get_metadata_batch(raw_filenames[0])
+        #     retazec = str(metadata)
+        #     position = retazec.index("CameraTemperature")
+        with exiftool.ExifTool() as et:
+            for j in range (0,len(raw_filenames)):
+                print(raw_filenames[j])
+                # with rawpy.imread(raw_filenames[j]) as raw:
+
+                metadata = et.get_metadata(raw_filenames[j])
+                # print(metadata)
+                metastring = str(metadata)
+                position = metastring.index("CameraTemperature")
+                print(position)
+                # print(retazec[position])
+                # print(retazec[14317:14347])
+                print(metastring[position + 19:position + 22])
+                # start = position
+                # end = position + 22
+                # temperature = str(retazec[start:end])
+                # print(temperature)
 
 
 def adumaxmin():
@@ -573,6 +603,9 @@ openmultiraw_button.place(x=510, y=10)
 
 checklinearity_button = ttk.Button(master=frame3, text='Check Linearity', command=checklinearity, width=18)
 checklinearity_button.place(x=510, y=40)
+
+checktemperature_button = ttk.Button(master=frame3, text='Sensor Temp. (°C)', command=checktemperature, width=18)
+checktemperature_button.place(x=640, y=40)
 
 rawmaxmin_button = ttk.Button(master=frame3, text='Max./Min. ADU', command=adumaxmin, width=15)
 rawmaxmin_button.place(x=24, y=40)

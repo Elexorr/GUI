@@ -10,8 +10,28 @@ import PIL.Image
 import PIL.ExifTags
 from PIL import ImageTk,Image,ExifTags
 from fractions import Fraction
+import exiftool
 
-raw_filename = 'test2.CR2'
+raw_filename = 'L_0036_ISO1600_30s__15C.CR2'
+
+files = [raw_filename]
+with exiftool.ExifTool() as et:
+    metadata = et.get_metadata_batch(files)
+    retazec = str(metadata)
+    poloha = retazec.index("CameraTemperature")
+    print(poloha)
+    print(retazec[poloha+19:poloha+22])
+    temperature = int(retazec[poloha+19:poloha+22])
+    print(temperature)
+    # for tag in metadata:
+    #     print(tag, "\nahoj")
+
+
+
+
+# for d in metadata:
+#     print("{:20.20} {:20.20}".format(d["SourceFile"],
+#                                      d["EXIF:DateTimeOriginal"]))
 
 # with rawpy.imread(raw_filename) as raw:
 #     print(f'raw type:                     {raw.raw_type}')  # raw type (flat or stack, e.g., Foveon sensor)
@@ -35,6 +55,11 @@ raw_filename = 'test2.CR2'
 # tags = exifread.process_file(f)
 # data = list(tags. items())
 # an_array = np. array(data)
+# print(tags)
+# print(an_array)
+# for tag in tags.keys():
+#     if tag not in ('JPEGThumbnail', 'TIFFThumbnail', 'Filename', 'EXIF MakerNote'):
+#         print("Key: %s, value %s" % (tag, tags[tag]))
 # for i in range (0,len(an_array)):
 #     if an_array[i][0] == 'EXIF ExposureTime':
 #         print(an_array[i][1])
