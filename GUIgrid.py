@@ -31,6 +31,8 @@ error = []      # error list / floats
 x = []
 y = []
 linearity = [[],[]]
+sensortemp = [[],[],[]]
+phase = [[],[],[]]
 fopened = []
 rawopen = []
 mrawopen = []
@@ -57,6 +59,38 @@ def select_file():
     separatenumericalvalues()
     xyscale()
     drawcurve()
+    fopened.append(x)
+    showinfo(title='Open a File', message= 'File Selected: ' + filename)
+
+
+def select_phasefile():
+    if fopened != []:
+        clearwindow()
+    filetypes = (('Text Files', '*.txt'), ('All Files', '*.*'))
+    filename = fd.askopenfilename(title='Open a File',
+                                  initialdir='/', filetypes=filetypes)
+    global f
+    global lines
+    f = open(filename)
+    lines = f.readlines()
+    global JDay
+    for i in range(0, len(lines)):              # extracting string data from source file
+        # if i == 2:
+        #     JDay = str(lines[i][0:7])           # checking julian day
+        # if str(lines[i][16:18]) != '99':        # filtering invalid data
+        if lines[i][0] == '-':
+            JDstr.append(lines[i][0:9])  # julian dates
+            magstr.append(lines[i][10:18])  # mags
+            errstr.append(lines[i][19:27])  # error
+        else:
+            JDstr.append(lines[i][0:8])        # julian dates
+            magstr.append(lines[i][9:17])      # mags
+            errstr.append(lines[i][18:26])      # error
+    separatephasevalues()
+    xyphasescale()
+    drawphasecurve()
+    # for i in range(0, len(JDstr)):
+    #     print(JDstr[i], magstr[i], errstr[i])
     fopened.append(x)
     showinfo(title='Open a File', message= 'File Selected: ' + filename)
 
@@ -269,32 +303,100 @@ def checklinearity():
 
 
 def checktemperature():
-    # print(mrawopen)
     if mrawopen == []:
         showinfo(title='Error', message='No Multiple RAW to Check')
     else:
         files = [raw_filenames]
-        # with exiftool.ExifTool() as et:
-        #     metadata = et.get_metadata_batch(raw_filenames[0])
-        #     retazec = str(metadata)
-        #     position = retazec.index("CameraTemperature")
         with exiftool.ExifTool() as et:
             for j in range (0,len(raw_filenames)):
-                print(raw_filenames[j])
-                # with rawpy.imread(raw_filenames[j]) as raw:
-
                 metadata = et.get_metadata(raw_filenames[j])
-                # print(metadata)
                 metastring = str(metadata)
-                position = metastring.index("CameraTemperature")
-                print(position)
-                # print(retazec[position])
-                # print(retazec[14317:14347])
-                print(metastring[position + 19:position + 22])
-                # start = position
-                # end = position + 22
-                # temperature = str(retazec[start:end])
-                # print(temperature)
+                tempposition = metastring.index("CameraTemperature")
+                timeposition = metastring.index("DateTimeOriginal")
+                exptime = str(metastring[timeposition + 20:timeposition + 39])
+                # exphh = int(metastring[timeposition + 31:timeposition + 33])
+                # expmm = int(metastring[timeposition + 34:timeposition + 36])
+                # expss = int(metastring[timeposition + 37:timeposition + 39])
+                isotime = Time(str(metastring[timeposition+20:timeposition+24])+'-'
+                            +str(metastring[timeposition+25:timeposition+27])+'-'
+                            +str(metastring[timeposition+28:timeposition+30])+' '
+                            +str(metastring[timeposition+31:timeposition+33])+':'
+                            +str(metastring[timeposition+34:timeposition+36])+':'
+                            +str(metastring[timeposition+37:timeposition+39])+'.000', format='iso')
+                # jtime = Time(JDstr[0], format='jd')
+                jdtime = round(isotime.jd,6)
+                # print(jdtime)
+                if metastring[tempposition + 21] == ',':
+                    temperature = metastring[tempposition + 19:tempposition + 21]
+                else:
+                    temperature = metastring[tempposition + 19:tempposition + 22]
+                # temperature = int(metastring[tempposition + 19:tempposition + 22])
+                sensortemp[0].append(jdtime)
+                sensortemp[1].append(exptime)
+                sensortemp[2].append(int(temperature))
+        filesensortemp = open("sensortemp.txt", "w")
+        for l in range (0, len(sensortemp[0])):
+            filesensortemp.write(str(sensortemp[0][l])+' '
+                                 +str(sensortemp[1][l])+' '
+                                 +str(sensortemp[2][l])+'\n')
+
+        Maxtempvalue = np.amax(sensortemp[2])
+        Mintempvalue = np.amin(sensortemp[2])
+        temperaturescale = Maxtempvalue - Mintempvalue
+
+        tscale = round(sensortemp[0][len(sensortemp[0]) - 1] - sensortemp[0][0], 5)
+        print(temperaturescale,tscale)
+
+        window.create_rectangle(80, 0, xx - 150, yy - 210)  # |^^^^^^^^^^^^^^^
+        window.create_text(20, 10, text='Temp')  # |
+        window.create_text(20, yy - 195, text='Time')  # |
+
+        window.create_line(75, 22 + (yy - 250) * (Mintempvalue - Mintempvalue) / temperaturescale,
+                           86, 22 + (yy - 250) * (Mintempvalue - Mintempvalue) / temperaturescale)
+        window.create_text(50, 22 + (yy - 250) * (Mintempvalue - Mintempvalue) / temperaturescale, text=Maxtempvalue)
+        window.create_line(75, 22 + (yy - 250) * (Maxtempvalue - Mintempvalue) / temperaturescale,
+                           86, 22 + (yy - 250) * (Maxtempvalue - Mintempvalue) / temperaturescale)
+        window.create_text(50, 22 + (yy - 250) * (Maxtempvalue - Mintempvalue) / temperaturescale, text=Mintempvalue)
+        # window.create_text(50, yy - 195, text=JDay + "+")
+        # jtime = Time(JDstr[0], format='jd')
+        # isotime = jtime.iso
+        # window.create_text(38, yy - 180, text=isotime[0:10])
+        # window.create_text(102 + (xx - 290) * (JD[0] - JD[0]) / timescale, yy - 180, text=isotime[11:23])
+
+        window.create_line(102 + (xx - 290) * (sensortemp[0][0] - sensortemp[0][0]) / tscale, yy - 210 - 5,
+                           102 + (xx - 290) * (sensortemp[0][0] - sensortemp[0][0]) / tscale, yy - 210 + 6)
+        window.create_text(102 + (xx - 290) * (sensortemp[0][0] - sensortemp[0][0]) / tscale, yy - 195, text=str(sensortemp[1][0]))
+
+        window.create_line(102 + (xx - 290) * (sensortemp[0][len(sensortemp[0])-1] - sensortemp[0][0]) / tscale, yy - 210 - 5,
+                           102 + (xx - 290) * (sensortemp[0][len(sensortemp[0])-1] - sensortemp[0][0]) / tscale, yy - 210 + 6)
+        window.create_text(102 + (xx - 290) * (sensortemp[0][len(sensortemp[0])-1] - sensortemp[0][0]) / tscale, yy - 195,
+                           text=str(sensortemp[1][len(sensortemp[0])-1]))
+
+        # jtime = Time(JDstr[len(JDstr) - 1], format='jd')
+        # isotime = jtime.iso
+        # window.create_text(102 + (xx - 290) * (JD[len(JD) - 1] - JD[0]) / timescale, yy - 180, text=isotime[11:23])
+
+        for i in range(0, len(sensortemp[0])):
+            # window.create_rectangle(100 + (xx - 290) * (sensortemp[0][i] - sensortemp[0][0]) / tscale,  # drawing lightucrve
+            #                         20 + (yy - 250) * (sensortemp[2][i] - Mintempvalue) / temperaturescale,
+            #                         104 + (xx - 290) * (sensortemp[0][i] - sensortemp[0][0]) / tscale,
+            #                         24 + (yy - 250) * (sensortemp[2][i] - Mintempvalue) / temperaturescale,
+            #                         fill='red', outline='red')
+            window.create_rectangle(100 + (xx - 290) * (sensortemp[0][i] - sensortemp[0][0]) / tscale,  # drawing lightucrve
+                                    yy - 230 - (yy - 250) * (sensortemp[2][i] - Mintempvalue) / temperaturescale,
+                                    104 + (xx - 290) * (sensortemp[0][i] - sensortemp[0][0]) / tscale,
+                                    yy - 226 - (yy - 250) * (sensortemp[2][i] - Mintempvalue) / temperaturescale,
+                                    fill='red', outline='red')
+
+            # if i % 10 == 0:  # drawing point numbers
+            #     window.create_line(102 + (xx - 290) * (JD[i] - JD[0]) / timescale,
+            #                        5 + 25 + error[i] * 1000 + (yy - 250) * (mag[i] - Minmagvalue) / magscale,
+            #                        102 + (xx - 290) * (JD[i] - JD[0]) / timescale,
+            #                        40 + 25 + error[i] * 1000 + (yy - 250) * (mag[i] - Minmagvalue) / magscale,
+            #                        fill='grey')
+            #     window.create_text(102 + (xx - 290) * (JD[i] - JD[0]) / timescale,
+            #                        50 + 25 + error[i] * 1000 + (yy - 250) * (mag[i] - Minmagvalue) / magscale,
+            #                        text=i + 1)
 
 
 def adumaxmin():
@@ -512,6 +614,36 @@ def separatenumericalvalues():
         error.append(round(float(errstr[i][0:8]), 5))       # error
 
 
+def separatephasevalues():
+    global npphase
+    for i in range(0, len(JDstr)):                          # creating numerical data
+        if JDstr[i][0] == '-':
+            JD.append(1000000.5+(-1)*round(float(JDstr[i][1:9]) % 1, 7))
+            phase[0].append(1000000.5+(-1)*round(float(JDstr[i][1:9]) % 1, 7))
+        else:
+            JD.append(1000000.5+round(float(JDstr[i][0:8]) % 1, 7))      # julian dates
+            phase[0].append(1000000.5+round(float(JDstr[i][1:9]) % 1, 7))
+        # if JDstr[i][0] == '-':
+        #     JD.append(0.5+(-1)*round(float(JDstr[i][1:9]) % 1, 7))
+        # else:
+        #     JD.append(0.5+round(float(JDstr[i][0:8]) % 1, 7))      # julian dates
+        mag.append(round(float(magstr[i][0:8]), 5))         # mags
+        phase[1].append(round(float(magstr[i][0:8]), 5))
+        error.append(round(float(errstr[i][0:8]), 5))       # error
+        phase[2].append(round(float(errstr[i][0:8]), 5))
+    print(phase)
+    npphase = np.array(phase)
+    # print(npphase)
+    npphase = npphase[:, npphase[0, :].argsort()]
+    # print(npphase[0])
+
+    # print(phase)
+    # for i in range(3, len(phase)):
+    #     print(phase[i])
+    # for i in range(0, len(JD)):
+    #     print(JD[i], mag[i], error[i])
+
+
 def xyscale():              # creating variables for scaling purposes
     global Maxmagvalue
     global Minmagvalue
@@ -582,6 +714,83 @@ def drawcurve():                # drawing axes, labels and curves
                                text=i + 1)
 
 
+def xyphasescale():              # creating variables for scaling purposes
+    global Maxmagvalue
+    global Minmagvalue
+    global magscale
+    global timescale
+    Maxmagvalue = 0
+    Minmagvalue = 100
+    magscale = 0
+    for i in range(0, len(npphase[1])):
+        if mag[i] > Maxmagvalue:
+            Maxmagvalue = mag[i]
+        if mag[i] < Minmagvalue:
+            Minmagvalue = mag[i]
+        magscale = round(Maxmagvalue - Minmagvalue, 5)
+    timescale = 1
+    # timescale = round((JD[len(JD) - 1] - JD[0]), 7)
+
+
+def drawphasecurve():                # drawing axes, labels and curves
+    window.create_rectangle(80, 0, xx-150, yy-210)     # |^^^^^^^^^^^^^^^
+    window.create_text(20, 5, text='mag')               # |
+    window.create_text(15, yy-195, text='phase')           # |
+
+    window.create_line(75, 22 + (yy-250) * (Minmagvalue - Minmagvalue) / magscale,
+                       86, 22 + (yy-250) * (Minmagvalue - Minmagvalue) / magscale)
+    window.create_text(50, 22 + (yy-250) * (Minmagvalue - Minmagvalue) / magscale, text=Minmagvalue)
+    window.create_line(75, 22 + (yy-250) * (Maxmagvalue - Minmagvalue) / magscale,
+                       86, 22 + (yy-250) * (Maxmagvalue - Minmagvalue) / magscale)
+    window.create_text(50, 22 + (yy-250) * (Maxmagvalue - Minmagvalue) / magscale, text=Maxmagvalue)
+    # window.create_text(50, yy-195, text=JDay + "+")
+
+
+    # window.create_text(38, yy-180, text=isotime[0:10])
+    # window.create_text(102 + (xx - 290) * (JD[0] - JD[0]) / timescale, yy-180, text=isotime[11:23])
+
+    window.create_line(102 + (xx - 290) * (JD[0] - JD[0]) / timescale, yy-210-5,
+                       102 + (xx - 290) * (JD[0] - JD[0]) / timescale, yy-210+6)
+    # window.create_text(102 + (xx - 290) * (JD[0] - JD[0]) / timescale, yy-195, text=JD[0])
+
+    window.create_line(102 + (xx - 290) * (JD[len(JD) - 1] - JD[0]) / timescale, yy-210-5,
+                       102 + (xx - 290) * (JD[len(JD) - 1] - JD[0]) / timescale, yy-210+6)
+    # window.create_text(102 + (xx - 290) * (JD[len(JD) - 1] - JD[0]) / timescale, yy-195,
+    #                    text=JD[len(JD) - 1])
+
+    # jtime = Time(JDstr[len(JDstr) - 1], format='jd')
+    # isotime = jtime.iso
+    # window.create_text(102 + (xx - 290) * (JD[len(JD) - 1] - JD[0]) / timescale, yy-180, text=isotime[11:23])
+
+    for i in range(0, len(npphase[0])):
+        # window.create_line(800 + 102 + (xx - 290) * (JD[i] - JD[0]) / timescale,        # drawing error bar
+        #                    20 - error[i] * 1000 + (yy-250) * (mag[i] - Minmagvalue) / magscale,
+        #                    800 + 102 + (xx - 290) * (JD[i] - JD[0]) / timescale,
+        #                    25 + error[i] * 1000 + (yy-250) * (mag[i] - Minmagvalue) / magscale,
+        #                    fill='red')
+        window.create_rectangle(100 + (xx - 290) * (npphase[0][i] - npphase[0][0]) / timescale,   # drawing lightucrve
+                                20 + (yy-250) * (npphase[1][i] - Minmagvalue) / magscale,
+                                104 + (xx - 290) * (npphase[0][i] - npphase[0][0]) / timescale,
+                                24 + (yy-250) * (npphase[1][i] - Minmagvalue) / magscale,
+                                fill='red', outline='red')
+
+        # window.create_rectangle(800 + 100 + (xx - 290) * (JD[i] - JD[0]) / timescale,   # drawing lightucrve
+        #                         20 + (yy-250) * (mag[i] - Minmagvalue) / magscale,
+        #                         800 + 104 + (xx - 290) * (JD[i] - JD[0]) / timescale,
+        #                         24 + (yy-250) * (mag[i] - Minmagvalue) / magscale,
+        #                         fill='red', outline='red')
+
+        # if i % 10 == 0:                                                     # drawing point numbers
+        #     window.create_line(800 + 102 + (xx - 290) * (JD[i] - JD[0]) / timescale,
+        #                        5 + 25 + error[i] * 1000 + (yy-250) * (mag[i] - Minmagvalue) / magscale,
+        #                        800 + 102 + (xx - 290) * (JD[i] - JD[0]) / timescale,
+        #                        40 + 25 + error[i] * 1000 + (yy-250) * (mag[i] - Minmagvalue) / magscale,
+        #                        fill='grey')
+        #     window.create_text(800 + 102 + (xx - 290) * (JD[i] - JD[0]) / timescale,
+        #                        50 + 25 + error[i] * 1000 + (yy-250) * (mag[i] - Minmagvalue) / magscale,
+        #                        text=i + 1)
+
+
 window = tk.Canvas(width=xx - 153, height=yy - 150, bg="light grey")  # yy*0.9-80
 frame2 = tk.Frame(master=root, width=150, height=yy - 146, bg="grey")  # yy*0.9-76
 frame3 = tk.Frame(master=root, width=xx - 149, height=83, bg="grey")  # yy*0.1
@@ -594,6 +803,9 @@ frame4.grid(row=1, column=1, sticky=W)
 
 open_button = ttk.Button(master=frame2, text='Open a File', command=select_file, width=15)
 open_button.place(x=24, y=10)
+
+openphase_button = ttk.Button(master=frame2, text='Open Phase Curve', command=select_phasefile, width=15)
+openphase_button.place(x=24, y=90)
 
 openraw_button = ttk.Button(master=frame3, text='Open RAW File', command=select_rawfile, width=15)
 openraw_button.place(x=24, y=10)
@@ -842,6 +1054,11 @@ def clearwindow():
     tintoutput.place(x=22, y=511)
     if 'lines' in globals():
         lines.clear()
+    # phase.clear()
+    if 'npphase' in globals():
+        np.delete(npphase, 0)
+        np.delete(npphase, 1)
+        np.delete(npphase, 2)
     JDstr.clear()
     magstr.clear()
     errstr.clear()

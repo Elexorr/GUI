@@ -18,11 +18,12 @@ files = [raw_filename]
 with exiftool.ExifTool() as et:
     metadata = et.get_metadata_batch(files)
     retazec = str(metadata)
-    poloha = retazec.index("CameraTemperature")
-    print(poloha)
-    print(retazec[poloha+19:poloha+22])
-    temperature = int(retazec[poloha+19:poloha+22])
-    print(temperature)
+    print(retazec)
+    # poloha = retazec.index("CameraTemperature")
+    # print(poloha)
+    # print(retazec[poloha+19:poloha+22])
+    # temperature = int(retazec[poloha+19:poloha+22])
+    # print(temperature)
     # for tag in metadata:
     #     print(tag, "\nahoj")
 
