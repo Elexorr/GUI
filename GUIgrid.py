@@ -36,6 +36,7 @@ phase = [[],[],[]]
 fopened = []
 rawopen = []
 mrawopen = []
+curvetype = []
 
 
 def select_file():
@@ -60,6 +61,7 @@ def select_file():
     xyscale()
     drawcurve()
     fopened.append(x)
+    curvetype.append(1)
     showinfo(title='Open a File', message= 'File Selected: ' + filename)
 
 
@@ -92,6 +94,7 @@ def select_phasefile():
     # for i in range(0, len(JDstr)):
     #     print(JDstr[i], magstr[i], errstr[i])
     fopened.append(x)
+    curvetype.append(2)
     showinfo(title='Open a File', message= 'File Selected: ' + filename)
 
 
@@ -627,8 +630,8 @@ def separatephasevalues():
         #     JD.append(0.5+(-1)*round(float(JDstr[i][1:9]) % 1, 7))
         # else:
         #     JD.append(0.5+round(float(JDstr[i][0:8]) % 1, 7))      # julian dates
-        mag.append(round(float(magstr[i][0:8]), 5))         # mags
-        phase[1].append(round(float(magstr[i][0:8]), 5))
+        mag.append(1-round(float(magstr[i][0:8]), 5))         # mags
+        phase[1].append(1-round(float(magstr[i][0:8]), 5))
         error.append(round(float(errstr[i][0:8]), 5))       # error
         phase[2].append(round(float(errstr[i][0:8]), 5))
     print(phase)
@@ -722,11 +725,18 @@ def xyphasescale():              # creating variables for scaling purposes
     Maxmagvalue = 0
     Minmagvalue = 100
     magscale = 0
+    # for i in range(0, len(npphase[1])):
+    #     if mag[i] > Maxmagvalue:
+    #         Maxmagvalue = mag[i]
+    #     if mag[i] < Minmagvalue:
+    #         Minmagvalue = mag[i]
+    #     magscale = round(Maxmagvalue - Minmagvalue, 5)
+    # timescale = 1
     for i in range(0, len(npphase[1])):
-        if mag[i] > Maxmagvalue:
-            Maxmagvalue = mag[i]
-        if mag[i] < Minmagvalue:
-            Minmagvalue = mag[i]
+        if npphase[1][i] > Maxmagvalue:
+            Maxmagvalue = npphase[1][i]
+        if npphase[1][i] < Minmagvalue:
+            Minmagvalue = npphase[1][i]
         magscale = round(Maxmagvalue - Minmagvalue, 5)
     timescale = 1
     # timescale = round((JD[len(JD) - 1] - JD[0]), 7)
@@ -749,46 +759,41 @@ def drawphasecurve():                # drawing axes, labels and curves
     # window.create_text(38, yy-180, text=isotime[0:10])
     # window.create_text(102 + (xx - 290) * (JD[0] - JD[0]) / timescale, yy-180, text=isotime[11:23])
 
-    window.create_line(102 + (xx - 290) * (JD[0] - JD[0]) / timescale, yy-210-5,
-                       102 + (xx - 290) * (JD[0] - JD[0]) / timescale, yy-210+6)
-    # window.create_text(102 + (xx - 290) * (JD[0] - JD[0]) / timescale, yy-195, text=JD[0])
-
-    window.create_line(102 + (xx - 290) * (JD[len(JD) - 1] - JD[0]) / timescale, yy-210-5,
-                       102 + (xx - 290) * (JD[len(JD) - 1] - JD[0]) / timescale, yy-210+6)
-    # window.create_text(102 + (xx - 290) * (JD[len(JD) - 1] - JD[0]) / timescale, yy-195,
-    #                    text=JD[len(JD) - 1])
+    # window.create_line(102 + (xx - 290) * (npphase[0][0] - npphase[0][0]) / timescale, yy-210-5,
+    #                    102 + (xx - 290) * (npphase[0][0] - npphase[0][0]) / timescale, yy-210+6)
+    # window.create_text(102 + (xx - 290) * (npphase[0][0] - npphase[0][0]) / timescale, yy-195,
+    #                    text=npphase[0][0])
+    #
+    # window.create_line(102 + (xx - 290) * (npphase[len(npphase) - 1] - npphase[0]) / timescale, yy-210-5,
+    #                    102 + (xx - 290) * (npphase[len(npphase) - 1] - npphase[0]) / timescale, yy-210+6)
+    # window.create_text(102 + (xx - 290) * (npphase[len(npphase) - 1] - npphase[0]) / timescale, yy-195,
+    #                    text=npphase[len(npphase) - 1] - npphase[0])
 
     # jtime = Time(JDstr[len(JDstr) - 1], format='jd')
     # isotime = jtime.iso
     # window.create_text(102 + (xx - 290) * (JD[len(JD) - 1] - JD[0]) / timescale, yy-180, text=isotime[11:23])
 
     for i in range(0, len(npphase[0])):
-        # window.create_line(800 + 102 + (xx - 290) * (JD[i] - JD[0]) / timescale,        # drawing error bar
-        #                    20 - error[i] * 1000 + (yy-250) * (mag[i] - Minmagvalue) / magscale,
-        #                    800 + 102 + (xx - 290) * (JD[i] - JD[0]) / timescale,
-        #                    25 + error[i] * 1000 + (yy-250) * (mag[i] - Minmagvalue) / magscale,
-        #                    fill='red')
+        window.create_line(102 + (xx - 290) * (npphase[0][i] - npphase[0][0]) / timescale,        # drawing error bar
+                           20 - npphase[2][i] * 1000 + (yy-250) * (npphase[1][i] - Minmagvalue) / magscale,
+                           102 + (xx - 290) * (npphase[0][i] - npphase[0][0]) / timescale,
+                           25 + npphase[2][i] * 1000 + (yy-250) * (npphase[1][i] - Minmagvalue) / magscale,
+                           fill='red')
         window.create_rectangle(100 + (xx - 290) * (npphase[0][i] - npphase[0][0]) / timescale,   # drawing lightucrve
                                 20 + (yy-250) * (npphase[1][i] - Minmagvalue) / magscale,
                                 104 + (xx - 290) * (npphase[0][i] - npphase[0][0]) / timescale,
                                 24 + (yy-250) * (npphase[1][i] - Minmagvalue) / magscale,
                                 fill='red', outline='red')
 
-        # window.create_rectangle(800 + 100 + (xx - 290) * (JD[i] - JD[0]) / timescale,   # drawing lightucrve
-        #                         20 + (yy-250) * (mag[i] - Minmagvalue) / magscale,
-        #                         800 + 104 + (xx - 290) * (JD[i] - JD[0]) / timescale,
-        #                         24 + (yy-250) * (mag[i] - Minmagvalue) / magscale,
-        #                         fill='red', outline='red')
-
-        # if i % 10 == 0:                                                     # drawing point numbers
-        #     window.create_line(800 + 102 + (xx - 290) * (JD[i] - JD[0]) / timescale,
-        #                        5 + 25 + error[i] * 1000 + (yy-250) * (mag[i] - Minmagvalue) / magscale,
-        #                        800 + 102 + (xx - 290) * (JD[i] - JD[0]) / timescale,
-        #                        40 + 25 + error[i] * 1000 + (yy-250) * (mag[i] - Minmagvalue) / magscale,
-        #                        fill='grey')
-        #     window.create_text(800 + 102 + (xx - 290) * (JD[i] - JD[0]) / timescale,
-        #                        50 + 25 + error[i] * 1000 + (yy-250) * (mag[i] - Minmagvalue) / magscale,
-        #                        text=i + 1)
+        if i % 10 == 0:                                                     # drawing point numbers
+            window.create_line(102 + (xx - 290) * (npphase[0][i] - npphase[0][0]) / timescale,
+                               5 + 25 + npphase[2][i] * 1000 + (yy-250) * (npphase[1][i] - Minmagvalue) / magscale,
+                               102 + (xx - 290) * (npphase[0][i] - npphase[0][0]) / timescale,
+                               40 + 25 + npphase[2][i] * 1000 + (yy-250) * (npphase[1][i] - Minmagvalue) / magscale,
+                               fill='grey')
+            window.create_text(102 + (xx - 290) * (npphase[0][i] - npphase[0][0]) / timescale,
+                               50 + 25 + npphase[2][i] * 1000 + (yy-250) * (npphase[1][i] - Minmagvalue) / magscale,
+                               text=i + 1)
 
 
 window = tk.Canvas(width=xx - 153, height=yy - 150, bg="light grey")  # yy*0.9-80
@@ -882,46 +887,94 @@ checkboxLorentz.place(x=27, y=350)
 
 
 def fitprocessing():
-    fstart = int(fitentry1.get())    # getting user starting and ending point
-    fend = int(fitentry2.get())        # of fitting
-    for i in range(fstart - 1, fend):                   # creating lists of chosen data
-        x.append(JD[i])
-        y.append(mag[i])
+    print(curvetype[0])
+    if curvetype[0] == 1:
+        fstart = int(fitentry1.get())    # getting user starting and ending point
+        fend = int(fitentry2.get())        # of fitting
+        for i in range(fstart - 1, fend):                   # creating lists of chosen data
+            x.append(JD[i])
+            y.append(mag[i])
 
-    if Gaussian.get() == 1:          # fitting and drawing Gaussian model
-        sd = (JD[fend] - JD[fstart]) / 4
-        g_init = models.Gaussian1D(amplitude=magscale, mean=x[len(x) // 2], stddev=sd)
-        fit_g = fitting.LevMarLSQFitter()
-        fitted_g = fit_g(g_init, x, y)
+        if Gaussian.get() == 1:          # fitting and drawing Gaussian model
+            sd = (JD[fend] - JD[fstart]) / 4
+            g_init = models.Gaussian1D(amplitude=magscale, mean=x[len(x) // 2], stddev=sd)
+            fit_g = fitting.LevMarLSQFitter()
+            fitted_g = fit_g(g_init, x, y)
 
-        window.create_line(102 + (xx - 290) * (fitted_g.mean - JD[0]) / timescale, yy-210-200,
-                           102 + (xx - 290) * (fitted_g.mean - JD[0]) / timescale, yy-210+201)
+            window.create_line(102 + (xx - 290) * (fitted_g.mean - JD[0]) / timescale, yy-210-200,
+                               102 + (xx - 290) * (fitted_g.mean - JD[0]) / timescale, yy-210+201)
 
-        for i in range(0, len(x)):
-            window.create_rectangle(100 + (xx - 290) * (x[i] - JD[0]) / timescale,
-                                    20 + (yy-250) * (fitted_g(x[i]) - Minmagvalue) / magscale,  # drawing
-                                    104 + (xx - 290) * (x[i] - JD[0]) / timescale,
-                                    24 + (yy-250) * (fitted_g(x[i]) - Minmagvalue) / magscale,  # graph
-                                    fill='blue', outline='blue')
+            for i in range(0, len(x)):
+                window.create_rectangle(100 + (xx - 290) * (x[i] - JD[0]) / timescale,
+                                        20 + (yy-250) * (fitted_g(x[i]) - Minmagvalue) / magscale,  # drawing
+                                        104 + (xx - 290) * (x[i] - JD[0]) / timescale,
+                                        24 + (yy-250) * (fitted_g(x[i]) - Minmagvalue) / magscale,  # graph
+                                        fill='blue', outline='blue')
 
-    if Lorentzian.get() == 1:        # fitting and drawing Lorentzian model
-        locmin = Maxmagvalue
-        index = 0
-        for i in range(0, len(y)):
-            if y[i] < locmin:
-                locmin = y[i]
-                index = i
-        l_init = models.Lorentz1D(amplitude=magscale, x_0=x[index], fwhm=(JD[fend - 1] - JD[fstart - 1]) / 2)
-        fit_l = fitting.LevMarLSQFitter()
-        fitted_l = fit_l(l_init, x, y)
-        for i in range(0, len(x)):
-            window.create_rectangle(100 + (xx - 290) * (x[i] - JD[0]) / timescale,
-                                    20 + (yy-250) * (fitted_l(x[i]) - Minmagvalue) / magscale,  # drawing
-                                    104 + (xx - 290) * (x[i] - JD[0]) / timescale,
-                                    24 + (yy-250) * (fitted_l(x[i]) - Minmagvalue) / magscale,  # graph
-                                    fill='brown', outline='brown')
+    if curvetype[0] == 2:
+        fstart = int(fitentry1.get())    # getting user starting and ending point
+        fend = int(fitentry2.get())        # of fitting
+        for i in range(fstart - 1, fend):                   # creating lists of chosen data
+            x.append(npphase[0][i])
+            y.append(npphase[1][i])
+
+        if Gaussian.get() == 1:          # fitting and drawing Gaussian model
+            sd = (npphase[0][fend] - npphase[0][fstart]) / 4
+            g_init = models.Gaussian1D(amplitude=magscale, mean=x[len(x) // 2], stddev=sd)
+            fit_g = fitting.LevMarLSQFitter()
+            fitted_g = fit_g(g_init, x, y)
+
+            window.create_line(102 + (xx - 290) * (fitted_g.mean - npphase[0][0]) / timescale, yy-210-200,
+                                102 + (xx - 290) * (fitted_g.mean - npphase[0][0]) / timescale, yy-210+201)
+
+            for i in range(0, len(x)):
+                window.create_rectangle(100 + (xx - 290) * (x[i] - npphase[0][0]) / timescale,
+                                        20 + (yy-250) * (fitted_g(x[i]) - Minmagvalue) / magscale,  # drawing
+                                        104 + (xx - 290) * (x[i] - npphase[0][0]) / timescale,
+                                        24 + (yy-250) * (fitted_g(x[i]) - Minmagvalue) / magscale,  # graph
+                                        fill='blue', outline='blue')
+
+        if Lorentzian.get() == 1:        # fitting and drawing Lorentzian model
+            locmin = Maxmagvalue
+            index = 0
+            for i in range(0, len(y)):
+                if y[i] < locmin:
+                    locmin = y[i]
+                    index = i
+            l_init = models.Lorentz1D(amplitude=magscale, x_0=x[index], fwhm=(npphase[0][fend - 1] - npphase[0][fstart - 1]) / 2)
+            fit_l = fitting.LevMarLSQFitter()
+            fitted_l = fit_l(l_init, x, y)
+            for i in range(0, len(x)):
+                window.create_rectangle(100 + (xx - 290) * (x[i] - npphase[0][0]) / timescale,
+                                        20 + (yy-250) * (fitted_l(x[i]) - Minmagvalue) / magscale,  # drawing
+                                        104 + (xx - 290) * (x[i] - npphase[0][0]) / timescale,
+                                        24 + (yy-250) * (fitted_l(x[i]) - Minmagvalue) / magscale,  # graph
+                                        fill='brown', outline='brown')
+    else:
+        showinfo(title='Fit Curve', message='No File Selected')
+    curvetype.clear()
     x.clear()
     y.clear()
+#
+
+#     if Lorentzian.get() == 1:        # fitting and drawing Lorentzian model
+#         locmin = Maxmagvalue
+#         index = 0
+#         for i in range(0, len(y)):
+#             if y[i] < locmin:
+#                 locmin = y[i]
+#                 index = i
+#         l_init = models.Lorentz1D(amplitude=magscale, x_0=x[index], fwhm=(JD[fend - 1] - JD[fstart - 1]) / 2)
+#         fit_l = fitting.LevMarLSQFitter()
+#         fitted_l = fit_l(l_init, x, y)
+#         for i in range(0, len(x)):
+#             window.create_rectangle(100 + (xx - 290) * (x[i] - JD[0]) / timescale,
+#                                     20 + (yy-250) * (fitted_l(x[i]) - Minmagvalue) / magscale,  # drawing
+#                                     104 + (xx - 290) * (x[i] - JD[0]) / timescale,
+#                                     24 + (yy-250) * (fitted_l(x[i]) - Minmagvalue) / magscale,  # graph
+#                                     fill='brown', outline='brown')
+#     x.clear()
+#     y.clear()
 
 
 fit_button = ttk.Button(master=frame2, text='Fit Curve', command=fitprocessing, width=14)
