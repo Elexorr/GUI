@@ -37,6 +37,7 @@ fopened = []
 rawopen = []
 mrawopen = []
 curvetype = []
+curvetype.append(0)
 
 
 def select_file():
@@ -634,7 +635,7 @@ def separatephasevalues():
         phase[1].append(1-round(float(magstr[i][0:8]), 5))
         error.append(round(float(errstr[i][0:8]), 5))       # error
         phase[2].append(round(float(errstr[i][0:8]), 5))
-    print(phase)
+    # print(phase)
     npphase = np.array(phase)
     # print(npphase)
     npphase = npphase[:, npphase[0, :].argsort()]
@@ -887,7 +888,7 @@ checkboxLorentz.place(x=27, y=350)
 
 
 def fitprocessing():
-    print(curvetype[0])
+    print(curvetype[len(curvetype)]
     if curvetype[0] == 1:
         fstart = int(fitentry1.get())    # getting user starting and ending point
         fend = int(fitentry2.get())        # of fitting
@@ -950,9 +951,9 @@ def fitprocessing():
                                         104 + (xx - 290) * (x[i] - npphase[0][0]) / timescale,
                                         24 + (yy-250) * (fitted_l(x[i]) - Minmagvalue) / magscale,  # graph
                                         fill='brown', outline='brown')
-    else:
+    if curvetype[0] == 0:
         showinfo(title='Fit Curve', message='No File Selected')
-    curvetype.clear()
+    # curvetype.clear()
     x.clear()
     y.clear()
 #
