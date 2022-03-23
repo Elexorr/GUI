@@ -9,6 +9,8 @@ from astropy.modeling import models, fitting
 from astropy.time import Time
 import numpy as np
 from fractions import Fraction
+from scipy.optimize import curve_fit
+from matplotlib import pyplot as plt
 
 import os
 from io import BytesIO
@@ -30,14 +32,16 @@ mag = []        # mag list / floats
 error = []      # error list / floats
 x = []
 y = []
+harx = []
+hary = []
 linearity = [[],[]]
 sensortemp = [[],[],[]]
 phase = [[],[],[]]
 fopened = []
 rawopen = []
 mrawopen = []
-curvetype = []
-curvetype.append(0)
+# curvetype = []
+# curvetype.append(0)
 
 
 def select_file():
@@ -62,7 +66,8 @@ def select_file():
     xyscale()
     drawcurve()
     fopened.append(x)
-    curvetype.append(1)
+    global curvetype
+    curvetype = 1
     showinfo(title='Open a File', message= 'File Selected: ' + filename)
 
 
@@ -95,7 +100,8 @@ def select_phasefile():
     # for i in range(0, len(JDstr)):
     #     print(JDstr[i], magstr[i], errstr[i])
     fopened.append(x)
-    curvetype.append(2)
+    global curvetype
+    curvetype = 2
     showinfo(title='Open a File', message= 'File Selected: ' + filename)
 
 
@@ -622,30 +628,22 @@ def separatephasevalues():
     global npphase
     for i in range(0, len(JDstr)):                          # creating numerical data
         if JDstr[i][0] == '-':
-            JD.append(1000000.5+(-1)*round(float(JDstr[i][1:9]) % 1, 7))
+            JD.append(1000000.5+(-1)*round(float(JDstr[i][1:9]) % 1, 7))    #phase
             phase[0].append(1000000.5+(-1)*round(float(JDstr[i][1:9]) % 1, 7))
         else:
-            JD.append(1000000.5+round(float(JDstr[i][0:8]) % 1, 7))      # julian dates
+            JD.append(1000000.5+round(float(JDstr[i][0:8]) % 1, 7))      #phase
             phase[0].append(1000000.5+round(float(JDstr[i][1:9]) % 1, 7))
-        # if JDstr[i][0] == '-':
-        #     JD.append(0.5+(-1)*round(float(JDstr[i][1:9]) % 1, 7))
-        # else:
-        #     JD.append(0.5+round(float(JDstr[i][0:8]) % 1, 7))      # julian dates
-        mag.append(1-round(float(magstr[i][0:8]), 5))         # mags
-        phase[1].append(1-round(float(magstr[i][0:8]), 5))
+        # mag.append(1-round(float(magstr[i][0:8]), 5))         # mags
+        # phase[1].append(1-round(float(magstr[i][0:8]), 5))
+        mag.append(round(float(magstr[i][0:8]), 5))         # mags
+        phase[1].append(round(float(magstr[i][0:8]), 5))
+
         error.append(round(float(errstr[i][0:8]), 5))       # error
         phase[2].append(round(float(errstr[i][0:8]), 5))
     # print(phase)
-    npphase = np.array(phase)
+    npphase = np.array(phase)   #creating np.array from standard array for fitting and drawing purposes
     # print(npphase)
-    npphase = npphase[:, npphase[0, :].argsort()]
-    # print(npphase[0])
-
-    # print(phase)
-    # for i in range(3, len(phase)):
-    #     print(phase[i])
-    # for i in range(0, len(JD)):
-    #     print(JD[i], mag[i], error[i])
+    npphase = npphase[:, npphase[0, :].argsort()]  #sorting np.array by phase
 
 
 def xyscale():              # creating variables for scaling purposes
@@ -810,8 +808,8 @@ frame4.grid(row=1, column=1, sticky=W)
 open_button = ttk.Button(master=frame2, text='Open a File', command=select_file, width=15)
 open_button.place(x=24, y=10)
 
-openphase_button = ttk.Button(master=frame2, text='Open Phase Curve', command=select_phasefile, width=15)
-openphase_button.place(x=24, y=90)
+openphase_button = ttk.Button(master=frame2, text='Open Phase Curve', command=select_phasefile, width=17)
+openphase_button.place(x=18, y=90)
 
 openraw_button = ttk.Button(master=frame3, text='Open RAW File', command=select_rawfile, width=15)
 openraw_button.place(x=24, y=10)
@@ -878,6 +876,7 @@ pixproplabel.place(x=411, y=22)
 
 Gaussian = IntVar()
 Lorentzian = IntVar()
+Harmonic = IntVar()
 
 checkboxGauss = tk.Checkbutton(master=frame2, text=' Gaussian',
                                variable=Gaussian, onvalue=1, offvalue=0, bg="grey")
@@ -885,77 +884,127 @@ checkboxGauss.place(x=27, y=330)
 checkboxLorentz = tk.Checkbutton(master=frame2, text=' Lorentzian',
                                  variable=Lorentzian, onvalue=1, offvalue=0, bg="grey")
 checkboxLorentz.place(x=27, y=350)
+checkboxHarmonic = tk.Checkbutton(master=frame2, text=' Harmonic',
+                                  variable=Harmonic, onvalue=1, offvalue=0, bg="grey")
+checkboxHarmonic.place(x=27, y=370)
 
 
 def fitprocessing():
-    print(curvetype[len(curvetype)]
-    if curvetype[0] == 1:
-        fstart = int(fitentry1.get())    # getting user starting and ending point
-        fend = int(fitentry2.get())        # of fitting
-        for i in range(fstart - 1, fend):                   # creating lists of chosen data
-            x.append(JD[i])
-            y.append(mag[i])
+    if fopened != []:
+        print(curvetype)
+        if curvetype == 1:
+            fstart = int(fitentry1.get())    # getting user starting and ending point
+            fend = int(fitentry2.get())        # of fitting
+            for i in range(fstart - 1, fend):                   # creating lists of chosen data
+                x.append(JD[i])
+                y.append(mag[i])
 
-        if Gaussian.get() == 1:          # fitting and drawing Gaussian model
-            sd = (JD[fend] - JD[fstart]) / 4
-            g_init = models.Gaussian1D(amplitude=magscale, mean=x[len(x) // 2], stddev=sd)
-            fit_g = fitting.LevMarLSQFitter()
-            fitted_g = fit_g(g_init, x, y)
+            if Gaussian.get() == 1:          # fitting and drawing Gaussian model
+                sd = (JD[fend] - JD[fstart]) / 4
+                g_init = models.Gaussian1D(amplitude=magscale, mean=x[len(x) // 2], stddev=sd)
+                fit_g = fitting.LevMarLSQFitter()
+                fitted_g = fit_g(g_init, x, y)
 
-            window.create_line(102 + (xx - 290) * (fitted_g.mean - JD[0]) / timescale, yy-210-200,
-                               102 + (xx - 290) * (fitted_g.mean - JD[0]) / timescale, yy-210+201)
+                window.create_line(102 + (xx - 290) * (fitted_g.mean - JD[0]) / timescale, yy-210-200,
+                                   102 + (xx - 290) * (fitted_g.mean - JD[0]) / timescale, yy-210+201)
 
-            for i in range(0, len(x)):
-                window.create_rectangle(100 + (xx - 290) * (x[i] - JD[0]) / timescale,
-                                        20 + (yy-250) * (fitted_g(x[i]) - Minmagvalue) / magscale,  # drawing
-                                        104 + (xx - 290) * (x[i] - JD[0]) / timescale,
-                                        24 + (yy-250) * (fitted_g(x[i]) - Minmagvalue) / magscale,  # graph
-                                        fill='blue', outline='blue')
+                for i in range(0, len(x)):
+                    window.create_rectangle(100 + (xx - 290) * (x[i] - JD[0]) / timescale,
+                                            20 + (yy-250) * (fitted_g(x[i]) - Minmagvalue) / magscale,  # drawing
+                                            104 + (xx - 290) * (x[i] - JD[0]) / timescale,
+                                            24 + (yy-250) * (fitted_g(x[i]) - Minmagvalue) / magscale,  # graph
+                                            fill='blue', outline='blue')
 
-    if curvetype[0] == 2:
-        fstart = int(fitentry1.get())    # getting user starting and ending point
-        fend = int(fitentry2.get())        # of fitting
-        for i in range(fstart - 1, fend):                   # creating lists of chosen data
-            x.append(npphase[0][i])
-            y.append(npphase[1][i])
+            if Lorentzian.get() == 1:        # fitting and drawing Lorentzian model
+                locmin = Maxmagvalue
+                index = 0
+                for i in range(0, len(y)):
+                    if y[i] < locmin:
+                        locmin = y[i]
+                        index = i
+                l_init = models.Lorentz1D(amplitude=magscale, x_0=x[index], fwhm=(JD[fend - 1] - JD[fstart - 1]) / 2)
+                fit_l = fitting.LevMarLSQFitter()
+                fitted_l = fit_l(l_init, x, y)
+                for i in range(0, len(x)):
+                    window.create_rectangle(100 + (xx - 290) * (x[i] - JD[0]) / timescale,
+                                            20 + (yy-250) * (fitted_l(x[i]) - Minmagvalue) / magscale,  # drawing
+                                            104 + (xx - 290) * (x[i] - JD[0]) / timescale,
+                                            24 + (yy-250) * (fitted_l(x[i]) - Minmagvalue) / magscale,  # graph
+                                            fill='brown', outline='brown')
 
-        if Gaussian.get() == 1:          # fitting and drawing Gaussian model
-            sd = (npphase[0][fend] - npphase[0][fstart]) / 4
-            g_init = models.Gaussian1D(amplitude=magscale, mean=x[len(x) // 2], stddev=sd)
-            fit_g = fitting.LevMarLSQFitter()
-            fitted_g = fit_g(g_init, x, y)
+        if curvetype == 2:
+            fstart = int(fitentry1.get())    # getting user starting and ending point
+            fend = int(fitentry2.get())        # of fitting
+            for i in range(fstart - 1, fend):                   # creating lists of chosen data
+                x.append(npphase[0][i])
+                y.append(npphase[1][i])
 
-            window.create_line(102 + (xx - 290) * (fitted_g.mean - npphase[0][0]) / timescale, yy-210-200,
-                                102 + (xx - 290) * (fitted_g.mean - npphase[0][0]) / timescale, yy-210+201)
+            if Gaussian.get() == 1:          # fitting and drawing Gaussian model
+                sd = (npphase[0][fend] - npphase[0][fstart]) / 4
+                g_init = models.Gaussian1D(amplitude=magscale, mean=x[len(x) // 2], stddev=sd)
+                fit_g = fitting.LevMarLSQFitter()
+                fitted_g = fit_g(g_init, x, y)
 
-            for i in range(0, len(x)):
-                window.create_rectangle(100 + (xx - 290) * (x[i] - npphase[0][0]) / timescale,
-                                        20 + (yy-250) * (fitted_g(x[i]) - Minmagvalue) / magscale,  # drawing
-                                        104 + (xx - 290) * (x[i] - npphase[0][0]) / timescale,
-                                        24 + (yy-250) * (fitted_g(x[i]) - Minmagvalue) / magscale,  # graph
-                                        fill='blue', outline='blue')
+                window.create_line(102 + (xx - 290) * (fitted_g.mean - npphase[0][0]) / timescale, yy-210-200,
+                                    102 + (xx - 290) * (fitted_g.mean - npphase[0][0]) / timescale, yy-210+201)
 
-        if Lorentzian.get() == 1:        # fitting and drawing Lorentzian model
-            locmin = Maxmagvalue
-            index = 0
-            for i in range(0, len(y)):
-                if y[i] < locmin:
-                    locmin = y[i]
-                    index = i
-            l_init = models.Lorentz1D(amplitude=magscale, x_0=x[index], fwhm=(npphase[0][fend - 1] - npphase[0][fstart - 1]) / 2)
-            fit_l = fitting.LevMarLSQFitter()
-            fitted_l = fit_l(l_init, x, y)
-            for i in range(0, len(x)):
-                window.create_rectangle(100 + (xx - 290) * (x[i] - npphase[0][0]) / timescale,
-                                        20 + (yy-250) * (fitted_l(x[i]) - Minmagvalue) / magscale,  # drawing
-                                        104 + (xx - 290) * (x[i] - npphase[0][0]) / timescale,
-                                        24 + (yy-250) * (fitted_l(x[i]) - Minmagvalue) / magscale,  # graph
-                                        fill='brown', outline='brown')
-    if curvetype[0] == 0:
+                for i in range(0, len(x)):
+                    window.create_rectangle(100 + (xx - 290) * (x[i] - npphase[0][0]) / timescale,
+                                            20 + (yy-250) * (fitted_g(x[i]) - Minmagvalue) / magscale,  # drawing
+                                            104 + (xx - 290) * (x[i] - npphase[0][0]) / timescale,
+                                            24 + (yy-250) * (fitted_g(x[i]) - Minmagvalue) / magscale,  # graph
+                                            fill='blue', outline='blue')
+
+            if Lorentzian.get() == 1:        # fitting and drawing Lorentzian model
+                locmin = Maxmagvalue
+                index = 0
+                for i in range(0, len(y)):
+                    if y[i] < locmin:
+                        locmin = y[i]
+                        index = i
+                l_init = models.Lorentz1D(amplitude=magscale, x_0=x[index], fwhm=(npphase[0][fend - 1] - npphase[0][fstart - 1]) / 2)
+                fit_l = fitting.LevMarLSQFitter()
+                fitted_l = fit_l(l_init, x, y)
+                for i in range(0, len(x)):
+                    window.create_rectangle(100 + (xx - 290) * (x[i] - npphase[0][0]) / timescale,
+                                            20 + (yy-250) * (fitted_l(x[i]) - Minmagvalue) / magscale,  # drawing
+                                            104 + (xx - 290) * (x[i] - npphase[0][0]) / timescale,
+                                            24 + (yy-250) * (fitted_l(x[i]) - Minmagvalue) / magscale,  # graph
+                                            fill='brown', outline='brown')
+
+            if Harmonic.get() == 1:        # fitting and drawing Harmonic model
+                print('Harmonic')
+                fstart = int(fitentry1.get())  # getting user starting and ending point
+                fend = int(fitentry2.get())  # of fitting
+                # for i in range(fstart - 1, fend):  # creating lists of chosen data
+                #     harx.append(npphase[0][i])
+                #     hary.append(npphase[1][i])
+                harx = npphase[0][fstart:fend]
+                hary = npphase[1][fstart:fend]
+                # print(harx)
+                def test(harx, a, b):
+                    return a * np.sin(b * harx)
+                param, param_cov = curve_fit(test, harx, hary)
+
+                print("Sine function coefficients:")
+                print(param)
+                print("Covariance of coefficients:")
+                print(param_cov)
+
+                ans = (param[0] * (np.sin(param[1] * harx)))
+
+                plt.plot(harx, 1-hary, 'o', color='red', label="data")
+                plt.plot(harx, ans, '--', color='blue', label="optimized data")
+                plt.legend()
+                plt.show()
+
+
+
+        # curvetype.clear()
+        x.clear()
+        y.clear()
+    else:
         showinfo(title='Fit Curve', message='No File Selected')
-    # curvetype.clear()
-    x.clear()
-    y.clear()
 #
 
 #     if Lorentzian.get() == 1:        # fitting and drawing Lorentzian model
@@ -979,16 +1028,16 @@ def fitprocessing():
 
 
 fit_button = ttk.Button(master=frame2, text='Fit Curve', command=fitprocessing, width=14)
-fit_button.place(x=26, y=380)
+fit_button.place(x=26, y=430)
 
 tintlabel = tk.Label(master=frame2, text='Time Interval', bg="grey")
-tintlabel.place(x=35, y=420)
+tintlabel.place(x=35, y=520)
 
 tintentry1 = tk.Entry(master=frame2, justify=CENTER, width=5)
-tintentry1.place(x=26, y=450)
+tintentry1.place(x=26, y=550)
 
 tintentry2 = tk.Entry(master=frame2, justify=CENTER, width=5)
-tintentry2.place(x=86, y=450)
+tintentry2.place(x=86, y=550)
 
 tint = ""
 
@@ -998,17 +1047,17 @@ def timeinterval():
     global tintoutput
     tintoutput = tk.Label(master=frame2, text=str(tint) + " d", font="Times 10 bold",
                           bg="light grey", justify=CENTER, width=14)
-    tintoutput.place(x=22, y=511)
+    tintoutput.place(x=22, y=611)
 
 
 tint_button = ttk.Button(master=frame2, text='Compute', command=timeinterval, width=15)
-tint_button.place(x=24, y=480)
+tint_button.place(x=24, y=580)
 
 tintblacklabel = tk.Label(master=frame2, text=str(tint), bg="black", bd=3, width=14)
-tintblacklabel.place(x=21, y=510)
+tintblacklabel.place(x=21, y=610)
 
 tintoutput = tk.Label(master=frame2, text=str(tint), bg="light grey", width=14)
-tintoutput.place(x=22, y=511)
+tintoutput.place(x=22, y=611)
 
 def selectsample():
     window.delete('samprop')
