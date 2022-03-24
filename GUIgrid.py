@@ -6,10 +6,11 @@ import exiftool
 from tkinter import filedialog as fd
 from tkinter.messagebox import showinfo
 from astropy.modeling import models, fitting
+from astropy.modeling.models import Sine1D
 from astropy.time import Time
 import numpy as np
 from fractions import Fraction
-from scipy.optimize import curve_fit
+# from scipy.optimize import curve_fit
 from matplotlib import pyplot as plt
 
 import os
@@ -75,7 +76,7 @@ def select_phasefile():
     if fopened != []:
         clearwindow()
     filetypes = (('Text Files', '*.txt'), ('All Files', '*.*'))
-    filename = fd.askopenfilename(title='Open a File',
+    filename = fd.askopenfilename(title='Open Phase Curve',
                                   initialdir='/', filetypes=filetypes)
     global f
     global lines
@@ -633,8 +634,8 @@ def separatephasevalues():
         else:
             JD.append(1000000.5+round(float(JDstr[i][0:8]) % 1, 7))      #phase
             phase[0].append(1000000.5+round(float(JDstr[i][1:9]) % 1, 7))
-        mag.append(1-round(float(magstr[i][0:8]), 5))         # mags
-        phase[1].append(1-round(float(magstr[i][0:8]), 5))
+        mag.append(round(2+(float(magstr[i][0:8])), 5))           # adds factor 5 to make all values positive
+        phase[1].append(round(2+(float(magstr[i][0:8])), 5))      # adds factor 5 to make all values positive
         # mag.append(round(float(magstr[i][0:8]), 5))         # mags
         # phase[1].append(round(float(magstr[i][0:8]), 5))
 
@@ -651,15 +652,10 @@ def xyscale():              # creating variables for scaling purposes
     global Minmagvalue
     global magscale
     global timescale
-    Maxmagvalue = 0
-    Minmagvalue = 100
-    magscale = 0
-    for i in range(0, len(mag)):
-        if mag[i] > Maxmagvalue:
-            Maxmagvalue = mag[i]
-        if mag[i] < Minmagvalue:
-            Minmagvalue = mag[i]
-        magscale = round(Maxmagvalue - Minmagvalue, 5)
+    Maxmagvalue = np.max(mag, axis = 0)
+    Minmagvalue = np.min(mag, axis = 0)
+    print(Maxmagvalue, Minmagvalue)
+    magscale = round(Maxmagvalue - Minmagvalue, 5)
     timescale = round((JD[len(JD) - 1] - JD[0]), 7)
 
 
@@ -721,24 +717,11 @@ def xyphasescale():              # creating variables for scaling purposes
     global Minmagvalue
     global magscale
     global timescale
-    Maxmagvalue = 0
-    Minmagvalue = 100
-    magscale = 0
-    # for i in range(0, len(npphase[1])):
-    #     if mag[i] > Maxmagvalue:
-    #         Maxmagvalue = mag[i]
-    #     if mag[i] < Minmagvalue:
-    #         Minmagvalue = mag[i]
-    #     magscale = round(Maxmagvalue - Minmagvalue, 5)
-    # timescale = 1
-    for i in range(0, len(npphase[1])):
-        if npphase[1][i] > Maxmagvalue:
-            Maxmagvalue = npphase[1][i]
-        if npphase[1][i] < Minmagvalue:
-            Minmagvalue = npphase[1][i]
-        magscale = round(Maxmagvalue - Minmagvalue, 5)
+    Maxmagvalue = round(np.max(npphase[1], axis = 0), 5)
+    Minmagvalue = round(np.min(npphase[1], axis = 0), 5)
+    # print(round(Maxmagvalue-2, 5), round(Minmagvalue-2, 5))
+    magscale = round(Maxmagvalue - Minmagvalue, 5)
     timescale = 1
-    # timescale = round((JD[len(JD) - 1] - JD[0]), 7)
 
 
 def drawphasecurve():                # drawing axes, labels and curves
@@ -748,29 +731,20 @@ def drawphasecurve():                # drawing axes, labels and curves
 
     window.create_line(75, 22 + (yy-250) * (Minmagvalue - Minmagvalue) / magscale,
                        86, 22 + (yy-250) * (Minmagvalue - Minmagvalue) / magscale)
-    window.create_text(50, 22 + (yy-250) * (Minmagvalue - Minmagvalue) / magscale, text=Minmagvalue)
+    window.create_text(50, 22 + (yy-250) * (Minmagvalue - Minmagvalue) / magscale, text=round(Minmagvalue-2, 5))
     window.create_line(75, 22 + (yy-250) * (Maxmagvalue - Minmagvalue) / magscale,
                        86, 22 + (yy-250) * (Maxmagvalue - Minmagvalue) / magscale)
-    window.create_text(50, 22 + (yy-250) * (Maxmagvalue - Minmagvalue) / magscale, text=Maxmagvalue)
-    # window.create_text(50, yy-195, text=JDay + "+")
+    window.create_text(50, 22 + (yy-250) * (Maxmagvalue - Minmagvalue) / magscale, text=round(Maxmagvalue-2, 5))
 
+    window.create_line(102 + (xx - 290) * (npphase[0][0] - npphase[0][0]) / timescale, yy-210-5,
+                       102 + (xx - 290) * (npphase[0][0] - npphase[0][0]) / timescale, yy-210+6)
+    window.create_text(102 + (xx - 290) * (npphase[0][0] - npphase[0][0]) / timescale, yy-195,
+                       text=-0.5)  # text=round(npphase[0][0]-1000000.5, 1))
 
-    # window.create_text(38, yy-180, text=isotime[0:10])
-    # window.create_text(102 + (xx - 290) * (JD[0] - JD[0]) / timescale, yy-180, text=isotime[11:23])
-
-    # window.create_line(102 + (xx - 290) * (npphase[0][0] - npphase[0][0]) / timescale, yy-210-5,
-    #                    102 + (xx - 290) * (npphase[0][0] - npphase[0][0]) / timescale, yy-210+6)
-    # window.create_text(102 + (xx - 290) * (npphase[0][0] - npphase[0][0]) / timescale, yy-195,
-    #                    text=npphase[0][0])
-    #
-    # window.create_line(102 + (xx - 290) * (npphase[len(npphase) - 1] - npphase[0]) / timescale, yy-210-5,
-    #                    102 + (xx - 290) * (npphase[len(npphase) - 1] - npphase[0]) / timescale, yy-210+6)
-    # window.create_text(102 + (xx - 290) * (npphase[len(npphase) - 1] - npphase[0]) / timescale, yy-195,
-    #                    text=npphase[len(npphase) - 1] - npphase[0])
-
-    # jtime = Time(JDstr[len(JDstr) - 1], format='jd')
-    # isotime = jtime.iso
-    # window.create_text(102 + (xx - 290) * (JD[len(JD) - 1] - JD[0]) / timescale, yy-180, text=isotime[11:23])
+    window.create_line(102 + (xx - 290) * 1 / timescale, yy-210-5,
+                       102 + (xx - 290) * 1 / timescale, yy-210+6)
+    window.create_text(102 + (xx - 290) * 1 / timescale, yy-195,
+                       text=0.5)
 
     for i in range(0, len(npphase[0])):
         window.create_line(102 + (xx - 290) * (npphase[0][i] - npphase[0][0]) / timescale,        # drawing error bar
@@ -884,14 +858,14 @@ checkboxGauss.place(x=27, y=330)
 checkboxLorentz = tk.Checkbutton(master=frame2, text=' Lorentzian',
                                  variable=Lorentzian, onvalue=1, offvalue=0, bg="grey")
 checkboxLorentz.place(x=27, y=350)
-# checkboxHarmonic = tk.Checkbutton(master=frame2, text=' Harmonic',
-#                                   variable=Harmonic, onvalue=1, offvalue=0, bg="grey")
-# checkboxHarmonic.place(x=27, y=370)
+checkboxHarmonic = tk.Checkbutton(master=frame2, text=' Harmonic',
+                                  variable=Harmonic, onvalue=1, offvalue=0, bg="grey")
+checkboxHarmonic.place(x=27, y=370)
 
 
 def fitprocessing():
     if fopened != []:
-        print(curvetype)
+        # print(curvetype)
         if curvetype == 1:
             fstart = int(fitentry1.get())    # getting user starting and ending point
             fend = int(fitentry2.get())        # of fitting
@@ -971,15 +945,27 @@ def fitprocessing():
                                             104 + (xx - 290) * (x[i] - npphase[0][0]) / timescale,
                                             24 + (yy-250) * (fitted_l(x[i]) - Minmagvalue) / magscale,  # graph
                                             fill='brown', outline='brown')
-            # if Harmonic.get() == 1:        # fitting and drawing Harmonic model
-            #     print('Harmonic')
-            #     fstart = int(fitentry1.get())  # getting user starting and ending point
-            #     fend = int(fitentry2.get())  # of fitting
-            #     # for i in range(fstart - 1, fend):  # creating lists of chosen data
-            #     #     harx.append(npphase[0][i])
-            #     #     hary.append(npphase[1][i])
-            #     harx = npphase[0][fstart:fend]
-            #     hary = npphase[1][fstart:fend]
+
+            if Harmonic.get() == 1:        # fitting and drawing Harmonic model
+                print('Harmonic')
+                fstart = int(fitentry1.get())  # getting user starting and ending point
+                fend = int(fitentry2.get())  # of fitting
+                # for i in range(fstart - 1, fend):  # creating lists of chosen data
+                #     harx.append(npphase[0][i])
+                #     hary.append(npphase[1][i])
+                harx = npphase[0][fstart:fend]
+                hary = npphase[1][fstart:fend]
+                amp = (np.max(hary) - np.min(hary))
+                print(amp)
+                s_init = models.Sine1D(amplitude=amp, frequency=1.25)
+                fit_s = fitting.LevMarLSQFitter()
+                fitted_s = fit_s(s_init, harx, hary)
+                for i in range(0, len(harx)):
+                    window.create_rectangle(100 + (xx - 290) * (harx[i] - harx[0]) / timescale,
+                                            400 - (yy-250) * (fitted_s(harx[i]) - Minmagvalue) / magscale,  # drawing
+                                            104 + (xx - 290) * (harx[i] - harx[0]) / timescale,
+                                            404 - (yy-250) * (fitted_s(harx[i]) - Minmagvalue) / magscale,  # graph
+                                            fill='blue', outline='blue')
             #     # print(harx)
             #     def test(harx, K, a, b, c):
             #         return K + a * np.sin(b * harx + c)
@@ -1151,10 +1137,12 @@ def clearwindow():
     window.delete("all")
     # tintoutput.destroy()
     tintoutput = tk.Label(master=frame2, text='', bg="light grey", width=14)
-    tintoutput.place(x=22, y=511)
+    tintoutput.place(x=22, y=611)
     if 'lines' in globals():
         lines.clear()
-    # phase.clear()
+    phase[0].clear()
+    phase[1].clear()
+    phase[2].clear()
     if 'npphase' in globals():
         np.delete(npphase, 0)
         np.delete(npphase, 1)
