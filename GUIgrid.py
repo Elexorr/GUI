@@ -884,9 +884,9 @@ checkboxGauss.place(x=27, y=330)
 checkboxLorentz = tk.Checkbutton(master=frame2, text=' Lorentzian',
                                  variable=Lorentzian, onvalue=1, offvalue=0, bg="grey")
 checkboxLorentz.place(x=27, y=350)
-checkboxHarmonic = tk.Checkbutton(master=frame2, text=' Harmonic',
-                                  variable=Harmonic, onvalue=1, offvalue=0, bg="grey")
-checkboxHarmonic.place(x=27, y=370)
+# checkboxHarmonic = tk.Checkbutton(master=frame2, text=' Harmonic',
+#                                   variable=Harmonic, onvalue=1, offvalue=0, bg="grey")
+# checkboxHarmonic.place(x=27, y=370)
 
 
 def fitprocessing():
@@ -971,36 +971,32 @@ def fitprocessing():
                                             104 + (xx - 290) * (x[i] - npphase[0][0]) / timescale,
                                             24 + (yy-250) * (fitted_l(x[i]) - Minmagvalue) / magscale,  # graph
                                             fill='brown', outline='brown')
-
-            if Harmonic.get() == 1:        # fitting and drawing Harmonic model
-                print('Harmonic')
-                fstart = int(fitentry1.get())  # getting user starting and ending point
-                fend = int(fitentry2.get())  # of fitting
-                # for i in range(fstart - 1, fend):  # creating lists of chosen data
-                #     harx.append(npphase[0][i])
-                #     hary.append(npphase[1][i])
-                harx = npphase[0][fstart:fend]
-                hary = npphase[1][fstart:fend]
-                # print(harx)
-                def test(harx, K, a, b, c):
-                    return K + a * np.sin(b * harx + c)
-                    # return a * np.sin(b * harx)
-                param, param_cov = curve_fit(test, harx, hary, p0 = [np.mean(hary), 0.5*(np.max(hary) - np.min(hary)), np.pi, 0])
-
-                print("Sine function coefficients:")
-                print(param)
-                print("Covariance of coefficients:")
-                print(param_cov)
-
-                ans = (param[0] * (np.sin(param[1] * harx)))
-
-                plt.plot(harx, 1-hary, 'o', color='red', label="data")
-                plt.plot(harx, ans, '--', color='blue', label="optimized data")
-                plt.legend()
-                plt.show()
-
-
-
+            # if Harmonic.get() == 1:        # fitting and drawing Harmonic model
+            #     print('Harmonic')
+            #     fstart = int(fitentry1.get())  # getting user starting and ending point
+            #     fend = int(fitentry2.get())  # of fitting
+            #     # for i in range(fstart - 1, fend):  # creating lists of chosen data
+            #     #     harx.append(npphase[0][i])
+            #     #     hary.append(npphase[1][i])
+            #     harx = npphase[0][fstart:fend]
+            #     hary = npphase[1][fstart:fend]
+            #     # print(harx)
+            #     def test(harx, K, a, b, c):
+            #         return K + a * np.sin(b * harx + c)
+            #         # return a * np.sin(b * harx)
+            #     param, param_cov = curve_fit(test, harx, hary, p0 = [np.mean(hary), 0.5*(np.max(hary) - np.min(hary)), np.pi, 0])
+            #
+            #     print("Sine function coefficients:")
+            #     print(param)
+            #     print("Covariance of coefficients:")
+            #     print(param_cov)
+            #
+            #     ans = (param[0] * (np.sin(param[1] * harx)))
+            #
+            #     plt.plot(harx, 1-hary, 'o', color='red', label="data")
+            #     plt.plot(harx, ans, '--', color='blue', label="optimized data")
+            #     plt.legend()
+            #     plt.show()
         # curvetype.clear()
         x.clear()
         y.clear()
