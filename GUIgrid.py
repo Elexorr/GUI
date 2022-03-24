@@ -633,10 +633,10 @@ def separatephasevalues():
         else:
             JD.append(1000000.5+round(float(JDstr[i][0:8]) % 1, 7))      #phase
             phase[0].append(1000000.5+round(float(JDstr[i][1:9]) % 1, 7))
-        # mag.append(1-round(float(magstr[i][0:8]), 5))         # mags
-        # phase[1].append(1-round(float(magstr[i][0:8]), 5))
-        mag.append(round(float(magstr[i][0:8]), 5))         # mags
-        phase[1].append(round(float(magstr[i][0:8]), 5))
+        mag.append(1-round(float(magstr[i][0:8]), 5))         # mags
+        phase[1].append(1-round(float(magstr[i][0:8]), 5))
+        # mag.append(round(float(magstr[i][0:8]), 5))         # mags
+        # phase[1].append(round(float(magstr[i][0:8]), 5))
 
         error.append(round(float(errstr[i][0:8]), 5))       # error
         phase[2].append(round(float(errstr[i][0:8]), 5))
@@ -982,9 +982,10 @@ def fitprocessing():
                 harx = npphase[0][fstart:fend]
                 hary = npphase[1][fstart:fend]
                 # print(harx)
-                def test(harx, a, b):
-                    return a * np.sin(b * harx)
-                param, param_cov = curve_fit(test, harx, hary)
+                def test(harx, K, a, b, c):
+                    return K + a * np.sin(b * harx + c)
+                    # return a * np.sin(b * harx)
+                param, param_cov = curve_fit(test, harx, hary, p0 = [np.mean(hary), 0.5*(np.max(hary) - np.min(hary)), np.pi, 0])
 
                 print("Sine function coefficients:")
                 print(param)
