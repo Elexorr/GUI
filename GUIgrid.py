@@ -10,7 +10,7 @@ from astropy.modeling.models import Sine1D
 from astropy.time import Time
 import numpy as np
 from fractions import Fraction
-# from scipy.optimize import curve_fit
+from scipy.optimize import curve_fit
 from matplotlib import pyplot as plt
 
 import os
@@ -55,21 +55,24 @@ def select_file():
     global lines
     f = open(filename)
     lines = f.readlines()
-    global JDay
-    for i in range(2, len(lines)):              # extracting string data from source file
-        if i == 2:
-            JDay = str(lines[i][0:7])           # checking julian day
-        if str(lines[i][16:18]) != '99':        # filtering invalid data
-            JDstr.append(lines[i][0:15])        # julian dates
-            magstr.append(lines[i][16:24])      # mags
-            errstr.append(lines[i][25:32])      # error
-    separatenumericalvalues()
-    xyscale()
-    drawcurve()
-    fopened.append(x)
-    global curvetype
-    curvetype = 1
-    showinfo(title='Open a File', message= 'File Selected: ' + filename)
+    if lines[3][15] !=' ':
+        showinfo(title='Open a File', message='Not a Valid Lighturve File ' + filename)
+    else:
+        global JDay
+        for i in range(2, len(lines)):              # extracting string data from source file
+            if i == 2:
+                JDay = str(lines[i][0:7])           # checking julian day
+            if str(lines[i][16:18]) != '99':        # filtering invalid data
+                JDstr.append(lines[i][0:15])        # julian dates
+                magstr.append(lines[i][16:24])      # mags
+                errstr.append(lines[i][25:32])      # error
+        separatenumericalvalues()
+        xyscale()
+        drawcurve()
+        fopened.append(x)
+        global curvetype
+        curvetype = 1
+        showinfo(title='Open a File', message= 'File Selected: ' + filename)
 
 
 def select_phasefile():
@@ -82,28 +85,33 @@ def select_phasefile():
     global lines
     f = open(filename)
     lines = f.readlines()
-    global JDay
-    for i in range(0, len(lines)):              # extracting string data from source file
-        # if i == 2:
-        #     JDay = str(lines[i][0:7])           # checking julian day
-        # if str(lines[i][16:18]) != '99':        # filtering invalid data
-        if lines[i][0] == '-':
-            JDstr.append(lines[i][0:9])  # julian dates
-            magstr.append(lines[i][10:18])  # mags
-            errstr.append(lines[i][19:27])  # error
-        else:
-            JDstr.append(lines[i][0:8])        # julian dates
-            magstr.append(lines[i][9:17])      # mags
-            errstr.append(lines[i][18:26])      # error
-    separatephasevalues()
-    xyphasescale()
-    drawphasecurve()
-    # for i in range(0, len(JDstr)):
-    #     print(JDstr[i], magstr[i], errstr[i])
-    fopened.append(x)
-    global curvetype
-    curvetype = 2
-    showinfo(title='Open a File', message= 'File Selected: ' + filename)
+    print(len(lines[1]))
+    if lines[1][1] == '.' or lines[1][2] == '.':
+        global JDay
+        for i in range(0, len(lines)):  # extracting string data from source file
+            # if i == 2:
+            #     JDay = str(lines[i][0:7])           # checking julian day
+            # if str(lines[i][16:18]) != '99':        # filtering invalid data
+            if lines[i][0] == '-':
+                JDstr.append(lines[i][0:9])  # julian dates
+                magstr.append(lines[i][10:18])  # mags
+                errstr.append(lines[i][19:27])  # error
+            else:
+                JDstr.append(lines[i][0:8])  # julian dates
+                magstr.append(lines[i][9:17])  # mags
+                errstr.append(lines[i][18:26])  # error
+        separatephasevalues()
+        xyphasescale()
+        drawphasecurve()
+        # for i in range(0, len(JDstr)):
+        #     print(JDstr[i], magstr[i], errstr[i])
+        fopened.append(x)
+        global curvetype
+        curvetype = 2
+        showinfo(title='Open a File', message='File Selected: ' + filename)
+    else:
+        showinfo(title='Open a File', message='Not a Valid Phase Curve File ' + filename)
+
 
 
 def select_rawfile():
@@ -788,11 +796,11 @@ frame2.grid(row=0, column=1, sticky=S)
 frame3.grid(row=1, column=0, sticky=E)
 frame4.grid(row=1, column=1, sticky=W)
 
-open_button = ttk.Button(master=frame2, text='Open a File', command=select_file, width=15)
-open_button.place(x=24, y=10)
+open_button = ttk.Button(master=frame2, text='Open Light Curve', command=select_file, width=17)
+open_button.place(x=18, y=10)
 
 openphase_button = ttk.Button(master=frame2, text='Open Phase Curve', command=select_phasefile, width=17)
-openphase_button.place(x=18, y=90)
+openphase_button.place(x=18, y=50)
 
 openraw_button = ttk.Button(master=frame3, text='Open RAW File', command=select_rawfile, width=15)
 openraw_button.place(x=24, y=10)
@@ -809,11 +817,14 @@ checktemperature_button.place(x=640, y=40)
 rawmaxmin_button = ttk.Button(master=frame3, text='Max./Min. ADU', command=adumaxmin, width=15)
 rawmaxmin_button.place(x=24, y=40)
 
+tintlabel = tk.Label(master=frame2, text='Fit Start        Fit End', bg="grey")
+tintlabel.place(x=19, y=100)
+
 fitentry1 = tk.Entry(master=frame2, justify=CENTER, width=5)
-fitentry1.place(x=26, y=300)
+fitentry1.place(x=26, y=120)
 
 fitentry2 = tk.Entry(master=frame2, justify=CENTER, width=5)
-fitentry2.place(x=86, y=300)
+fitentry2.place(x=86, y=120)
 
 adulimitlabel = tk.Label(master=frame3, text='Show Pixels', bg="grey")
 adulimitlabel.place(x=165, y=0)
@@ -864,16 +875,16 @@ Harmonic = IntVar()
 
 checkboxInverted = tk.Checkbutton(master=frame2, text=' Inverted',
                                variable=Inverted, onvalue=1, offvalue=0, bg="grey")
-checkboxInverted.place(x=34, y=115)
+checkboxInverted.place(x=34, y=75)
 checkboxGauss = tk.Checkbutton(master=frame2, text=' Gaussian',
                                variable=Gaussian, onvalue=1, offvalue=0, bg="grey")
-checkboxGauss.place(x=27, y=330)
+checkboxGauss.place(x=27, y=140)
 checkboxLorentz = tk.Checkbutton(master=frame2, text=' Lorentzian',
                                  variable=Lorentzian, onvalue=1, offvalue=0, bg="grey")
-checkboxLorentz.place(x=27, y=350)
-checkboxHarmonic = tk.Checkbutton(master=frame2, text=' Harmonic',
-                                  variable=Harmonic, onvalue=1, offvalue=0, bg="grey")
-checkboxHarmonic.place(x=27, y=370)
+checkboxLorentz.place(x=27, y=160)
+# checkboxHarmonic = tk.Checkbutton(master=frame2, text=' Harmonic',
+#                                   variable=Harmonic, onvalue=1, offvalue=0, bg="grey")
+# checkboxHarmonic.place(x=27, y=180)
 
 
 def fitprocessing():
@@ -964,81 +975,61 @@ def fitprocessing():
                                             24 + (yy-250) * (fitted_l(x[i]) - Minmagvalue) / magscale,  # graph
                                             fill='brown', outline='brown')
 
-            if Harmonic.get() == 1:        # fitting and drawing Harmonic model
-                print('Harmonic')
-                fstart = int(fitentry1.get())  # getting user starting and ending point
-                fend = int(fitentry2.get())  # of fitting
+            # if Harmonic.get() == 1:        # fitting and drawing Harmonic model
+                # print('Harmonic')
+                # fstart = int(fitentry1.get())  # getting user starting and ending point
+                # fend = int(fitentry2.get())  # of fitting
                 # for i in range(fstart - 1, fend):  # creating lists of chosen data
                 #     harx.append(npphase[0][i])
                 #     hary.append(npphase[1][i])
-                harx = npphase[0][fstart:fend]
-                hary = npphase[1][fstart:fend]
-                amp = (np.max(hary) - np.min(hary))
-                print(amp)
-                s_init = models.Sine1D(amplitude=amp, frequency=1.25)
-                fit_s = fitting.LevMarLSQFitter()
-                fitted_s = fit_s(s_init, harx, hary)
-                for i in range(0, len(harx)):
-                    window.create_rectangle(100 + (xx - 290) * (harx[i] - harx[0]) / timescale,
-                                            400 - (yy-250) * (fitted_s(harx[i]) - Minmagvalue) / magscale,  # drawing
-                                            104 + (xx - 290) * (harx[i] - harx[0]) / timescale,
-                                            404 - (yy-250) * (fitted_s(harx[i]) - Minmagvalue) / magscale,  # graph
-                                            fill='blue', outline='blue')
-            #     # print(harx)
-            #     def test(harx, K, a, b, c):
-            #         return K + a * np.sin(b * harx + c)
-            #         # return a * np.sin(b * harx)
-            #     param, param_cov = curve_fit(test, harx, hary, p0 = [np.mean(hary), 0.5*(np.max(hary) - np.min(hary)), np.pi, 0])
-            #
-            #     print("Sine function coefficients:")
-            #     print(param)
-            #     print("Covariance of coefficients:")
-            #     print(param_cov)
-            #
-            #     ans = (param[0] * (np.sin(param[1] * harx)))
-            #
-            #     plt.plot(harx, 1-hary, 'o', color='red', label="data")
-            #     plt.plot(harx, ans, '--', color='blue', label="optimized data")
-            #     plt.legend()
-            #     plt.show()
+                # harx = npphase[0][fstart:fend]
+                # hary = npphase[1][fstart:fend]
+                # amp = (np.max(hary) - np.min(hary))
+                # print(amp)
+                # s_init = models.Sine1D(amplitude=amp, phase=0.5)
+                # fit_s = fitting.LevMarLSQFitter()
+                # fitted_s = fit_s(s_init, harx, hary)
+                # for i in range(0, len(harx)):
+                #     window.create_rectangle(100 + (xx - 290) * (harx[i] - harx[0]) / timescale,
+                #                             20 + (yy-250) * (fitted_s(harx[i]) - Minmagvalue) / magscale,  # drawing
+                #                             104 + (xx - 290) * (harx[i] - harx[0]) / timescale,
+                #                             24 + (yy-250) * (fitted_s(harx[i]) - Minmagvalue) / magscale,  # graph
+                #                             fill='blue', outline='blue')
+                # print(harx)
+        #         def test(harx, K, a1, b1, c1):
+        #             return K + a1 * np.sin(b1 * harx + c1)
+        #             # return a * np.sin(b * harx)
+        #         param, param_cov = curve_fit(test, harx, hary)
+        #
+        #         print("Sine function coefficients:")
+        #         print(param)
+        #         print("Covariance of coefficients:")
+        #         print(param_cov)
+        #
+        #         ans = (param[0] * (np.sin(param[1] * harx)))
+        #
+        #         plt.plot(harx, 1-hary, 'o', color='red', label="data")
+        #         plt.plot(harx, ans, '--', color='blue', label="optimized data")
+        #         plt.legend()
+        #         plt.show()
         # curvetype.clear()
-        x.clear()
-        y.clear()
+        # x.clear()
+        # y.clear()
     else:
         showinfo(title='Fit Curve', message='No File Selected')
-#
-
-#     if Lorentzian.get() == 1:        # fitting and drawing Lorentzian model
-#         locmin = Maxmagvalue
-#         index = 0
-#         for i in range(0, len(y)):
-#             if y[i] < locmin:
-#                 locmin = y[i]
-#                 index = i
-#         l_init = models.Lorentz1D(amplitude=magscale, x_0=x[index], fwhm=(JD[fend - 1] - JD[fstart - 1]) / 2)
-#         fit_l = fitting.LevMarLSQFitter()
-#         fitted_l = fit_l(l_init, x, y)
-#         for i in range(0, len(x)):
-#             window.create_rectangle(100 + (xx - 290) * (x[i] - JD[0]) / timescale,
-#                                     20 + (yy-250) * (fitted_l(x[i]) - Minmagvalue) / magscale,  # drawing
-#                                     104 + (xx - 290) * (x[i] - JD[0]) / timescale,
-#                                     24 + (yy-250) * (fitted_l(x[i]) - Minmagvalue) / magscale,  # graph
-#                                     fill='brown', outline='brown')
-#     x.clear()
-#     y.clear()
 
 
 fit_button = ttk.Button(master=frame2, text='Fit Curve', command=fitprocessing, width=14)
-fit_button.place(x=26, y=430)
+fit_button.place(x=26, y=190)
 
 tintlabel = tk.Label(master=frame2, text='Time Interval', bg="grey")
 tintlabel.place(x=35, y=520)
 
 tintentry1 = tk.Entry(master=frame2, justify=CENTER, width=5)
-tintentry1.place(x=26, y=550)
+tintentry1.place(x=26, y=540)
 
 tintentry2 = tk.Entry(master=frame2, justify=CENTER, width=5)
-tintentry2.place(x=86, y=550)
+tintentry2.place(x=86, y=540)
 
 tint = ""
 
@@ -1180,7 +1171,7 @@ def clearwindow():
         f.close()
 
 
-clear_button = ttk.Button(master=frame2, text='Clear All', command=clearwindow, width=15)
-clear_button.place(x=24, y=50)
+clear_button = ttk.Button(master=frame4, text='Clear All', command=clearwindow, width=15)
+clear_button.place(x=22, y=10)
 
 root.mainloop()
