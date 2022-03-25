@@ -629,16 +629,19 @@ def separatephasevalues():
     global npphase
     for i in range(0, len(JDstr)):                          # creating numerical data
         if JDstr[i][0] == '-':
-            JD.append(1000000.5+(-1)*round(float(JDstr[i][1:9]) % 1, 7))    #phase
-            phase[0].append(1000000.5+(-1)*round(float(JDstr[i][1:9]) % 1, 7))
+            JD.append(0.5+(-1)*round(float(JDstr[i][1:9]) % 1, 7))    #phase
+            phase[0].append(0.5+(-1)*round(float(JDstr[i][1:9]) % 1, 7))
         else:
-            JD.append(1000000.5+round(float(JDstr[i][0:8]) % 1, 7))      #phase
-            phase[0].append(1000000.5+round(float(JDstr[i][1:9]) % 1, 7))
-        mag.append(round(2+(float(magstr[i][0:8])), 5))           # adds factor 5 to make all values positive
-        phase[1].append(round(2+(float(magstr[i][0:8])), 5))      # adds factor 5 to make all values positive
-        # mag.append(round(float(magstr[i][0:8]), 5))         # mags
-        # phase[1].append(round(float(magstr[i][0:8]), 5))
-
+            JD.append(0.5+round(float(JDstr[i][0:8]) % 1, 7))      #phase
+            phase[0].append(0.5+round(float(JDstr[i][1:9]) % 1, 7))
+        if Inverted.get() == 1:
+            mag.append(5-round(2 + (float(magstr[i][0:8])), 5))  # adds factor 5 to make all values positive
+            phase[1].append(5-round(2 + (float(magstr[i][0:8])), 5))  # adds factor 5 to make all values positive
+        else:
+            # mag.append(round(2+(float(magstr[i][0:8])), 5))           # adds factor 5 to make all values positive
+            # phase[1].append(round(2+(float(magstr[i][0:8])), 5))      # adds factor 5 to make all values positive
+            mag.append(round(float(magstr[i][0:8]), 5))         # mags
+            phase[1].append(round(float(magstr[i][0:8]), 5))
         error.append(round(float(errstr[i][0:8]), 5))       # error
         phase[2].append(round(float(errstr[i][0:8]), 5))
     # print(phase)
@@ -731,10 +734,16 @@ def drawphasecurve():                # drawing axes, labels and curves
 
     window.create_line(75, 22 + (yy-250) * (Minmagvalue - Minmagvalue) / magscale,
                        86, 22 + (yy-250) * (Minmagvalue - Minmagvalue) / magscale)
-    window.create_text(50, 22 + (yy-250) * (Minmagvalue - Minmagvalue) / magscale, text=round(Minmagvalue-2, 5))
+    if Inverted.get() == 1:
+        window.create_text(50, 22 + (yy-250) * (Minmagvalue - Minmagvalue) / magscale, text=round(5-Minmagvalue-2, 5))
+    else:
+        window.create_text(50, 22 + (yy - 250) * (Minmagvalue - Minmagvalue) / magscale, text=round(Minmagvalue-2, 5))
     window.create_line(75, 22 + (yy-250) * (Maxmagvalue - Minmagvalue) / magscale,
                        86, 22 + (yy-250) * (Maxmagvalue - Minmagvalue) / magscale)
-    window.create_text(50, 22 + (yy-250) * (Maxmagvalue - Minmagvalue) / magscale, text=round(Maxmagvalue-2, 5))
+    if Inverted.get() == 1:
+        window.create_text(50, 22 + (yy-250) * (Maxmagvalue - Minmagvalue) / magscale, text=round(5-Maxmagvalue-2, 5))
+    else:
+        window.create_text(50, 22 + (yy - 250) * (Maxmagvalue - Minmagvalue) / magscale, text=round(Maxmagvalue-2, 5))
 
     window.create_line(102 + (xx - 290) * (npphase[0][0] - npphase[0][0]) / timescale, yy-210-5,
                        102 + (xx - 290) * (npphase[0][0] - npphase[0][0]) / timescale, yy-210+6)
@@ -848,10 +857,14 @@ pixpropblacklabel.place(x=410, y=21)
 pixproplabel = tk.Label(master=frame3, text='', bg="light grey", width=11)
 pixproplabel.place(x=411, y=22)
 
+Inverted = IntVar()
 Gaussian = IntVar()
 Lorentzian = IntVar()
 Harmonic = IntVar()
 
+checkboxInverted = tk.Checkbutton(master=frame2, text=' Inverted',
+                               variable=Inverted, onvalue=1, offvalue=0, bg="grey")
+checkboxInverted.place(x=34, y=115)
 checkboxGauss = tk.Checkbutton(master=frame2, text=' Gaussian',
                                variable=Gaussian, onvalue=1, offvalue=0, bg="grey")
 checkboxGauss.place(x=27, y=330)
@@ -909,7 +922,7 @@ def fitprocessing():
         if curvetype == 2:
             fstart = int(fitentry1.get())    # getting user starting and ending point
             fend = int(fitentry2.get())        # of fitting
-            for i in range(fstart - 1, fend):                   # creating lists of chosen data
+            for i in range(fstart - 1, fend-1):                   # creating lists of chosen data
                 x.append(npphase[0][i])
                 y.append(npphase[1][i])
 
@@ -936,6 +949,11 @@ def fitprocessing():
                     if y[i] < locmin:
                         locmin = y[i]
                         index = i
+                # locmin2 = np.min(y)
+                # index = y.index(locmin)
+                # print(locmin, index, len(x)//2)
+                # index = len(x)//2
+                # l_init = models.Lorentz1D(amplitude=magscale, x_0=x[index], fwhm=(npphase[0][fend - 1] - npphase[0][fstart - 1]) / 2)
                 l_init = models.Lorentz1D(amplitude=magscale, x_0=x[index], fwhm=(npphase[0][fend - 1] - npphase[0][fstart - 1]) / 2)
                 fit_l = fitting.LevMarLSQFitter()
                 fitted_l = fit_l(l_init, x, y)
