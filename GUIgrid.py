@@ -6,12 +6,12 @@ import exiftool
 from tkinter import filedialog as fd
 from tkinter.messagebox import showinfo
 from astropy.modeling import models, fitting
-from astropy.modeling.models import Sine1D
+# from astropy.modeling.models import Sine1D
 from astropy.time import Time
 import numpy as np
 from fractions import Fraction
-from scipy.optimize import curve_fit
-from matplotlib import pyplot as plt
+# from scipy.optimize import curve_fit
+# from matplotlib import pyplot as plt
 
 import os
 from io import BytesIO
@@ -41,6 +41,7 @@ phase = [[],[],[]]
 fopened = []
 rawopen = []
 mrawopen = []
+fitcounter = []
 # curvetype = []
 # curvetype.append(0)
 
@@ -51,28 +52,29 @@ def select_file():
     filetypes = (('Text Files', '*.txt'), ('All Files', '*.*'))
     filename = fd.askopenfilename(title='Open a File',
                                   initialdir='/', filetypes=filetypes)
-    global f
-    global lines
-    f = open(filename)
-    lines = f.readlines()
-    if lines[3][15] !=' ':
-        showinfo(title='Open a File', message='Not a Valid Lighturve File ' + filename)
-    else:
-        global JDay
-        for i in range(2, len(lines)):              # extracting string data from source file
-            if i == 2:
-                JDay = str(lines[i][0:7])           # checking julian day
-            if str(lines[i][16:18]) != '99':        # filtering invalid data
-                JDstr.append(lines[i][0:15])        # julian dates
-                magstr.append(lines[i][16:24])      # mags
-                errstr.append(lines[i][25:32])      # error
-        separatenumericalvalues()
-        xyscale()
-        drawcurve()
-        fopened.append(x)
-        global curvetype
-        curvetype = 1
-        showinfo(title='Open a File', message= 'File Selected: ' + filename)
+    if filename != '':
+        global f
+        global lines
+        f = open(filename)
+        lines = f.readlines()
+        if lines[3][15] !=' ':
+            showinfo(title='Open a File', message='Not a Valid Lighturve File ' + filename)
+        else:
+            global JDay
+            for i in range(2, len(lines)):              # extracting string data from source file
+                if i == 2:
+                    JDay = str(lines[i][0:7])           # checking julian day
+                if str(lines[i][16:18]) != '99':        # filtering invalid data
+                    JDstr.append(lines[i][0:15])        # julian dates
+                    magstr.append(lines[i][16:24])      # mags
+                    errstr.append(lines[i][25:32])      # error
+            separatenumericalvalues()
+            xyscale()
+            drawcurve()
+            fopened.append(x)
+            global curvetype
+            curvetype = 1
+            showinfo(title='Open a File', message= 'File Selected: ' + filename)
 
 
 def select_phasefile():
@@ -81,35 +83,36 @@ def select_phasefile():
     filetypes = (('Text Files', '*.txt'), ('All Files', '*.*'))
     filename = fd.askopenfilename(title='Open Phase Curve',
                                   initialdir='/', filetypes=filetypes)
-    global f
-    global lines
-    f = open(filename)
-    lines = f.readlines()
-    if lines[1][1] == '.' or lines[1][2] == '.':
-        global JDay
-        for i in range(0, len(lines)):  # extracting string data from source file
-            # if i == 2:
-            #     JDay = str(lines[i][0:7])           # checking julian day
-            # if str(lines[i][16:18]) != '99':        # filtering invalid data
-            if lines[i][0] == '-':
-                JDstr.append(lines[i][0:9])  # julian dates
-                magstr.append(lines[i][10:18])  # mags
-                errstr.append(lines[i][19:27])  # error
-            else:
-                JDstr.append(lines[i][0:8])  # julian dates
-                magstr.append(lines[i][9:17])  # mags
-                errstr.append(lines[i][18:26])  # error
-        separatephasevalues()
-        xyphasescale()
-        drawphasecurve()
-        # for i in range(0, len(JDstr)):
-        #     print(JDstr[i], magstr[i], errstr[i])
-        fopened.append(x)
-        global curvetype
-        curvetype = 2
-        showinfo(title='Open a File', message='File Selected: ' + filename)
-    else:
-        showinfo(title='Open a File', message='Not a Valid Phase Curve File ' + filename)
+    if filename != '':
+        global f
+        global lines
+        f = open(filename)
+        lines = f.readlines()
+        if lines[1][1] == '.' or lines[1][2] == '.':
+            # global JDay
+            for i in range(0, len(lines)):  # extracting string data from source file
+                # if i == 2:
+                #     JDay = str(lines[i][0:7])           # checking julian day
+                # if str(lines[i][16:18]) != '99':        # filtering invalid data
+                if lines[i][0] == '-':
+                    JDstr.append(lines[i][0:9])  # julian dates
+                    magstr.append(lines[i][10:18])  # mags
+                    errstr.append(lines[i][19:27])  # error
+                else:
+                    JDstr.append(lines[i][0:8])  # julian dates
+                    magstr.append(lines[i][9:17])  # mags
+                    errstr.append(lines[i][18:26])  # error
+            separatephasevalues()
+            xyphasescale()
+            drawphasecurve()
+            # for i in range(0, len(JDstr)):
+            #     print(JDstr[i], magstr[i], errstr[i])
+            fopened.append(x)
+            global curvetype
+            curvetype = 2
+            showinfo(title='Open a File', message='File Selected: ' + filename)
+        else:
+            showinfo(title='Open a File', message='Not a Valid Phase Curve File ' + filename)
 
 
 
@@ -742,13 +745,14 @@ def drawphasecurve():                # drawing axes, labels and curves
     if Inverted.get() == 1:
         window.create_text(50, 22 + (yy-250) * (Minmagvalue - Minmagvalue) / magscale, text=round(5-Minmagvalue-2, 5))
     else:
-        window.create_text(50, 22 + (yy - 250) * (Minmagvalue - Minmagvalue) / magscale, text=round(Minmagvalue-2, 5))
+        window.create_text(50, 22 + (yy - 250) * (Minmagvalue - Minmagvalue) / magscale, text=round(Minmagvalue, 5))
     window.create_line(75, 22 + (yy-250) * (Maxmagvalue - Minmagvalue) / magscale,
                        86, 22 + (yy-250) * (Maxmagvalue - Minmagvalue) / magscale)
     if Inverted.get() == 1:
         window.create_text(50, 22 + (yy-250) * (Maxmagvalue - Minmagvalue) / magscale, text=round(5-Maxmagvalue-2, 5))
+
     else:
-        window.create_text(50, 22 + (yy - 250) * (Maxmagvalue - Minmagvalue) / magscale, text=round(Maxmagvalue-2, 5))
+        window.create_text(50, 22 + (yy - 250) * (Maxmagvalue - Minmagvalue) / magscale, text=round(Maxmagvalue, 5))
 
     window.create_line(102 + (xx - 290) * (npphase[0][0] - npphase[0][0]) / timescale, yy-210-5,
                        102 + (xx - 290) * (npphase[0][0] - npphase[0][0]) / timescale, yy-210+6)
@@ -883,6 +887,47 @@ checkboxLorentz.place(x=27, y=160)
 #                                   variable=Harmonic, onvalue=1, offvalue=0, bg="grey")
 # checkboxHarmonic.place(x=27, y=180)
 
+Tmin1 = ''
+magmin1 = ''
+
+min1label = tk.Label(master=frame2, text='T1', bg="grey")
+min1label.place(x=5, y=225)
+
+min1tblacklabel = tk.Label(master=frame2, bg="black", bd=3, width=15)
+min1tblacklabel.place(x=26, y=224)
+
+min1toutput = tk.Label(master=frame2, text=Tmin1, bg="light grey", width=15)
+min1toutput.place(x=27, y=225)
+
+magmin1label = tk.Label(master=frame2, text='M1', bg="grey")
+magmin1label.place(x=3, y=251)
+
+magmin1tblacklabel = tk.Label(master=frame2, bg="black", bd=3, width=15)
+magmin1tblacklabel.place(x=26, y=250)
+
+magmin1toutput = tk.Label(master=frame2, text=magmin1, bg="light grey", width=15)
+magmin1toutput.place(x=27, y=251)
+
+Tmin2 = ''
+magmin2 = ''
+
+min2label = tk.Label(master=frame2, text='T2', bg="grey")
+min2label.place(x=5, y=276)
+
+min2tblacklabel = tk.Label(master=frame2, bg="black", bd=3, width=15)
+min2tblacklabel.place(x=26, y=276)
+
+min2toutput = tk.Label(master=frame2, text=Tmin2, bg="light grey", width=15)
+min2toutput.place(x=27, y=277)
+
+magmin2label = tk.Label(master=frame2, text='M2', bg="grey")
+magmin2label.place(x=3, y=302)
+
+magmin2tblacklabel = tk.Label(master=frame2, bg="black", bd=3, width=15)
+magmin2tblacklabel.place(x=26, y=302)
+
+magmin2toutput = tk.Label(master=frame2, text=magmin2, bg="light grey", width=15)
+magmin2toutput.place(x=27, y=303)
 
 def fitprocessing():
     if fopened != []:
@@ -901,6 +946,24 @@ def fitprocessing():
 
                 window.create_line(102 + (xx - 290) * (fitted_g.mean - JD[0]) / timescale, yy-210-200,
                                    102 + (xx - 290) * (fitted_g.mean - JD[0]) / timescale, yy-210+201)
+
+                if fitcounter == []:
+                    Tmin1 = round(float(JDay)+fitted_g.mean, 7)
+                    magmin1 = round(fitted_g(fitted_g.mean), 5)
+                    mintoutput = tk.Label(master=frame2, text=str(Tmin1), bg="light grey", width=15, font="Times 10 bold")
+                    mintoutput.place(x=27, y=225)
+                    magmin1toutput = tk.Label(master=frame2, text=str(magmin1), bg="light grey", width=15, font="Times 10 bold")
+                    magmin1toutput.place(x=27, y=251)
+                    fitcounter.append('1')
+                else:
+                    Tmin2 = round(float(JDay)+fitted_g.mean, 7)
+                    magmin2 = round(fitted_g(fitted_g.mean), 5)
+                    min2toutput = tk.Label(master=frame2, text=str(Tmin2), bg="light grey", width=15, font="Times 10 bold")
+                    min2toutput.place(x=27, y=277)
+                    magmin2toutput = tk.Label(master=frame2, text=str(magmin2), bg="light grey", width=15, font="Times 10 bold")
+                    magmin2toutput.place(x=27, y=303)
+                    fitcounter.clear()
+                # print(magmin1)
 
                 for i in range(0, len(x)):
                     window.create_rectangle(100 + (xx - 290) * (x[i] - JD[0]) / timescale,
@@ -926,6 +989,26 @@ def fitprocessing():
                                             24 + (yy-250) * (fitted_l(x[i]) - Minmagvalue) / magscale,  # graph
                                             fill='brown', outline='brown')
 
+                window.create_line(102 + (xx - 290) * (fitted_l.x_0 - JD[0]) / timescale, yy-210-200,
+                                   102 + (xx - 290) * (fitted_l.x_0 - JD[0]) / timescale, yy-210+201)
+
+                if fitcounter == []:
+                    Tmin1 = round(float(JDay)+fitted_l.x_0, 7)
+                    magmin1 = round(fitted_l(fitted_l.x_0), 5)
+                    mintoutput = tk.Label(master=frame2, text=str(Tmin1), bg="light grey", width=15, font="Times 10 bold")
+                    mintoutput.place(x=27, y=225)
+                    magmin1toutput = tk.Label(master=frame2, text=str(magmin1), bg="light grey", width=15, font="Times 10 bold")
+                    magmin1toutput.place(x=27, y=251)
+                    fitcounter.append('1')
+                else:
+                    Tmin2 = round(float(JDay)+fitted_l.x_0, 7)
+                    magmin2 = round(fitted_l(fitted_l.x_0), 5)
+                    min2toutput = tk.Label(master=frame2, text=str(Tmin2), bg="light grey", width=15, font="Times 10 bold")
+                    min2toutput.place(x=27, y=277)
+                    magmin2toutput = tk.Label(master=frame2, text=str(magmin2), bg="light grey", width=15, font="Times 10 bold")
+                    magmin2toutput.place(x=27, y=303)
+                    fitcounter.clear()
+
         if curvetype == 2:
             fstart = int(fitentry1.get())    # getting user starting and ending point
             fend = int(fitentry2.get())        # of fitting
@@ -948,6 +1031,28 @@ def fitprocessing():
                                             104 + (xx - 290) * (x[i] - npphase[0][0]) / timescale,
                                             24 + (yy-250) * (fitted_g(x[i]) - Minmagvalue) / magscale,  # graph
                                             fill='blue', outline='blue')
+                if fitcounter == []:
+                    Tmin1 = round(((3+fitted_g.mean)-3)-0.5, 7)
+                    if Inverted.get() == 1:
+                        magmin1 = round(5-fitted_g(fitted_g.mean)-2, 5)
+                    else:
+                        magmin1 = round(fitted_g(fitted_g.mean), 5)
+                    mintoutput = tk.Label(master=frame2, text=str(Tmin1), bg="light grey", width=15, font="Times 10 bold")
+                    mintoutput.place(x=27, y=225)
+                    magmin1toutput = tk.Label(master=frame2, text=str(magmin1), bg="light grey", width=15, font="Times 10 bold")
+                    magmin1toutput.place(x=27, y=251)
+                    fitcounter.append('1')
+                else:
+                    Tmin2 = round(((3+fitted_g.mean)-3)-0.5, 7)
+                    if Inverted.get() == 1:
+                        magmin2 = round(5-fitted_g(fitted_g.mean)-2, 5)
+                    else:
+                        magmin2 = round(fitted_g(fitted_g.mean), 5)
+                    min2toutput = tk.Label(master=frame2, text=str(Tmin2), bg="light grey", width=15, font="Times 10 bold")
+                    min2toutput.place(x=27, y=277)
+                    magmin2toutput = tk.Label(master=frame2, text=str(magmin2), bg="light grey", width=15, font="Times 10 bold")
+                    magmin2toutput.place(x=27, y=303)
+                    fitcounter.clear()
 
             if Lorentzian.get() == 1:        # fitting and drawing Lorentzian model
                 locmin = Maxmagvalue
@@ -965,6 +1070,32 @@ def fitprocessing():
                                             104 + (xx - 290) * (x[i] - npphase[0][0]) / timescale,
                                             24 + (yy-250) * (fitted_l(x[i]) - Minmagvalue) / magscale,  # graph
                                             fill='brown', outline='brown')
+
+                window.create_line(102 + (xx - 290) * (fitted_l.x_0 - npphase[0][0]) / timescale, yy-210-200,
+                                    102 + (xx - 290) * (fitted_l.x_0 - npphase[0][0]) / timescale, yy-210+201)
+
+                if fitcounter == []:
+                    Tmin1 = round(((3+fitted_l.x_0)-3)-0.5, 7)
+                    if Inverted.get() == 1:
+                        magmin1 = round(5-fitted_l(fitted_l.x_0)-2, 5)
+                    else:
+                        magmin1 = round(fitted_l(fitted_l.x_0), 5)
+                    mintoutput = tk.Label(master=frame2, text=str(Tmin1), bg="light grey", width=15, font="Times 10 bold")
+                    mintoutput.place(x=27, y=225)
+                    magmin1toutput = tk.Label(master=frame2, text=str(magmin1), bg="light grey", width=15, font="Times 10 bold")
+                    magmin1toutput.place(x=27, y=251)
+                    fitcounter.append('1')
+                else:
+                    Tmin2 = round(((3+fitted_l.x_0)-3)-0.5, 7)
+                    if Inverted.get() == 1:
+                        magmin2 = round(5-fitted_l(fitted_l.x_0)-2, 5)
+                    else:
+                        magmin2 = round(fitted_l(fitted_l.x_0), 5)
+                    min2toutput = tk.Label(master=frame2, text=str(Tmin2), bg="light grey", width=15, font="Times 10 bold")
+                    min2toutput.place(x=27, y=277)
+                    magmin2toutput = tk.Label(master=frame2, text=str(magmin2), bg="light grey", width=15, font="Times 10 bold")
+                    magmin2toutput.place(x=27, y=303)
+                    fitcounter.clear()
             # if Harmonic.get() == 1:        # fitting and drawing Harmonic model
                 # print('Harmonic')
                 # fstart = int(fitentry1.get())  # getting user starting and ending point
@@ -1135,8 +1266,17 @@ def clearwindow():
     checkboxLorentz.deselect()
     window.delete("all")
     # tintoutput.destroy()
+    fitcounter.clear()
     tintoutput = tk.Label(master=frame2, text='', bg="light grey", width=14)
     tintoutput.place(x=22, y=611)
+    min1toutput = tk.Label(master=frame2, text='', bg="light grey", width=15)
+    min1toutput.place(x=27, y=225)
+    magmin1toutput = tk.Label(master=frame2, text='', bg="light grey", width=15)
+    magmin1toutput.place(x=27, y=251)
+    min2toutput = tk.Label(master=frame2, text='', bg="light grey", width=15)
+    min2toutput.place(x=27, y=277)
+    magmin2toutput = tk.Label(master=frame2, text='', bg="light grey", width=15)
+    magmin2toutput.place(x=27, y=303)
     if 'lines' in globals():
         lines.clear()
     phase[0].clear()
@@ -1146,6 +1286,8 @@ def clearwindow():
         np.delete(npphase, 0)
         np.delete(npphase, 1)
         np.delete(npphase, 2)
+    # Tmin1.clear()
+    # magmin1.clear()
     JDstr.clear()
     magstr.clear()
     errstr.clear()
