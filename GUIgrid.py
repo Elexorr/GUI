@@ -33,8 +33,8 @@ mag = []        # mag list / floats
 error = []      # error list / floats
 x = []
 y = []
-harx = []
-hary = []
+# harx = []
+# hary = []
 linearity = [[],[]]
 sensortemp = [[],[],[]]
 phase = [[],[],[]]
@@ -730,7 +730,6 @@ def xyphasescale():              # creating variables for scaling purposes
     global timescale
     Maxmagvalue = round(np.max(npphase[1], axis = 0), 5)
     Minmagvalue = round(np.min(npphase[1], axis = 0), 5)
-    # print(round(Maxmagvalue-2, 5), round(Minmagvalue-2, 5))
     magscale = round(Maxmagvalue - Minmagvalue, 5)
     timescale = 1
 
@@ -877,18 +876,18 @@ Harmonic = IntVar()
 checkboxInverted = tk.Checkbutton(master=frame2, text=' Inverted',
                                variable=Inverted, onvalue=1, offvalue=0, bg="grey")
 checkboxInverted.place(x=34, y=75)
+
 checkboxGauss = tk.Checkbutton(master=frame2, text=' Gaussian',
                                variable=Gaussian, onvalue=1, offvalue=0, bg="grey")
 checkboxGauss.place(x=27, y=140)
+
 checkboxLorentz = tk.Checkbutton(master=frame2, text=' Lorentzian',
                                  variable=Lorentzian, onvalue=1, offvalue=0, bg="grey")
 checkboxLorentz.place(x=27, y=160)
+
 # checkboxHarmonic = tk.Checkbutton(master=frame2, text=' Harmonic',
 #                                   variable=Harmonic, onvalue=1, offvalue=0, bg="grey")
 # checkboxHarmonic.place(x=27, y=180)
-
-Tmin1 = ''
-magmin1 = ''
 
 min1label = tk.Label(master=frame2, text='T1', bg="grey")
 min1label.place(x=5, y=225)
@@ -896,7 +895,7 @@ min1label.place(x=5, y=225)
 min1tblacklabel = tk.Label(master=frame2, bg="black", bd=3, width=15)
 min1tblacklabel.place(x=26, y=224)
 
-min1toutput = tk.Label(master=frame2, text=Tmin1, bg="light grey", width=15)
+min1toutput = tk.Label(master=frame2, text='', bg="light grey", width=15)
 min1toutput.place(x=27, y=225)
 
 magmin1label = tk.Label(master=frame2, text='M1', bg="grey")
@@ -905,11 +904,8 @@ magmin1label.place(x=3, y=251)
 magmin1tblacklabel = tk.Label(master=frame2, bg="black", bd=3, width=15)
 magmin1tblacklabel.place(x=26, y=250)
 
-magmin1toutput = tk.Label(master=frame2, text=magmin1, bg="light grey", width=15)
+magmin1toutput = tk.Label(master=frame2, text='', bg="light grey", width=15)
 magmin1toutput.place(x=27, y=251)
-
-Tmin2 = ''
-magmin2 = ''
 
 min2label = tk.Label(master=frame2, text='T2', bg="grey")
 min2label.place(x=5, y=277)
@@ -917,7 +913,7 @@ min2label.place(x=5, y=277)
 min2tblacklabel = tk.Label(master=frame2, bg="black", bd=3, width=15)
 min2tblacklabel.place(x=26, y=276)
 
-min2toutput = tk.Label(master=frame2, text=Tmin2, bg="light grey", width=15)
+min2toutput = tk.Label(master=frame2, text='', bg="light grey", width=15)
 min2toutput.place(x=27, y=277)
 
 magmin2label = tk.Label(master=frame2, text='M2', bg="grey")
@@ -926,7 +922,7 @@ magmin2label.place(x=3, y=303)
 magmin2tblacklabel = tk.Label(master=frame2, bg="black", bd=3, width=15)
 magmin2tblacklabel.place(x=26, y=302)
 
-magmin2toutput = tk.Label(master=frame2, text=magmin2, bg="light grey", width=15)
+magmin2toutput = tk.Label(master=frame2, text='', bg="light grey", width=15)
 magmin2toutput.place(x=27, y=303)
 
 timediflabel = tk.Label(master=frame2, text='T2-T1', bg="grey")
@@ -1307,6 +1303,10 @@ def clearwindow():
     min2toutput.place(x=27, y=277)
     magmin2toutput = tk.Label(master=frame2, text='', bg="light grey", width=15)
     magmin2toutput.place(x=27, y=303)
+    timedifoutput = tk.Label(master=frame2, text='', bg="light grey", width=12)
+    timedifoutput.place(x=48, y=329)
+    mindifoutput = tk.Label(master=frame2, text='', bg="light grey", width=12)
+    mindifoutput.place(x=48, y=355)
     if 'lines' in globals():
         lines.clear()
     phase[0].clear()
