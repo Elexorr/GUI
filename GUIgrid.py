@@ -1013,8 +1013,8 @@ def fitprocessing():
         #         plt.legend()
         #         plt.show()
         # curvetype.clear()
-        # x.clear()
-        # y.clear()
+        x.clear()
+        y.clear()
     else:
         showinfo(title='Fit Curve', message='No File Selected')
 
