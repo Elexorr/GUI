@@ -912,7 +912,7 @@ Tmin2 = ''
 magmin2 = ''
 
 min2label = tk.Label(master=frame2, text='T2', bg="grey")
-min2label.place(x=5, y=276)
+min2label.place(x=5, y=277)
 
 min2tblacklabel = tk.Label(master=frame2, bg="black", bd=3, width=15)
 min2tblacklabel.place(x=26, y=276)
@@ -921,7 +921,7 @@ min2toutput = tk.Label(master=frame2, text=Tmin2, bg="light grey", width=15)
 min2toutput.place(x=27, y=277)
 
 magmin2label = tk.Label(master=frame2, text='M2', bg="grey")
-magmin2label.place(x=3, y=302)
+magmin2label.place(x=3, y=303)
 
 magmin2tblacklabel = tk.Label(master=frame2, bg="black", bd=3, width=15)
 magmin2tblacklabel.place(x=26, y=302)
@@ -929,8 +929,28 @@ magmin2tblacklabel.place(x=26, y=302)
 magmin2toutput = tk.Label(master=frame2, text=magmin2, bg="light grey", width=15)
 magmin2toutput.place(x=27, y=303)
 
+timediflabel = tk.Label(master=frame2, text='T2-T1', bg="grey")
+timediflabel.place(x=7, y=330)
+
+timediftblacklabel = tk.Label(master=frame2, bg="black", bd=3, width=12)
+timediftblacklabel.place(x=47, y=328)
+
+timedifoutput = tk.Label(master=frame2, text='', bg="light grey", width=12)
+timedifoutput.place(x=48, y=329)
+
+mindiflabel = tk.Label(master=frame2, text='M2-M1', bg="grey")
+mindiflabel.place(x=3, y=356)
+
+mindiftblacklabel = tk.Label(master=frame2, bg="black", bd=3, width=12)
+mindiftblacklabel.place(x=47, y=354)
+
+mindifoutput = tk.Label(master=frame2, text='', bg="light grey", width=12)
+mindifoutput.place(x=48, y=355)
+
 def fitprocessing():
     if fopened != []:
+        global Tmin1
+        global magmin1
         if curvetype == 1:
             fstart = int(fitentry1.get())    # getting user starting and ending point
             fend = int(fitentry2.get())        # of fitting
@@ -955,6 +975,7 @@ def fitprocessing():
                     magmin1toutput = tk.Label(master=frame2, text=str(magmin1), bg="light grey", width=15, font="Times 10 bold")
                     magmin1toutput.place(x=27, y=251)
                     fitcounter.append('1')
+
                 else:
                     Tmin2 = round(float(JDay)+fitted_g.mean, 7)
                     magmin2 = round(fitted_g(fitted_g.mean), 5)
@@ -962,6 +983,10 @@ def fitprocessing():
                     min2toutput.place(x=27, y=277)
                     magmin2toutput = tk.Label(master=frame2, text=str(magmin2), bg="light grey", width=15, font="Times 10 bold")
                     magmin2toutput.place(x=27, y=303)
+                    timedifoutput = tk.Label(master=frame2, text=str(round((Tmin2-Tmin1), 7)), bg="light grey", width=12, font="Times 10 bold")
+                    timedifoutput.place(x=48, y=329)
+                    mindifoutput = tk.Label(master=frame2, text=str(round((magmin2-magmin1), 5)), bg="light grey", width=12, font="Times 10 bold")
+                    mindifoutput.place(x=48, y=355)
                     fitcounter.clear()
                 # print(magmin1)
 
@@ -1007,6 +1032,11 @@ def fitprocessing():
                     min2toutput.place(x=27, y=277)
                     magmin2toutput = tk.Label(master=frame2, text=str(magmin2), bg="light grey", width=15, font="Times 10 bold")
                     magmin2toutput.place(x=27, y=303)
+                    timedifoutput = tk.Label(master=frame2, text=str(round((Tmin2-Tmin1), 7)), bg="light grey", width=12, font="Times 10 bold")
+                    timedifoutput.place(x=48, y=329)
+                    mindifoutput = tk.Label(master=frame2, text=str(round((magmin2-magmin1), 5)), bg="light grey", width=12, font="Times 10 bold")
+                    mindifoutput.place(x=48, y=355)
+                    fitcounter.clear()
                     fitcounter.clear()
 
         if curvetype == 2:
