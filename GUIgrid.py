@@ -85,7 +85,6 @@ def select_phasefile():
     global lines
     f = open(filename)
     lines = f.readlines()
-    print(len(lines[1]))
     if lines[1][1] == '.' or lines[1][2] == '.':
         global JDay
         for i in range(0, len(lines)):  # extracting string data from source file
@@ -652,9 +651,7 @@ def separatephasevalues():
             phase[1].append(round(float(magstr[i][0:8]), 5))
         error.append(round(float(errstr[i][0:8]), 5))       # error
         phase[2].append(round(float(errstr[i][0:8]), 5))
-    # print(phase)
     npphase = np.array(phase)   #creating np.array from standard array for fitting and drawing purposes
-    # print(npphase)
     npphase = npphase[:, npphase[0, :].argsort()]  #sorting np.array by phase
 
 
@@ -665,7 +662,7 @@ def xyscale():              # creating variables for scaling purposes
     global timescale
     Maxmagvalue = np.max(mag, axis = 0)
     Minmagvalue = np.min(mag, axis = 0)
-    print(Maxmagvalue, Minmagvalue)
+    # print(Maxmagvalue, Minmagvalue)
     magscale = round(Maxmagvalue - Minmagvalue, 5)
     timescale = round((JD[len(JD) - 1] - JD[0]), 7)
 
@@ -889,7 +886,6 @@ checkboxLorentz.place(x=27, y=160)
 
 def fitprocessing():
     if fopened != []:
-        # print(curvetype)
         if curvetype == 1:
             fstart = int(fitentry1.get())    # getting user starting and ending point
             fend = int(fitentry2.get())        # of fitting
@@ -960,11 +956,6 @@ def fitprocessing():
                     if y[i] < locmin:
                         locmin = y[i]
                         index = i
-                # locmin2 = np.min(y)
-                # index = y.index(locmin)
-                # print(locmin, index, len(x)//2)
-                # index = len(x)//2
-                # l_init = models.Lorentz1D(amplitude=magscale, x_0=x[index], fwhm=(npphase[0][fend - 1] - npphase[0][fstart - 1]) / 2)
                 l_init = models.Lorentz1D(amplitude=magscale, x_0=x[index], fwhm=(npphase[0][fend - 1] - npphase[0][fstart - 1]) / 2)
                 fit_l = fitting.LevMarLSQFitter()
                 fitted_l = fit_l(l_init, x, y)
@@ -974,7 +965,6 @@ def fitprocessing():
                                             104 + (xx - 290) * (x[i] - npphase[0][0]) / timescale,
                                             24 + (yy-250) * (fitted_l(x[i]) - Minmagvalue) / magscale,  # graph
                                             fill='brown', outline='brown')
-
             # if Harmonic.get() == 1:        # fitting and drawing Harmonic model
                 # print('Harmonic')
                 # fstart = int(fitentry1.get())  # getting user starting and ending point
