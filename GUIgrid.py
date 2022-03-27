@@ -737,8 +737,8 @@ def xyphasescale():              # creating variables for scaling purposes
 
 def drawphasecurve():                # drawing axes, labels and curves
     window.create_rectangle(80, 0, xx-150, yy-210)     # |^^^^^^^^^^^^^^^
-    window.create_text(20, 5, text='mag')               # |
-    window.create_text(15, yy-195, text='phase')           # |
+    window.create_text(60, 6, text='mag')               # |
+    window.create_text(60, yy-196, text='Phase:')           # |
 
     window.create_line(75, 22 + (yy-250) * (Minmagvalue - Minmagvalue) / magscale,
                        86, 22 + (yy-250) * (Minmagvalue - Minmagvalue) / magscale)
@@ -819,13 +819,13 @@ rawmaxmin_button = ttk.Button(master=frame3, text='Max./Min. ADU', command=aduma
 rawmaxmin_button.place(x=24, y=40)
 
 tintlabel = tk.Label(master=frame2, text='Fit Start        Fit End', bg="grey")
-tintlabel.place(x=19, y=100)
+tintlabel.place(x=19, y=99)
 
 fitentry1 = tk.Entry(master=frame2, justify=CENTER, width=5)
-fitentry1.place(x=26, y=120)
+fitentry1.place(x=26, y=119)
 
 fitentry2 = tk.Entry(master=frame2, justify=CENTER, width=5)
-fitentry2.place(x=86, y=120)
+fitentry2.place(x=87, y=119)
 
 def recommendline():
     hi = int(fitentry1.get()) - 1
@@ -838,7 +838,7 @@ def recommendline():
 
 
 recommend_button = ttk.Button(master=frame2, text='-', command=recommendline, width=1)
-recommend_button.place(x=24, y=600)
+recommend_button.place(x=66, y=117)
 
 adulimitlabel = tk.Label(master=frame3, text='Show Pixels', bg="grey")
 adulimitlabel.place(x=165, y=0)
@@ -893,11 +893,11 @@ checkboxInverted.place(x=34, y=75)
 
 checkboxGauss = tk.Checkbutton(master=frame2, text=' Gaussian',
                                variable=Gaussian, onvalue=1, offvalue=0, bg="grey")
-checkboxGauss.place(x=27, y=140)
+checkboxGauss.place(x=27, y=142)
 
 checkboxLorentz = tk.Checkbutton(master=frame2, text=' Lorentzian',
                                  variable=Lorentzian, onvalue=1, offvalue=0, bg="grey")
-checkboxLorentz.place(x=27, y=160)
+checkboxLorentz.place(x=27, y=162)
 
 # checkboxHarmonic = tk.Checkbutton(master=frame2, text=' Harmonic',
 #                                   variable=Harmonic, onvalue=1, offvalue=0, bg="grey")
