@@ -1283,8 +1283,6 @@ tintentry1.place(x=26, y=406)
 tintentry2 = tk.Entry(master=frame2, justify=CENTER, width=5)
 tintentry2.place(x=86, y=406)
 
-# tint = ""
-
 
 def timeinterval():
     if fopened != []:
