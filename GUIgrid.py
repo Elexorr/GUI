@@ -45,6 +45,7 @@ fitcounter = []
 # curvetype = []
 # curvetype.append(0)
 
+protocol = open("protocol.txt", "w")
 
 def select_file():
     if fopened != []:
@@ -970,6 +971,14 @@ def fitprocessing():
                     mintoutput.place(x=27, y=225)
                     magmin1toutput = tk.Label(master=frame2, text=str(magmin1), bg="light grey", width=15, font="Times 10 bold")
                     magmin1toutput.place(x=27, y=251)
+                    protocol = open("protocol.txt", "a")
+                    if Inverted.get() == 1:
+                        protocol.write('Time Of Maximum 1 (Gaussian):   T(M1) = ' + str(Tmin1) + '\n')
+                        protocol.write('Magnitude:                         M1 = ' + str(magmin1) + '\n')
+                    else:
+                        protocol.write('Time Of Minimum 1 (Gaussian):   T(M1) = ' + str(Tmin1) + '\n')
+                        protocol.write('Magnitude:                         M1 = ' + str(magmin1) + '\n')
+                    protocol.close()
                     fitcounter.append('1')
 
                 else:
@@ -983,6 +992,18 @@ def fitprocessing():
                     timedifoutput.place(x=48, y=329)
                     mindifoutput = tk.Label(master=frame2, text=str(round((magmin2-magmin1), 5)), bg="light grey", width=12, font="Times 10 bold")
                     mindifoutput.place(x=48, y=355)
+                    protocol = open("protocol.txt", "a")
+                    if Inverted.get() == 1:
+                        protocol.write('Time Of Maximum 2 (Gaussian):   T(M2) = ' + str(Tmin2) + '\n')
+                        protocol.write('Magnitude:                         M2 = ' + str(magmin2) + '\n')
+                        protocol.write('Maxima Dev.:            T(M2) - T(M1) = ' + str(round((Tmin2 - Tmin1), 7)) + '\n')
+                        protocol.write('Magnitude Dev.:               M2 - M1 = ' + str(round((magmin2-magmin1), 5)) + '\n')
+                    else:
+                        protocol.write('Time Of Minimum 2 (Gaussian):   T(M2) = ' + str(Tmin1) + '\n')
+                        protocol.write('Magnitude:                         M2 = ' + str(magmin2) + '\n')
+                        protocol.write('Minima Dev.:            T(M2) - T(M1) = ' + str(round((Tmin2 - Tmin1), 7)) + '\n')
+                        protocol.write('Magnitude Dev.:               M2 - M1 = ' + str(round((magmin2 - magmin1), 5)) + '\n')
+                    protocol.close()
                     fitcounter.clear()
                 # print(magmin1)
 
@@ -1020,6 +1041,14 @@ def fitprocessing():
                     mintoutput.place(x=27, y=225)
                     magmin1toutput = tk.Label(master=frame2, text=str(magmin1), bg="light grey", width=15, font="Times 10 bold")
                     magmin1toutput.place(x=27, y=251)
+                    protocol = open("protocol.txt", "a")
+                    if Inverted.get() == 1:
+                        protocol.write('Time Of Maximum 1 (Lorentzian): T(M1) = ' + str(Tmin1) + '\n')
+                        protocol.write('Magnitude:                         M1 = ' + str(magmin1) + '\n')
+                    else:
+                        protocol.write('Time Of Minimum 1 (Lorentzian): T(M1) = ' + str(Tmin1) + '\n')
+                        protocol.write('Magnitude:                         M1 = ' + str(magmin1) + '\n')
+                    protocol.close()
                     fitcounter.append('1')
                 else:
                     Tmin2 = round(float(JDay)+fitted_l.x_0, 7)
@@ -1032,8 +1061,20 @@ def fitprocessing():
                     timedifoutput.place(x=48, y=329)
                     mindifoutput = tk.Label(master=frame2, text=str(round((magmin2-magmin1), 5)), bg="light grey", width=12, font="Times 10 bold")
                     mindifoutput.place(x=48, y=355)
+                    protocol = open("protocol.txt", "a")
+                    if Inverted.get() == 1:
+                        protocol.write('Time Of Maximum 2 (Lorentzian): T(M2) = ' + str(Tmin2) + '\n')
+                        protocol.write('Magnitude:                         M2 = ' + str(magmin2) + '\n')
+                        protocol.write('Maxima Dev.:            T(M2) - T(M1) = ' + str(round((Tmin2 - Tmin1), 7)) + '\n')
+                        protocol.write('Magnitude Dev.:               M2 - M1 = ' + str(round((magmin2 - magmin1), 5)) + '\n')
+                    else:
+                        protocol.write('Time Of Minimum 2 (Lorentzian): T(M2) = ' + str(Tmin2) + '\n')
+                        protocol.write('Magnitude:                         M2 = ' + str(magmin2) + '\n')
+                        protocol.write('Minima Dev.:            T(M2) - T(M1) = ' + str(round((Tmin2 - Tmin1), 7)) + '\n')
+                        protocol.write('Magnitude Dev.:               M2 - M1 = ' + str(round((magmin2 - magmin1), 5)) + '\n')
+                    protocol.close()
                     fitcounter.clear()
-                    fitcounter.clear()
+
 
         if curvetype == 2:
             fstart = int(fitentry1.get())    # getting user starting and ending point
@@ -1067,6 +1108,14 @@ def fitprocessing():
                     mintoutput.place(x=27, y=225)
                     magmin1toutput = tk.Label(master=frame2, text=str(magmin1), bg="light grey", width=15, font="Times 10 bold")
                     magmin1toutput.place(x=27, y=251)
+                    protocol = open("protocol.txt", "a")
+                    if Inverted.get() == 1:
+                        protocol.write('Time Of Maximum 1 (Gaussian):   T(M1) = ' + str(Tmin1) + '\n')
+                        protocol.write('Magnitude:                         M1 = ' + str(magmin1) + '\n')
+                    else:
+                        protocol.write('Time Of Minimum 1 (Gaussian):   T(M1) = ' + str(Tmin1) + '\n')
+                        protocol.write('Magnitude:                         M1 = ' + str(magmin1) + '\n')
+                    protocol.close()
                     fitcounter.append('1')
                 else:
                     Tmin2 = round(((3+fitted_g.mean)-3)-0.5, 7)
@@ -1078,6 +1127,22 @@ def fitprocessing():
                     min2toutput.place(x=27, y=277)
                     magmin2toutput = tk.Label(master=frame2, text=str(magmin2), bg="light grey", width=15, font="Times 10 bold")
                     magmin2toutput.place(x=27, y=303)
+                    timedifoutput = tk.Label(master=frame2, text=str(round((Tmin2-Tmin1), 7)), bg="light grey", width=12, font="Times 10 bold")
+                    timedifoutput.place(x=48, y=329)
+                    mindifoutput = tk.Label(master=frame2, text=str(round((magmin2-magmin1), 5)), bg="light grey", width=12, font="Times 10 bold")
+                    mindifoutput.place(x=48, y=355)
+                    protocol = open("protocol.txt", "a")
+                    if Inverted.get() == 1:
+                        protocol.write('Time Of Maximum 2 (Gaussian):   T(M2) = ' + str(Tmin2) + '\n')
+                        protocol.write('Magnitude:                         M2 = ' + str(magmin2) + '\n')
+                        protocol.write('Maxima Dev.:            T(M2) - T(M1) = ' + str(round((Tmin2 - Tmin1), 7)) + '\n')
+                        protocol.write('Magnitude Dev.:               M2 - M1 = ' + str(round((magmin2-magmin1), 5)) + '\n')
+                    else:
+                        protocol.write('Time Of Minimum 2 (Gaussian):   T(M2) = ' + str(Tmin1) + '\n')
+                        protocol.write('Magnitude:                         M2 = ' + str(magmin2) + '\n')
+                        protocol.write('Minima Dev.:            T(M2) - T(M1) = ' + str(round((Tmin2 - Tmin1), 7)) + '\n')
+                        protocol.write('Magnitude Dev.:               M2 - M1 = ' + str(round((magmin2 - magmin1), 5)) + '\n')
+                    protocol.close()
                     fitcounter.clear()
 
             if Lorentzian.get() == 1:        # fitting and drawing Lorentzian model
@@ -1110,6 +1175,14 @@ def fitprocessing():
                     mintoutput.place(x=27, y=225)
                     magmin1toutput = tk.Label(master=frame2, text=str(magmin1), bg="light grey", width=15, font="Times 10 bold")
                     magmin1toutput.place(x=27, y=251)
+                    protocol = open("protocol.txt", "a")
+                    if Inverted.get() == 1:
+                        protocol.write('Time Of Maximum 1 (Lorentzian): T(M1) = ' + str(Tmin1) + '\n')
+                        protocol.write('Magnitude:                         M1 = ' + str(magmin1) + '\n')
+                    else:
+                        protocol.write('Time Of Minimum 1 (Lorentzian): T(M1) = ' + str(Tmin1) + '\n')
+                        protocol.write('Magnitude:                         M1 = ' + str(magmin1) + '\n')
+                    protocol.close()
                     fitcounter.append('1')
                 else:
                     Tmin2 = round(((3+fitted_l.x_0)-3)-0.5, 7)
@@ -1121,6 +1194,22 @@ def fitprocessing():
                     min2toutput.place(x=27, y=277)
                     magmin2toutput = tk.Label(master=frame2, text=str(magmin2), bg="light grey", width=15, font="Times 10 bold")
                     magmin2toutput.place(x=27, y=303)
+                    timedifoutput = tk.Label(master=frame2, text=str(round((Tmin2-Tmin1), 7)), bg="light grey", width=12, font="Times 10 bold")
+                    timedifoutput.place(x=48, y=329)
+                    mindifoutput = tk.Label(master=frame2, text=str(round((magmin2-magmin1), 5)), bg="light grey", width=12, font="Times 10 bold")
+                    mindifoutput.place(x=48, y=355)
+                    protocol = open("protocol.txt", "a")
+                    if Inverted.get() == 1:
+                        protocol.write('Time Of Maximum 2 (Lorentzian): T(M2) = ' + str(Tmin2) + '\n')
+                        protocol.write('Magnitude:                         M2 = ' + str(magmin2) + '\n')
+                        protocol.write('Maxima Dev.:            T(M2) - T(M1) = ' + str(round((Tmin2 - Tmin1), 7)) + '\n')
+                        protocol.write('Magnitude Dev.:               M2 - M1 = ' + str(round((magmin2 - magmin1), 5)) + '\n')
+                    else:
+                        protocol.write('Time Of Minimum 2 (Lorentzian): T(M2) = ' + str(Tmin2) + '\n')
+                        protocol.write('Magnitude:                         M2 = ' + str(magmin2) + '\n')
+                        protocol.write('Minima Dev.:            T(M2) - T(M1) = ' + str(round((Tmin2 - Tmin1), 7)) + '\n')
+                        protocol.write('Magnitude Dev.:               M2 - M1 = ' + str(round((magmin2 - magmin1), 5)) + '\n')
+                    protocol.close()
                     fitcounter.clear()
             # if Harmonic.get() == 1:        # fitting and drawing Harmonic model
                 # print('Harmonic')
@@ -1336,4 +1425,5 @@ def clearwindow():
 clear_button = ttk.Button(master=frame4, text='Clear All', command=clearwindow, width=15)
 clear_button.place(x=22, y=10)
 
+protocol.close()
 root.mainloop()
