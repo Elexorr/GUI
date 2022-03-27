@@ -1271,24 +1271,27 @@ tint = ""
 
 
 def timeinterval():
-    if curvetype == 1:
-        tint = round(JD[int(tintentry2.get()) - 1] - JD[int(tintentry1.get()) - 1], 7)
-    if curvetype == 2:
-        tint = round(npphase[0][int(tintentry2.get())-1] - npphase[0][int(tintentry1.get())-1], 7)
-    global tintoutput
-    if curvetype == 1:
-        tintoutput = tk.Label(master=frame2, text=str(tint) + " d", font="Times 10 bold",
-                              bg="light grey", justify=CENTER, width=14)
-        protocol = open("protocol.txt", "a")
-        protocol.write('Time interval:                      T = ' + str(tint) + " d\n")
-        protocol.close()
-    if curvetype == 2:
-        tintoutput = tk.Label(master=frame2, text=str(tint) + " p", font="Times 10 bold",
-                              bg="light grey", justify=CENTER, width=14)
-        protocol = open("protocol.txt", "a")
-        protocol.write('Time interval:                      T = ' + str(tint) + " p\n")
-        protocol.close()
-    tintoutput.place(x=22, y=463)
+    if fopened != []:
+        if curvetype == 1:
+            tint = round(JD[int(tintentry2.get()) - 1] - JD[int(tintentry1.get()) - 1], 7)
+        if curvetype == 2:
+            tint = round(npphase[0][int(tintentry2.get())-1] - npphase[0][int(tintentry1.get())-1], 7)
+        global tintoutput
+        if curvetype == 1:
+            tintoutput = tk.Label(master=frame2, text=str(tint) + " d", font="Times 10 bold",
+                                  bg="light grey", justify=CENTER, width=14)
+            protocol = open("protocol.txt", "a")
+            protocol.write('Time interval:                      T = ' + str(tint) + " d\n")
+            protocol.close()
+        if curvetype == 2:
+            tintoutput = tk.Label(master=frame2, text=str(tint) + " p", font="Times 10 bold",
+                                  bg="light grey", justify=CENTER, width=14)
+            protocol = open("protocol.txt", "a")
+            protocol.write('Time interval:                      T = ' + str(tint) + " p\n")
+            protocol.close()
+        tintoutput.place(x=22, y=463)
+    else:
+        showinfo(title='Fit Curve', message='No File Selected')
 
 
 tint_button = ttk.Button(master=frame2, text='Compute', command=timeinterval, width=15)
