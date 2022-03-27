@@ -1259,33 +1259,46 @@ fit_button = ttk.Button(master=frame2, text='Fit Curve', command=fitprocessing, 
 fit_button.place(x=26, y=190)
 
 tintlabel = tk.Label(master=frame2, text='Time Interval', bg="grey")
-tintlabel.place(x=35, y=520)
+tintlabel.place(x=35, y=385)
 
 tintentry1 = tk.Entry(master=frame2, justify=CENTER, width=5)
-tintentry1.place(x=26, y=540)
+tintentry1.place(x=26, y=406)
 
 tintentry2 = tk.Entry(master=frame2, justify=CENTER, width=5)
-tintentry2.place(x=86, y=540)
+tintentry2.place(x=86, y=406)
 
 tint = ""
 
 
 def timeinterval():
-    tint = round(JD[int(tintentry2.get())-1] - JD[int(tintentry1.get())-1], 7)
+    if curvetype == 1:
+        tint = round(JD[int(tintentry2.get()) - 1] - JD[int(tintentry1.get()) - 1], 7)
+    if curvetype == 2:
+        tint = round(npphase[0][int(tintentry2.get())-1] - npphase[0][int(tintentry1.get())-1], 7)
     global tintoutput
-    tintoutput = tk.Label(master=frame2, text=str(tint) + " d", font="Times 10 bold",
-                          bg="light grey", justify=CENTER, width=14)
-    tintoutput.place(x=22, y=611)
+    if curvetype == 1:
+        tintoutput = tk.Label(master=frame2, text=str(tint) + " d", font="Times 10 bold",
+                              bg="light grey", justify=CENTER, width=14)
+        protocol = open("protocol.txt", "a")
+        protocol.write('Time interval:                      T = ' + str(tint) + " d\n")
+        protocol.close()
+    if curvetype == 2:
+        tintoutput = tk.Label(master=frame2, text=str(tint) + " p", font="Times 10 bold",
+                              bg="light grey", justify=CENTER, width=14)
+        protocol = open("protocol.txt", "a")
+        protocol.write('Time interval:                      T = ' + str(tint) + " p\n")
+        protocol.close()
+    tintoutput.place(x=22, y=463)
 
 
 tint_button = ttk.Button(master=frame2, text='Compute', command=timeinterval, width=15)
-tint_button.place(x=24, y=580)
+tint_button.place(x=24, y=432)
 
 tintblacklabel = tk.Label(master=frame2, text=str(tint), bg="black", bd=3, width=14)
-tintblacklabel.place(x=21, y=610)
+tintblacklabel.place(x=21, y=462)
 
 tintoutput = tk.Label(master=frame2, text=str(tint), bg="light grey", width=14)
-tintoutput.place(x=22, y=611)
+tintoutput.place(x=22, y=463)
 
 def selectsample():
     window.delete('samprop')
@@ -1383,7 +1396,7 @@ def clearwindow():
     # tintoutput.destroy()
     fitcounter.clear()
     tintoutput = tk.Label(master=frame2, text='', bg="light grey", width=14)
-    tintoutput.place(x=22, y=611)
+    tintoutput.place(x=22, y=463)
     min1toutput = tk.Label(master=frame2, text='', bg="light grey", width=15)
     min1toutput.place(x=27, y=225)
     magmin1toutput = tk.Label(master=frame2, text='', bg="light grey", width=15)
