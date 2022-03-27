@@ -827,6 +827,19 @@ fitentry1.place(x=26, y=120)
 fitentry2 = tk.Entry(master=frame2, justify=CENTER, width=5)
 fitentry2.place(x=86, y=120)
 
+def recommendline():
+    hi = int(fitentry1.get()) - 1
+    if curvetype == 1:
+        window.create_line(60, 22 + (yy - 250) * (mag[hi] - Minmagvalue) / magscale,
+                           xx-90, 22 + (yy - 250) * (mag[hi] - Minmagvalue) / magscale, dash=(3,2), fill='black')
+    if curvetype == 2:
+        window.create_line(60, 22 + (yy - 250) * (npphase[1][hi] - Minmagvalue) / magscale,
+                           xx-90, 22 + (yy - 250) * (npphase[1][hi] - Minmagvalue) / magscale, dash=(3,2), fill='black')
+
+
+recommend_button = ttk.Button(master=frame2, text='-', command=recommendline, width=1)
+recommend_button.place(x=24, y=600)
+
 adulimitlabel = tk.Label(master=frame3, text='Show Pixels', bg="grey")
 adulimitlabel.place(x=165, y=0)
 
@@ -943,6 +956,9 @@ mindiftblacklabel.place(x=47, y=354)
 
 mindifoutput = tk.Label(master=frame2, text='', bg="light grey", width=12)
 mindifoutput.place(x=48, y=355)
+
+def recommendline():
+    height = int(fitentry1.get())
 
 def fitprocessing():
     if fopened != []:
@@ -1267,7 +1283,7 @@ tintentry1.place(x=26, y=406)
 tintentry2 = tk.Entry(master=frame2, justify=CENTER, width=5)
 tintentry2.place(x=86, y=406)
 
-tint = ""
+# tint = ""
 
 
 def timeinterval():
@@ -1297,10 +1313,10 @@ def timeinterval():
 tint_button = ttk.Button(master=frame2, text='Compute', command=timeinterval, width=15)
 tint_button.place(x=24, y=432)
 
-tintblacklabel = tk.Label(master=frame2, text=str(tint), bg="black", bd=3, width=14)
+tintblacklabel = tk.Label(master=frame2, text=str(''), bg="black", bd=3, width=14)
 tintblacklabel.place(x=21, y=462)
 
-tintoutput = tk.Label(master=frame2, text=str(tint), bg="light grey", width=14)
+tintoutput = tk.Label(master=frame2, text=str(''), bg="light grey", width=14)
 tintoutput.place(x=22, y=463)
 
 def selectsample():
