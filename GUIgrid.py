@@ -958,8 +958,35 @@ mindiftblacklabel.place(x=47, y=354)
 mindifoutput = tk.Label(master=frame2, text='', bg="light grey", width=12)
 mindifoutput.place(x=48, y=355)
 
-def recommendline():
-    height = int(fitentry1.get())
+tclabel = tk.Label(master=frame2, text='V-band Transformation', bg="grey")
+tclabel.place(x=10, y=495)
+
+VTClabel = tk.Label(master=frame2, text='V(comp)         TC', bg="grey")
+VTClabel.place(x=19, y=515)
+
+vcompentry = tk.Entry(master=frame2, justify=CENTER, width=5)
+vcompentry.place(x=26, y=535)
+
+tcentry = tk.Entry(master=frame2, justify=CENTER, width=5)
+tcentry.place(x=87, y=535)
+
+bvlabel = tk.Label(master=frame2, text='B-V(comp)    B-V(tgt)', bg="grey")
+bvlabel.place(x=12, y=555)
+
+bvcompentry = tk.Entry(master=frame2, justify=CENTER, width=5)
+bvcompentry.place(x=26, y=575)
+
+bvcompentry = tk.Entry(master=frame2, justify=CENTER, width=5)
+bvcompentry.place(x=87, y=575)
+
+
+def transformation():
+    print('transformation')
+
+
+tcbutton = ttk.Button(master=frame2, text='Transform', command=transformation, width=15)
+tcbutton.place(x=24, y=600)
+
 
 def fitprocessing():
     if fopened != []:
