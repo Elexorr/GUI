@@ -787,7 +787,8 @@ def drawphasecurve():                # drawing axes, labels and curves
                                text=i + 1)
 
 
-window = tk.Canvas(width=xx - 153, height=yy - 150, bg="light grey")  # yy*0.9-80
+# window = tk.Canvas(width=xx - 153, height=yy - 150, bg="light grey")  # yy*0.9-80
+window = tk.Canvas(width=xx - 153, height=yy - 150, bg="White")  # yy*0.9-80
 frame2 = tk.Frame(master=root, width=150, height=yy - 146, bg="grey")  # yy*0.9-76
 frame3 = tk.Frame(master=root, width=xx - 149, height=83, bg="grey")  # yy*0.1
 frame4 = tk.Frame(master=root, width=150, height=83, bg="grey")  # y*0.1
@@ -967,6 +968,12 @@ def fitprocessing():
         if curvetype == 1:
             fstart = int(fitentry1.get())    # getting user starting and ending point
             fend = int(fitentry2.get())        # of fitting
+            protocol = open("protocol.txt", "a")
+            if Inverted.get() == 1:
+                protocol.write('Curve inverted: Yes \n' + 'Fit start: ' + str(fstart) + ' Fit end: ' + str(fend) + '\n')
+            else:
+                protocol.write('Curve inverted: No \n' + 'Fit start: ' + str(fstart) + ' Fit end: ' + str(fend) + '\n')
+            protocol.close()
             for i in range(fstart - 1, fend):                   # creating lists of chosen data
                 x.append(JD[i])
                 y.append(mag[i])
@@ -1095,10 +1102,15 @@ def fitprocessing():
         if curvetype == 2:
             fstart = int(fitentry1.get())    # getting user starting and ending point
             fend = int(fitentry2.get())        # of fitting
+            protocol = open("protocol.txt", "a")
+            if Inverted.get() == 1:
+                protocol.write('Curve inverted: Yes \n' + 'Fit start: ' + str(fstart) + ' Fit end: ' + str(fend) + '\n')
+            else:
+                protocol.write('Curve inverted: No \n' + 'Fit start: ' + str(fstart) + ' Fit end: ' + str(fend) + '\n')
+            protocol.close()
             for i in range(fstart - 1, fend-1):                   # creating lists of chosen data
                 x.append(npphase[0][i])
                 y.append(npphase[1][i])
-
             if Gaussian.get() == 1:          # fitting and drawing Gaussian model
                 sd = (npphase[0][fend] - npphase[0][fstart]) / 4
                 g_init = models.Gaussian1D(amplitude=magscale, mean=x[len(x) // 2], stddev=sd)
