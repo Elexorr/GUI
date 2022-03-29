@@ -642,7 +642,6 @@ def separatenumericalvalues():
         JD.append(round(float(JDstr[i][0:15]) % 1, 7))      # julian dates
         mag.append(round(float(magstr[i][0:8]), 5))         # mags
         error.append(round(float(errstr[i][0:8]), 5))       # error
-    print(mag)
 
 
 def separatephasevalues():
@@ -1002,7 +1001,8 @@ def transformation():
     for i in range (0, len(JD)):
         magtransformed = str(round((Vcomp+mag[i]+TC*(BVvar-BVcomp)), 5))
         magtransformed = round((Vcomp+mag[i]+TC*(BVvar-BVcomp)), 5)
-        transformed.write(JDstr[i] + ' ' + str(f'{mag[i]:.5f}') + ' ' + str(f'{magtransformed:.5f}') + ' ' + errstr[i] + '\n')
+        transformed.write(JDstr[i] + ' ' + str(f'{magtransformed:.5f}') + ' ' + errstr[i] + '\n')
+        # transformed.write(JDstr[i] + ' ' + str(f'{mag[i]:.5f}') + ' ' + str(f'{magtransformed:.5f}') + ' ' + errstr[i] + '\n')
     transformed.close()
 
 tcbutton = ttk.Button(master=frame2, text='Transform', command=transformation, width=15)
