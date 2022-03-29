@@ -788,7 +788,7 @@ def drawphasecurve():                # drawing axes, labels and curves
 
 
 # window = tk.Canvas(width=xx - 153, height=yy - 150, bg="light grey")  # yy*0.9-80
-window = tk.Canvas(width=xx - 153, height=yy - 150, bg="White")  # yy*0.9-80
+window = tk.Canvas(width=xx - 153, height=yy - 150, bg="light grey")  # yy*0.9-80
 frame2 = tk.Frame(master=root, width=150, height=yy - 146, bg="grey")  # yy*0.9-76
 frame3 = tk.Frame(master=root, width=xx - 149, height=83, bg="grey")  # yy*0.1
 frame4 = tk.Frame(master=root, width=150, height=83, bg="grey")  # y*0.1
@@ -964,24 +964,29 @@ tclabel.place(x=10, y=495)
 VTClabel = tk.Label(master=frame2, text='V(comp)         TC', bg="grey")
 VTClabel.place(x=19, y=515)
 
-vcompentry = tk.Entry(master=frame2, justify=CENTER, width=5)
-vcompentry.place(x=26, y=535)
+vcompentry = tk.Entry(master=frame2, justify=CENTER, width=7)
+vcompentry.place(x=21, y=535)
 
-tcentry = tk.Entry(master=frame2, justify=CENTER, width=5)
-tcentry.place(x=87, y=535)
+tcentry = tk.Entry(master=frame2, justify=CENTER, width=7)
+tcentry.place(x=82, y=535)
 
 bvlabel = tk.Label(master=frame2, text='B-V(comp)    B-V(tgt)', bg="grey")
 bvlabel.place(x=12, y=555)
 
-bvcompentry = tk.Entry(master=frame2, justify=CENTER, width=5)
-bvcompentry.place(x=26, y=575)
+bvcompentry = tk.Entry(master=frame2, justify=CENTER, width=7)
+bvcompentry.place(x=21, y=575)
 
-bvcompentry = tk.Entry(master=frame2, justify=CENTER, width=5)
-bvcompentry.place(x=87, y=575)
+bvvarentry = tk.Entry(master=frame2, justify=CENTER, width=7)
+bvvarentry.place(x=82, y=575)
 
 
 def transformation():
     print('transformation')
+    Vcomp = round(float(vcompentry.get()), 3)
+    TC = round(float(tcentry.get()), 3)
+    BVcomp = round(float(bvcompentry.get()), 3)
+    BVvar = round(float(bvvarentry.get()), 3)
+    print(Vcomp,TC, BVcomp, BVvar)
 
 
 tcbutton = ttk.Button(master=frame2, text='Transform', command=transformation, width=15)
