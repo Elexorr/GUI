@@ -997,7 +997,7 @@ def transformation():
     BVvar = round(float(bvvarentry.get()), 3)
     print(Vcomp,TC, BVcomp, BVvar)
     transformed = open("transformed.txt", "a")
-    transformed.write(lines[0])
+    transformed.write('JD V-C s1')
     transformed.write(lines[1])
     for i in range (0, len(JD)):
         magtransformed = str(round((Vcomp+mag[i]+TC*(BVvar-BVcomp)), 5))
