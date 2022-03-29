@@ -68,8 +68,12 @@ def select_file():
                 if str(lines[i][16:18]) != '99':        # filtering invalid data
                     JDstr.append(lines[i][0:15])        # julian dates
 # TU OPRAVIT VYCITAVANIE ZAPORNYCH HODNOT
-                    magstr.append(lines[i][16:23])      # mags
-                    errstr.append(lines[i][24:32])      # error
+                    if lines[i][16] == '-':
+                        magstr.append(lines[i][16:24])  # mags
+                        errstr.append(lines[i][25:33])  # error
+                    else:
+                        magstr.append(lines[i][16:23])      # mags
+                        errstr.append(lines[i][24:32])      # error
             separatenumericalvalues()
             xyscale()
             drawcurve()
@@ -78,7 +82,7 @@ def select_file():
             curvetype = 1
             showinfo(title='Open a File', message= 'File Selected: ' + filename)
             # print(JDstr)
-            print(magstr)
+            # print(magstr)
             # print(errstr)
 
 
@@ -992,22 +996,14 @@ def transformation():
     BVcomp = round(float(bvcompentry.get()), 3)
     BVvar = round(float(bvvarentry.get()), 3)
     print(Vcomp,TC, BVcomp, BVvar)
-
     transformed = open("transformed.txt", "a")
     transformed.write(lines[0])
     transformed.write(lines[1])
     for i in range (0, len(JD)):
         magtransformed = str(round((Vcomp+mag[i]+TC*(BVvar-BVcomp)), 5))
         magtransformed = round((Vcomp+mag[i]+TC*(BVvar-BVcomp)), 5)
-        transformed.write(JDstr[i] + ' ' + str(f'{magtransformed:.5f}') + ' ' + errstr[i] + '\n')
+        transformed.write(JDstr[i] + ' ' + str(f'{mag[i]:.5f}') + ' ' + str(f'{magtransformed:.5f}') + ' ' + errstr[i] + '\n')
     transformed.close()
-
-
-# JD.append(round(float(JDstr[i][0:15]) % 1, 7))  # julian dates
-# mag.append(round(float(magstr[i][0:8]), 5))  # mags
-# error.append(round(float(errstr[i][0:8]), 5))  # error
-
-
 
 tcbutton = ttk.Button(master=frame2, text='Transform', command=transformation, width=15)
 tcbutton.place(x=24, y=600)
