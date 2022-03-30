@@ -94,7 +94,9 @@ def select_file():
             fopened.append(x)
             global curvetype
             curvetype = 1
-            showinfo(title='Open a File', message= 'File Selected: ' + filename)
+            T.insert(END, '\n' + 'Light curve selected: ' + filename)
+            T.see(END)
+            # showinfo(title='Open a File', message= 'File Selected: ' + filename)
             # print(JDstr)
             # print(magstr)
             # print(errstr)
@@ -133,7 +135,13 @@ def select_phasefile():
             fopened.append(x)
             global curvetype
             curvetype = 2
-            showinfo(title='Open a File', message='File Selected: ' + filename)
+            if Inverted.get() == 1:
+                T.insert(END, '\n' + 'Inverted phase curve selected: ' + filename)
+                T.see(END)
+            else:
+                T.insert(END, '\n' + 'Phase curve selected: ' + filename)
+                T.see(END)
+            # showinfo(title='Open a File', message='File Selected: ' + filename)
         else:
             showinfo(title='Open a File', message='Not a Valid Phase Curve File ' + filename)
 
@@ -819,6 +827,10 @@ frame2.grid(row=0, column=1, sticky=S)
 frame3.grid(row=1, column=0, sticky=E)
 frame4.grid(row=1, column=1, sticky=W)
 
+T = Text(master=frame3, height = 4, width = 74, bg = 'Light grey', bd = 3)
+T.place(x=xx - 153 - 594, y=3)
+T.insert(END, 'Select file')
+
 open_button = ttk.Button(master=frame2, text='Open Light Curve', command=select_file, width=17)
 open_button.place(x=18, y=10)
 
@@ -1052,8 +1064,12 @@ def fitprocessing():
             protocol = open("protocol.txt", "a")
             if Inverted.get() == 1:
                 protocol.write('Curve inverted: Yes \n' + 'Fit start: ' + str(fstart) + ' Fit end: ' + str(fend) + '\n')
+                T.insert(END, '\n' + 'Curve inverted: Yes \n' + 'Fit start: ' + str(fstart) + ' / Fit end: ' + str(fend))
+                T.see(END)
             else:
                 protocol.write('Curve inverted: No \n' + 'Fit start: ' + str(fstart) + ' Fit end: ' + str(fend) + '\n')
+                T.insert(END, '\n' + 'Curve inverted: No \n' + 'Fit start: ' + str(fstart) + ' / Fit end: ' + str(fend))
+                T.see(END)
             protocol.close()
             for i in range(fstart - 1, fend):                   # creating lists of chosen data
                 x.append(JD[i])
@@ -1079,9 +1095,13 @@ def fitprocessing():
                     if Inverted.get() == 1:
                         protocol.write('Time Of Maximum 1 (Gaussian):   T(M1) = ' + str(Tmin1) + '\n')
                         protocol.write('Magnitude:                         M1 = ' + str(magmin1) + '\n')
+                        T.insert(END, '\n' + 'Time Of Maximum 1 (Gaussian): T(M1) = ' + str(Tmin1) + ' / M1 = ' + str(magmin1))
+                        T.see(END)
                     else:
                         protocol.write('Time Of Minimum 1 (Gaussian):   T(M1) = ' + str(Tmin1) + '\n')
                         protocol.write('Magnitude:                         M1 = ' + str(magmin1) + '\n')
+                        T.insert(END, '\n' + 'Time Of Minimum 1 (Gaussian): T(M1) = ' + str(Tmin1) + ' / M1 = ' + str(magmin1))
+                        T.see(END)
                     protocol.close()
                     fitcounter.append('1')
 
@@ -1102,11 +1122,17 @@ def fitprocessing():
                         protocol.write('Magnitude:                         M2 = ' + str(magmin2) + '\n')
                         protocol.write('Maxima Dev.:            T(M2) - T(M1) = ' + str(round((Tmin2 - Tmin1), 7)) + '\n')
                         protocol.write('Magnitude Dev.:               M2 - M1 = ' + str(round((magmin2-magmin1), 5)) + '\n')
+                        T.insert(END, '\n' + 'Time Of Maximum 2 (Gaussian): T(M2) = ' + str(Tmin2) + ' / M2 = ' + str(magmin2))
+                        T.insert(END, '\n' + 'Magnitude Dev.: M2 - M1 = ' + str(round((magmin2-magmin1), 5)))
+                        T.see(END)
                     else:
                         protocol.write('Time Of Minimum 2 (Gaussian):   T(M2) = ' + str(Tmin1) + '\n')
                         protocol.write('Magnitude:                         M2 = ' + str(magmin2) + '\n')
                         protocol.write('Minima Dev.:            T(M2) - T(M1) = ' + str(round((Tmin2 - Tmin1), 7)) + '\n')
                         protocol.write('Magnitude Dev.:               M2 - M1 = ' + str(round((magmin2 - magmin1), 5)) + '\n')
+                        T.insert(END, '\n' + 'Time Of Minimum 2 (Gaussian): T(M2) = ' + str(Tmin2) + ' / M2 = ' + str(magmin2))
+                        T.insert(END, '\n' + 'Magnitude Dev.: M2 - M1 = ' + str(round((magmin2-magmin1), 5)))
+                        T.see(END)
                     protocol.close()
                     fitcounter.clear()
                 # print(magmin1)
@@ -1149,9 +1175,13 @@ def fitprocessing():
                     if Inverted.get() == 1:
                         protocol.write('Time Of Maximum 1 (Lorentzian): T(M1) = ' + str(Tmin1) + '\n')
                         protocol.write('Magnitude:                         M1 = ' + str(magmin1) + '\n')
+                        T.insert(END, '\n' + 'Time Of Maximum 1 (Lorentzian): T(M1) = ' + str(Tmin1) + ' / M1 = ' + str(magmin1))
+                        T.see(END)
                     else:
                         protocol.write('Time Of Minimum 1 (Lorentzian): T(M1) = ' + str(Tmin1) + '\n')
                         protocol.write('Magnitude:                         M1 = ' + str(magmin1) + '\n')
+                        T.insert(END, '\n' + 'Time Of Minimum 1 (Lorentzian): T(M1) = ' + str(Tmin1) + ' / M1 = ' + str(magmin1))
+                        T.see(END)
                     protocol.close()
                     fitcounter.append('1')
                 else:
@@ -1171,11 +1201,17 @@ def fitprocessing():
                         protocol.write('Magnitude:                         M2 = ' + str(magmin2) + '\n')
                         protocol.write('Maxima Dev.:            T(M2) - T(M1) = ' + str(round((Tmin2 - Tmin1), 7)) + '\n')
                         protocol.write('Magnitude Dev.:               M2 - M1 = ' + str(round((magmin2 - magmin1), 5)) + '\n')
+                        T.insert(END, '\n' + 'Time Of Maximum 2 (Lorentzian): T(M2) = ' + str(Tmin2) + ' / M2 = ' + str(magmin2))
+                        T.insert(END, '\n' + 'Magnitude Dev.: M2 - M1 = ' + str(round((magmin2-magmin1), 5)))
+                        T.see(END)
                     else:
                         protocol.write('Time Of Minimum 2 (Lorentzian): T(M2) = ' + str(Tmin2) + '\n')
                         protocol.write('Magnitude:                         M2 = ' + str(magmin2) + '\n')
                         protocol.write('Minima Dev.:            T(M2) - T(M1) = ' + str(round((Tmin2 - Tmin1), 7)) + '\n')
                         protocol.write('Magnitude Dev.:               M2 - M1 = ' + str(round((magmin2 - magmin1), 5)) + '\n')
+                        T.insert(END, '\n' + 'Time Of Minimum 2 (Lorentzian): T(M2) = ' + str(Tmin2) + ' / M2 = ' + str(magmin2))
+                        T.insert(END, '\n' + 'Magnitude Dev.: M2 - M1 = ' + str(round((magmin2-magmin1), 5)))
+                        T.see(END)
                     protocol.close()
                     fitcounter.clear()
 
@@ -1221,9 +1257,13 @@ def fitprocessing():
                     if Inverted.get() == 1:
                         protocol.write('Time Of Maximum 1 (Gaussian):   T(M1) = ' + str(Tmin1) + '\n')
                         protocol.write('Magnitude:                         M1 = ' + str(magmin1) + '\n')
+                        T.insert(END, '\n' + 'Time Of Maximum 1 (Gaussian): T(M1) = ' + str(Tmin1) + ' / M1 = ' + str(magmin1))
+                        T.see(END)
                     else:
                         protocol.write('Time Of Minimum 1 (Gaussian):   T(M1) = ' + str(Tmin1) + '\n')
                         protocol.write('Magnitude:                         M1 = ' + str(magmin1) + '\n')
+                        T.insert(END, '\n' + 'Time Of Minimum 1 (Gaussian): T(M1) = ' + str(Tmin1) + ' / M1 = ' + str(magmin1))
+                        T.see(END)
                     protocol.close()
                     fitcounter.append('1')
                 else:
@@ -1288,9 +1328,13 @@ def fitprocessing():
                     if Inverted.get() == 1:
                         protocol.write('Time Of Maximum 1 (Lorentzian): T(M1) = ' + str(Tmin1) + '\n')
                         protocol.write('Magnitude:                         M1 = ' + str(magmin1) + '\n')
+                        T.insert(END, '\n' + 'Time Of Maximum 1 (Lorentzian): T(M1) = ' + str(Tmin1) + ' / M1 = ' + str(magmin1))
+                        T.see(END)
                     else:
                         protocol.write('Time Of Minimum 1 (Lorentzian): T(M1) = ' + str(Tmin1) + '\n')
                         protocol.write('Magnitude:                         M1 = ' + str(magmin1) + '\n')
+                        T.insert(END, '\n' + 'Time Of Minimum 1 (Lorentzian): T(M1) = ' + str(Tmin1) + ' / M1 = ' + str(magmin1))
+                        T.see(END)
                     protocol.close()
                     fitcounter.append('1')
                 else:
