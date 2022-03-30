@@ -42,15 +42,33 @@ fopened = []
 rawopen = []
 mrawopen = []
 fitcounter = []
-# curvetype = []
-# curvetype.append(0)
 
 protocol = open("protocol.txt", "w")
+
+vcompdefault = ''
+tcdefault = ''
+bvcompdefault = ''
+bvvardefault = ''
+
+file_exists = os.path.exists('tcconfig.cfg')
+if file_exists == True:
+    tcsettings = open('tcconfig.cfg', 'r')
+    tcvalues = tcsettings.readlines()
+    # print (tcvalues)
+    vcompdefault = tcvalues[0]
+    tcdefault = tcvalues[1]
+    bvcompdefault = tcvalues[2]
+    bvvardefault = tcvalues[3]
+    tcsettings.close()
+
+# print(vcompdefault, tcdefault, bvcompdefault, bvvardefault)
+
 
 def select_file():
     if fopened != []:
         clearwindow()
     filetypes = (('Text Files', '*.txt'), ('All Files', '*.*'))
+    global filename
     filename = fd.askopenfilename(title='Open a File',
                                   initialdir='/', filetypes=filetypes)
     if filename != '':
@@ -67,7 +85,6 @@ def select_file():
                     JDay = str(lines[i][0:7])           # checking julian day
                 if str(lines[i][16:18]) != '99':        # filtering invalid data
                     JDstr.append(lines[i][0:15])        # julian dates
-# TU OPRAVIT VYCITAVANIE ZAPORNYCH HODNOT
                     if lines[i][16] == '-':
                         magstr.append(lines[i][16:24])  # mags
                         errstr.append(lines[i][25:33])  # error
@@ -972,38 +989,57 @@ tclabel.place(x=10, y=495)
 VTClabel = tk.Label(master=frame2, text='V(comp)         TC', bg="grey")
 VTClabel.place(x=19, y=515)
 
+
 vcompentry = tk.Entry(master=frame2, justify=CENTER, width=7)
+vcompentry.insert(0, vcompdefault)
 vcompentry.place(x=21, y=535)
 
 tcentry = tk.Entry(master=frame2, justify=CENTER, width=7)
+tcentry.insert(0, tcdefault)
 tcentry.place(x=82, y=535)
 
 bvlabel = tk.Label(master=frame2, text='B-V(comp)    B-V(tgt)', bg="grey")
 bvlabel.place(x=12, y=555)
 
 bvcompentry = tk.Entry(master=frame2, justify=CENTER, width=7)
+bvcompentry.insert(0, bvcompdefault)
 bvcompentry.place(x=21, y=575)
 
 bvvarentry = tk.Entry(master=frame2, justify=CENTER, width=7)
+bvvarentry.insert(0, bvvardefault)
 bvvarentry.place(x=82, y=575)
 
-
 def transformation():
-    print('transformation')
-    Vcomp = round(float(vcompentry.get()), 3)
-    TC = round(float(tcentry.get()), 3)
-    BVcomp = round(float(bvcompentry.get()), 3)
-    BVvar = round(float(bvvarentry.get()), 3)
-    print(Vcomp,TC, BVcomp, BVvar)
-    transformed = open("transformed.txt", "a")
-    transformed.write('JD V-C s1')
-    transformed.write(lines[1])
-    for i in range (0, len(JD)):
-        magtransformed = str(round((Vcomp+mag[i]+TC*(BVvar-BVcomp)), 5))
-        magtransformed = round((Vcomp+mag[i]+TC*(BVvar-BVcomp)), 5)
-        transformed.write(JDstr[i] + ' ' + str(f'{magtransformed:.5f}') + ' ' + errstr[i] + '\n')
-        # transformed.write(JDstr[i] + ' ' + str(f'{mag[i]:.5f}') + ' ' + str(f'{magtransformed:.5f}') + ' ' + errstr[i] + '\n')
-    transformed.close()
+    if 'curvetype' in globals():
+       if curvetype == 1:
+            # print('transformation')
+            Vcomp = round(float(vcompentry.get()), 3)
+            TC = round(float(tcentry.get()), 3)
+            BVcomp = round(float(bvcompentry.get()), 3)
+            BVvar = round(float(bvvarentry.get()), 3)
+            # print(Vcomp,TC, BVcomp, BVvar)
+            transformed = open(filename + "-V.txt", "w")
+            transformed.write('JD V-C s1\n')
+            transformed.write(lines[1])
+            for i in range (0, len(JD)):
+                magtransformed = str(round((Vcomp+mag[i]+TC*(BVvar-BVcomp)), 5))
+                magtransformed = round((Vcomp+mag[i]+TC*(BVvar-BVcomp)), 5)
+                transformed.write(JDstr[i] + ' ' + str(f'{magtransformed:.5f}') + ' ' + errstr[i] + '\n')
+                # transformed.write(JDstr[i] + ' ' + str(f'{mag[i]:.5f}') + ' ' + str(f'{magtransformed:.5f}') + ' ' + errstr[i] + '\n')
+            transformed.close()
+            open('tcconfig.cfg', 'w').close()
+            tcsettings = open('tcconfig.cfg', 'w')
+            tcsettings.write(str(Vcomp)+'\n')
+            tcsettings.write(str(TC)+'\n')
+            tcsettings.write(str(BVcomp)+'\n')
+            tcsettings.write(str(BVvar)+'\n')
+            tcsettings.close()
+            showinfo(title='V-band Transformation', message='File Transformed and Saved to: ' + filename + "-V.txt")
+       else:
+           showinfo(title='V-band Transformation', message='No Valid Curve File Selected')
+    else:
+        showinfo(title='V-band Transformation', message='No File Selected')
+
 
 tcbutton = ttk.Button(master=frame2, text='Transform', command=transformation, width=15)
 tcbutton.place(x=24, y=600)
