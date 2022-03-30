@@ -54,14 +54,11 @@ file_exists = os.path.exists('tcconfig.cfg')
 if file_exists == True:
     tcsettings = open('tcconfig.cfg', 'r')
     tcvalues = tcsettings.readlines()
-    # print (tcvalues)
-    vcompdefault = tcvalues[0]
-    tcdefault = tcvalues[1]
-    bvcompdefault = tcvalues[2]
-    bvvardefault = tcvalues[3]
+    vcompdefault = tcvalues[0][0:len(tcvalues[0])-1]
+    tcdefault = tcvalues[1][0:len(tcvalues[1])-1]
+    bvcompdefault = tcvalues[2][0:len(tcvalues[2])-1]
+    bvvardefault = tcvalues[3][0:len(tcvalues[3])-1]
     tcsettings.close()
-
-# print(vcompdefault, tcdefault, bvcompdefault, bvvardefault)
 
 
 def select_file():
@@ -991,22 +988,22 @@ VTClabel.place(x=19, y=515)
 
 
 vcompentry = tk.Entry(master=frame2, justify=CENTER, width=7)
-vcompentry.insert(0, ' '+vcompdefault)
+vcompentry.insert(0, vcompdefault)
 vcompentry.place(x=21, y=535)
 
 tcentry = tk.Entry(master=frame2, justify=CENTER, width=7)
-tcentry.insert(0, ' '+tcdefault)
+tcentry.insert(0, tcdefault)
 tcentry.place(x=82, y=535)
 
 bvlabel = tk.Label(master=frame2, text='B-V(comp)    B-V(tgt)', bg="grey")
 bvlabel.place(x=12, y=555)
 
 bvcompentry = tk.Entry(master=frame2, justify=CENTER, width=7)
-bvcompentry.insert(0, '  '+bvcompdefault)
+bvcompentry.insert(0, bvcompdefault)
 bvcompentry.place(x=21, y=575)
 
 bvvarentry = tk.Entry(master=frame2, justify=CENTER, width=7)
-bvvarentry.insert(0, '  '+bvvardefault)
+bvvarentry.insert(0, bvvardefault)
 bvvarentry.place(x=82, y=575)
 
 def transformation():
