@@ -138,7 +138,6 @@ def select_phasefile():
             showinfo(title='Open a File', message='Not a Valid Phase Curve File ' + filename)
 
 
-
 def select_rawfile():
     if fopened != []:
         clearwindow()
@@ -1006,6 +1005,7 @@ bvvarentry = tk.Entry(master=frame2, justify=CENTER, width=7)
 bvvarentry.insert(0, bvvardefault)
 bvvarentry.place(x=82, y=575)
 
+
 def transformation():
     if 'curvetype' in globals():
        if curvetype == 1:
@@ -1410,6 +1410,7 @@ tintblacklabel.place(x=21, y=462)
 tintoutput = tk.Label(master=frame2, text=str(''), bg="light grey", width=14)
 tintoutput.place(x=22, y=463)
 
+
 def selectsample():
     window.delete('samprop')
     path = rawselected
@@ -1494,6 +1495,7 @@ def selectsample():
     window.create_line(shiftx-3,shifty-int(samplemean*200/samplerange),
                        shiftx+250, shifty-int(samplemean*200/samplerange), width = 2, stipple='gray25', tags="samprop")
     window.create_text(shiftx-30, shifty-int(samplemean*200/samplerange), text = str(samplemean), tags="samprop")
+
 
 def clearwindow():
     fitentry1.delete(0, 'end')
