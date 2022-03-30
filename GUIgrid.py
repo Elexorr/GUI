@@ -827,7 +827,7 @@ frame2.grid(row=0, column=1, sticky=S)
 frame3.grid(row=1, column=0, sticky=E)
 frame4.grid(row=1, column=1, sticky=W)
 
-T = Text(master=frame3, height = 4, width = 74, bg = 'Light grey', bd = 3)
+T = Text(master=frame3, height = 4, width = 74, bg = 'Light grey', bd = 3, padx=10)
 T.place(x=xx - 153 - 594, y=3)
 T.insert(END, 'Select file')
 
