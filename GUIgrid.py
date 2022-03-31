@@ -1481,7 +1481,7 @@ def timeinterval():
             tint = round(npphase[0][int(tintentry2.get())-1] - npphase[0][int(tintentry1.get())-1], 7)
         global tintoutput
         protocol = open("protocol.txt", "a")
-        protocol.write('Time interval start / end: ' + tintentry1.get() + " / " + tintentry2.get())
+        protocol.write('Time interval start / end: ' + tintentry1.get() + " / " + tintentry2.get() + "\n")
         T.insert(END, '\n' + 'Time interval start / end: ' + tintentry1.get() + ' / ' + tintentry2.get())
         T.see(END)
         if curvetype == 1:
