@@ -828,7 +828,7 @@ frame3.grid(row=1, column=0, sticky=E)
 frame4.grid(row=1, column=1, sticky=W)
 
 T = Text(master=frame3, height = 4, width = 74, bg = 'Light grey', bd = 3, padx=10)
-T.place(x=xx - 153 - 594, y=3)
+T.place(x=xx - 153 - 594, y=1)
 T.insert(END, 'Select file')
 
 open_button = ttk.Button(master=frame2, text='Open Light Curve', command=select_file, width=17)
@@ -1043,6 +1043,15 @@ def transformation():
             tcsettings.write(str(BVcomp)+'\n')
             tcsettings.write(str(BVvar)+'\n')
             tcsettings.close()
+            protocol = open("protocol.txt", "a")
+            protocol.write('Data transformed to V-band with: ' + '\n')
+            protocol.write('V(comp) = ' + str(Vcomp) + ' / TC = ' + str(TC) + ' / B-V(comp) = ' + str(BVcomp) + ' / B-V(tgt) =' + str(BVvar) + '\n')
+            protocol.write('File saved: ' + filename + "-V.txt" + '\n')
+            protocol.close()
+            T.insert(END, '\n' + 'Data transformed to V-band with: ')
+            T.insert(END, '\n' + 'V(comp) = ' + str(Vcomp) + ' / TC = ' + str(TC) + ' / B-V(comp) = ' + str(BVcomp) + ' / B-V(tgt) = ' + str(BVvar))
+            T.insert(END, '\n' + 'File saved: ' + filename + "-V.txt")
+            T.see(END)
             showinfo(title='V-band Transformation', message='File Transformed and Saved to: ' + filename + "-V.txt")
        else:
            showinfo(title='V-band Transformation', message='No Valid Curve File Selected')
@@ -1222,8 +1231,12 @@ def fitprocessing():
             protocol = open("protocol.txt", "a")
             if Inverted.get() == 1:
                 protocol.write('Curve inverted: Yes \n' + 'Fit start: ' + str(fstart) + ' Fit end: ' + str(fend) + '\n')
+                T.insert(END, '\n' + 'Curve inverted: Yes \n' + 'Fit start: ' + str(fstart) + ' / Fit end: ' + str(fend))
+                T.see(END)
             else:
                 protocol.write('Curve inverted: No \n' + 'Fit start: ' + str(fstart) + ' Fit end: ' + str(fend) + '\n')
+                T.insert(END, '\n' + 'Curve inverted: No \n' + 'Fit start: ' + str(fstart) + ' / Fit end: ' + str(fend))
+                T.see(END)
             protocol.close()
             for i in range(fstart - 1, fend-1):                   # creating lists of chosen data
                 x.append(npphase[0][i])
@@ -1286,11 +1299,17 @@ def fitprocessing():
                         protocol.write('Magnitude:                         M2 = ' + str(magmin2) + '\n')
                         protocol.write('Maxima Dev.:            T(M2) - T(M1) = ' + str(round((Tmin2 - Tmin1), 7)) + '\n')
                         protocol.write('Magnitude Dev.:               M2 - M1 = ' + str(round((magmin2-magmin1), 5)) + '\n')
+                        T.insert(END, '\n' + 'Time Of Maximum 2 (Gaussian): T(M2) = ' + str(Tmin2) + ' / M2 = ' + str(magmin2))
+                        T.insert(END, '\n' + 'Magnitude Dev.: M2 - M1 = ' + str(round((magmin2-magmin1), 5)))
+                        T.see(END)
                     else:
                         protocol.write('Time Of Minimum 2 (Gaussian):   T(M2) = ' + str(Tmin1) + '\n')
                         protocol.write('Magnitude:                         M2 = ' + str(magmin2) + '\n')
                         protocol.write('Minima Dev.:            T(M2) - T(M1) = ' + str(round((Tmin2 - Tmin1), 7)) + '\n')
                         protocol.write('Magnitude Dev.:               M2 - M1 = ' + str(round((magmin2 - magmin1), 5)) + '\n')
+                        T.insert(END, '\n' + 'Time Of Minimum 2 (Gaussian): T(M2) = ' + str(Tmin2) + ' / M2 = ' + str(magmin2))
+                        T.insert(END, '\n' + 'Magnitude Dev.: M2 - M1 = ' + str(round((magmin2-magmin1), 5)))
+                        T.see(END)
                     protocol.close()
                     fitcounter.clear()
 
@@ -1357,11 +1376,17 @@ def fitprocessing():
                         protocol.write('Magnitude:                         M2 = ' + str(magmin2) + '\n')
                         protocol.write('Maxima Dev.:            T(M2) - T(M1) = ' + str(round((Tmin2 - Tmin1), 7)) + '\n')
                         protocol.write('Magnitude Dev.:               M2 - M1 = ' + str(round((magmin2 - magmin1), 5)) + '\n')
+                        T.insert(END, '\n' + 'Time Of Maximum 2 (Lorentzian): T(M2) = ' + str(Tmin2) + ' / M2 = ' + str(magmin2))
+                        T.insert(END, '\n' + 'Magnitude Dev.: M2 - M1 = ' + str(round((magmin2-magmin1), 5)))
+                        T.see(END)
                     else:
                         protocol.write('Time Of Minimum 2 (Lorentzian): T(M2) = ' + str(Tmin2) + '\n')
                         protocol.write('Magnitude:                         M2 = ' + str(magmin2) + '\n')
                         protocol.write('Minima Dev.:            T(M2) - T(M1) = ' + str(round((Tmin2 - Tmin1), 7)) + '\n')
                         protocol.write('Magnitude Dev.:               M2 - M1 = ' + str(round((magmin2 - magmin1), 5)) + '\n')
+                        T.insert(END, '\n' + 'Time Of Minimum 2 (Lorentzian): T(M2) = ' + str(Tmin2) + ' / M2 = ' + str(magmin2))
+                        T.insert(END, '\n' + 'Magnitude Dev.: M2 - M1 = ' + str(round((magmin2-magmin1), 5)))
+                        T.see(END)
                     protocol.close()
                     fitcounter.clear()
             # if Harmonic.get() == 1:        # fitting and drawing Harmonic model
@@ -1428,17 +1453,23 @@ def timeinterval():
         if curvetype == 2:
             tint = round(npphase[0][int(tintentry2.get())-1] - npphase[0][int(tintentry1.get())-1], 7)
         global tintoutput
+        protocol = open("protocol.txt", "a")
+        protocol.write('Time interval start / end: ' + tintentry1.get() + " / " + tintentry2.get())
+        T.insert(END, '\n' + 'Time interval start / end: ' + tintentry1.get() + ' / ' + tintentry2.get())
+        T.see(END)
         if curvetype == 1:
             tintoutput = tk.Label(master=frame2, text=str(tint) + " d", font="Times 10 bold",
                                   bg="light grey", justify=CENTER, width=14)
-            protocol = open("protocol.txt", "a")
             protocol.write('Time interval:                      T = ' + str(tint) + " d\n")
+            T.insert(END, '\n' + 'Time interval calculated: T = ' + str(tint) + ' d')
+            T.see(END)
             protocol.close()
         if curvetype == 2:
             tintoutput = tk.Label(master=frame2, text=str(tint) + " p", font="Times 10 bold",
                                   bg="light grey", justify=CENTER, width=14)
-            protocol = open("protocol.txt", "a")
             protocol.write('Time interval:                      T = ' + str(tint) + " p\n")
+            T.insert(END, '\n' + 'Time interval calculated: T = ' + str(tint) + ' p')
+            T.see(END)
             protocol.close()
         tintoutput.place(x=22, y=463)
     else:
