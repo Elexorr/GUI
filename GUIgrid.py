@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 import exifread
+# import PyExifTool
 import exiftool
 from tkinter import filedialog as fd
 from tkinter.messagebox import showinfo
@@ -20,6 +21,8 @@ from PIL import ImageTk, Image
 
 root = tk.Tk()
 root.title("GUI grid")
+# root.attributes('-fullscreen', True)
+root.state('zoomed')
 root.resizable(True, False)
 
 xx = root.winfo_screenwidth()
@@ -94,6 +97,9 @@ def select_file():
             fopened.append(x)
             global curvetype
             curvetype = 1
+            protocol = open("protocol.txt", "a")
+            protocol.write('Light curve selected: ' + filename + '\n')
+            protocol.close()
             T.insert(END, '\n' + 'Light curve selected: ' + filename)
             T.see(END)
             # showinfo(title='Open a File', message= 'File Selected: ' + filename)
@@ -136,9 +142,15 @@ def select_phasefile():
             global curvetype
             curvetype = 2
             if Inverted.get() == 1:
+                protocol = open("protocol.txt", "a")
+                protocol.write('Inverted phase curve selected: ' + filename + '\n')
+                protocol.close()
                 T.insert(END, '\n' + 'Inverted phase curve selected: ' + filename)
                 T.see(END)
             else:
+                protocol = open("protocol.txt", "a")
+                protocol.write('Phase curve selected: ' + filename + '\n')
+                protocol.close()
                 T.insert(END, '\n' + 'Phase curve selected: ' + filename)
                 T.see(END)
             # showinfo(title='Open a File', message='File Selected: ' + filename)
@@ -260,6 +272,11 @@ def select_rawfile():
             # window.create_text(20, 200,
             # text=f'Daylight White Balance:  {raw.daylight_whitebalance}', anchor=tk.W)
             # the camera's daylight white balance
+            protocol = open("protocol.txt", "a")
+            protocol.write('RAW file selected: ' + raw_filename + '\n')
+            protocol.close()
+            T.insert(END, '\n' + 'RAW file selected: ' + raw_filename)
+            T.see(END)
     window.mainloop()
 
 
@@ -271,7 +288,12 @@ def selectmultipleraws():
     print(raw_filenames)
     if len(raw_filenames) > 1:
         mrawopen.append('1')
-        showinfo(title='Open Multiple RAW', message= str(len(raw_filenames)) + ' RAW Files Opened')
+        # showinfo(title='Open Multiple RAW', message= str(len(raw_filenames)) + ' RAW Files Opened')
+        protocol = open("protocol.txt", "a")
+        protocol.write('Multiple RAW: ' + str(len(raw_filenames)) + ' RAW Files Opened' + '\n')
+        protocol.close()
+        T.insert(END, '\n' + 'Multiple RAW: ' + str(len(raw_filenames)) + ' RAW Files Opened')
+        T.see(END)
 
 
 def checklinearity():
@@ -501,6 +523,11 @@ def adumaxmin():
                                    text=str(indexmin[0][i]), fill='brown')
                 window.create_text(xxx + xshift, yyy + 20 + 2,
                                    text=str(indexmin[1][i]), fill='brown')
+        protocol = open("protocol.txt", "a")
+        protocol.write('Max. ADU: ' + str(maxvalue) + ' / Min. ADU: ' + str(minvalue) + '\n')
+        protocol.close()
+        T.insert(END, '\n' + 'Max. ADU: ' + str(maxvalue) + ' / Min. ADU: ' + str(minvalue))
+        T.see(END)
         # print(indexmax)
         # print(indexmin)
 
@@ -819,8 +846,8 @@ def drawphasecurve():                # drawing axes, labels and curves
 # window = tk.Canvas(width=xx - 153, height=yy - 150, bg="light grey")  # yy*0.9-80
 window = tk.Canvas(width=xx - 153, height=yy - 150, bg="light grey")  # yy*0.9-80
 frame2 = tk.Frame(master=root, width=150, height=yy - 146, bg="grey")  # yy*0.9-76
-frame3 = tk.Frame(master=root, width=xx - 149, height=83, bg="grey")  # yy*0.1
-frame4 = tk.Frame(master=root, width=150, height=83, bg="grey")  # y*0.1
+frame3 = tk.Frame(master=root, width=xx - 149, height=93, bg="grey")  # yy*0.1
+frame4 = tk.Frame(master=root, width=150, height=93, bg="grey")  # y*0.1
 
 window.grid(row=0, column=0, sticky=S)
 frame2.grid(row=0, column=1, sticky=S)
@@ -881,16 +908,16 @@ aduminbutton = ttk.Button(master=frame3, text='From:', command=adufromlimit, wid
 aduminbutton.place(x=140, y=18)
 
 adumaxbutton = ttk.Button(master=frame3, text='Up to:', command=aduuptolimit, width=8)
-adumaxbutton.place(x=140, y=48)
+adumaxbutton.place(x=140, y=47)
 
 clearsquaresbutton = ttk.Button(master=frame3, text='Clear', command=clearsquares, width=8)
-clearsquaresbutton.place(x=274, y=48)
+clearsquaresbutton.place(x=274, y=47)
 
 adulimitentry1 = tk.Entry(master=frame3, justify=CENTER, width=8)
 adulimitentry1.place(x=205, y=21)
 
 adulimitentry2 = tk.Entry(master=frame3, justify=CENTER, width=8)
-adulimitentry2.place(x=205, y=51)
+adulimitentry2.place(x=205, y=50)
 
 pixelrlabel = tk.Label(master=frame3, text='Row', bg="grey")
 pixelrlabel.place(x=280, y=3)
