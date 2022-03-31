@@ -612,36 +612,36 @@ def pixelprop():
                 if pixcolorindex == 0:
                     pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
                                             fg='yellow', bg="red", width=11)
-                    pixproplabel.place(x=411, y=22)
+                    pixproplabel.place(x=411, y=20)
                 if pixcolorindex == 1:
                     pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
                                             fg='yellow', bg="green", width=11)
-                    pixproplabel.place(x=411, y=22)
+                    pixproplabel.place(x=411, y=20)
                 if pixcolorindex == 2:
                     pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
                                             fg='yellow', bg="blue", width=11)
-                    pixproplabel.place(x=411, y=22)
+                    pixproplabel.place(x=411, y=20)
                 if pixcolorindex == 3:
                     pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
                                             fg='yellow', bg="green", width=11)
-                    pixproplabel.place(x=411, y=22)
+                    pixproplabel.place(x=411, y=20)
             if str(rawfile.raw_pattern.tolist()) == '[[3, 2], [0, 1]]':
                 if pixcolorindex == 0:
                     pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
                                             fg='yellow', bg="blue", width=11)
-                    pixproplabel.place(x=411, y=22)
+                    pixproplabel.place(x=411, y=20)
                 if pixcolorindex == 1:
                     pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
                                             fg='yellow', bg="green", width=11)
-                    pixproplabel.place(x=411, y=22)
+                    pixproplabel.place(x=411, y=20)
                 if pixcolorindex == 2:
                     pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
                                             fg='yellow', bg="blue",  width=11)
-                    pixproplabel.place(x=411, y=22)
+                    pixproplabel.place(x=411, y=20)
                 if pixcolorindex == 3:
                     pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
                                             fg='yellow', bg="red",  width=11)
-                    pixproplabel.place(x=411, y=22)
+                    pixproplabel.place(x=411, y=20)
         xshift = xx - 151 - thumbnailx + 1  # additional + 1 for correct display purposes
         xfactor = thumbnailx / rawfile.sizes.width
         yfactor = thumbnaily / rawfile.sizes.height
@@ -828,7 +828,7 @@ frame3.grid(row=1, column=0, sticky=E)
 frame4.grid(row=1, column=1, sticky=W)
 
 T = Text(master=frame3, height = 4, width = 74, bg = 'Light grey', bd = 3, padx=10)
-T.place(x=xx - 153 - 594, y=1)
+T.place(x=xx - 153 - 594, y=0)
 T.insert(END, 'Select file')
 
 open_button = ttk.Button(master=frame2, text='Open Light Curve', command=select_file, width=17)
@@ -875,46 +875,46 @@ recommend_button = ttk.Button(master=frame2, text='-', command=recommendline, wi
 recommend_button.place(x=66, y=117)
 
 adulimitlabel = tk.Label(master=frame3, text='Show Pixels', bg="grey")
-adulimitlabel.place(x=165, y=0)
+adulimitlabel.place(x=165, y=-1)
 
 aduminbutton = ttk.Button(master=frame3, text='From:', command=adufromlimit, width=8)
-aduminbutton.place(x=140, y=20)
+aduminbutton.place(x=140, y=18)
 
 adumaxbutton = ttk.Button(master=frame3, text='Up to:', command=aduuptolimit, width=8)
-adumaxbutton.place(x=140, y=50)
+adumaxbutton.place(x=140, y=48)
 
 clearsquaresbutton = ttk.Button(master=frame3, text='Clear', command=clearsquares, width=8)
-clearsquaresbutton.place(x=274, y=50)
+clearsquaresbutton.place(x=274, y=48)
 
 adulimitentry1 = tk.Entry(master=frame3, justify=CENTER, width=8)
-adulimitentry1.place(x=205, y=23)
+adulimitentry1.place(x=205, y=21)
 
 adulimitentry2 = tk.Entry(master=frame3, justify=CENTER, width=8)
-adulimitentry2.place(x=205, y=53)
+adulimitentry2.place(x=205, y=51)
 
 pixelrlabel = tk.Label(master=frame3, text='Row', bg="grey")
-pixelrlabel.place(x=280, y=5)
+pixelrlabel.place(x=280, y=3)
 
 pixelclabel = tk.Label(master=frame3, text='Col.', bg="grey")
-pixelclabel.place(x=328, y=5)
+pixelclabel.place(x=328, y=3)
 
 pixelrentry = tk.Entry(master=frame3, justify=CENTER, width=6)
-pixelrentry.place(x=273, y=23)
+pixelrentry.place(x=273, y=21)
 
 pixelcentry = tk.Entry(master=frame3, justify=CENTER, width=6)
-pixelcentry.place(x=321, y=23)
+pixelcentry.place(x=321, y=21)
 
 adulimitlabel = tk.Label(master=frame3, text='Col. Index/ADU', bg="grey")
-adulimitlabel.place(x=409, y=0)
+adulimitlabel.place(x=409, y=-1)
 
 pixelpropbutton = ttk.Button(master=frame3, text='>>', command=pixelprop, width=3)
-pixelpropbutton.place(x=371, y=20)
+pixelpropbutton.place(x=371, y=18)
 
 pixpropblacklabel = tk.Label(master=frame3, text='', bg="black", bd=3, width=11)
-pixpropblacklabel.place(x=410, y=21)
+pixpropblacklabel.place(x=410, y=19)
 
 pixproplabel = tk.Label(master=frame3, text='', bg="light grey", width=11)
-pixproplabel.place(x=411, y=22)
+pixproplabel.place(x=411, y=20)
 
 Inverted = IntVar()
 Gaussian = IntVar()
