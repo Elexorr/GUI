@@ -20,7 +20,7 @@ import rawpy
 from PIL import ImageTk, Image
 
 root = tk.Tk()
-root.title("GUI grid")
+root.title("LeLi Tool")
 # root.attributes('-fullscreen', True)
 root.state('zoomed')
 root.resizable(True, False)
@@ -46,7 +46,7 @@ rawopen = []
 mrawopen = []
 fitcounter = []
 
-protocol = open("protocol.txt", "w")
+protocol = open("protocol.txt", "a")
 
 vcompdefault = ''
 tcdefault = ''
