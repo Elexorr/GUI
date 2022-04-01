@@ -380,7 +380,7 @@ def checktemperature():
         showinfo(title='Error', message='No Multiple RAW to Check')
     else:
         files = [raw_filenames]
-        with exiftool.ExifTool() as et:
+        with exiftool.ExifToolHelper() as et:
             for j in range (0,len(raw_filenames)):
                 metadata = et.get_metadata(raw_filenames[j])
                 metastring = str(metadata)
