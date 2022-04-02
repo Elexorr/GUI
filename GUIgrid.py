@@ -9,6 +9,7 @@ from tkinter.messagebox import showinfo
 from astropy.modeling import models, fitting
 # from astropy.modeling.models import Sine1D
 from astropy.time import Time
+from datetime import date, datetime
 import numpy as np
 from fractions import Fraction
 # from scipy.optimize import curve_fit
@@ -854,9 +855,18 @@ frame2.grid(row=0, column=1, sticky=S)
 frame3.grid(row=1, column=0, sticky=E)
 frame4.grid(row=1, column=1, sticky=W)
 
+today = date.today()
+d1 = today.strftime("%d/%m/%Y")
+now = datetime.now()
+current_time = now.strftime("%H:%M:%S")
+print("Current Time =", current_time)
 T = Text(master=frame3, height = 4, width = 74, bg = 'Light grey', bd = 3, padx=10)
 T.place(x=xx - 153 - 594, y=0)
-T.insert(END, 'Select file')
+T.insert(END, d1 + ' ' + current_time + ' / LeLi Tool / Open a file to continue...')
+protocol = open("protocol.txt", "a")
+protocol.write(d1 + ' ' + current_time + '\n')
+protocol.close()
+
 
 open_button = ttk.Button(master=frame2, text='Open Light Curve', command=select_file, width=17)
 open_button.place(x=18, y=10)
