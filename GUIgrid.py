@@ -311,6 +311,7 @@ checkboxRBsample = tk.Checkbutton(master=frame3, text=' R/B sample',
                                variable=RBsample, onvalue=1, offvalue=0, bg="grey")
 checkboxRBsample.place(x=405, y=45)
 
+
 def checklinearity():
     print(mrawopen)
     if mrawopen == []:
@@ -665,6 +666,7 @@ def clearsquares():
 
 
 def pixelprop():
+    global pixcolor
     window.delete("square")
     if pixelrentry.get() == '' or pixelcentry.get() == '':
         showinfo(title='Error', message='No Pixel Coordinates to Check')
@@ -678,35 +680,43 @@ def pixelprop():
         if str(rawfile.color_desc) == "b'RGBG'":
             if str(rawfile.raw_pattern.tolist()) == '[[0, 1], [3, 2]]':
                 if pixcolorindex == 0:
+                    pixcolor = 'red'
                     pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
                                             fg='yellow', bg="red", width=11)
                     pixproplabel.place(x=411, y=20)
                 if pixcolorindex == 1:
+                    pixcolor = 'green'
                     pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
                                             fg='yellow', bg="green", width=11)
                     pixproplabel.place(x=411, y=20)
                 if pixcolorindex == 2:
+                    pixcolor = 'blue'
                     pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
                                             fg='yellow', bg="blue", width=11)
                     pixproplabel.place(x=411, y=20)
                 if pixcolorindex == 3:
+                    pixcolor = 'green'
                     pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
                                             fg='yellow', bg="green", width=11)
                     pixproplabel.place(x=411, y=20)
             if str(rawfile.raw_pattern.tolist()) == '[[3, 2], [0, 1]]':
                 if pixcolorindex == 0:
+                    pixcolor = 'blue'
                     pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
                                             fg='yellow', bg="blue", width=11)
                     pixproplabel.place(x=411, y=20)
                 if pixcolorindex == 1:
+                    pixcolor = 'green'
                     pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
                                             fg='yellow', bg="green", width=11)
                     pixproplabel.place(x=411, y=20)
                 if pixcolorindex == 2:
+                    pixcolor = 'blue'
                     pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
                                             fg='yellow', bg="blue",  width=11)
                     pixproplabel.place(x=411, y=20)
                 if pixcolorindex == 3:
+                    pixcolor = 'red'
                     pixproplabel = tk.Label(master=frame3, text=str(pixcolorindex)+' / '+str(value),
                                             fg='yellow', bg="red",  width=11)
                     pixproplabel.place(x=411, y=20)
@@ -1637,57 +1647,66 @@ def selectsample():
     window.create_text(shiftx-30, shifty-int(samplemean*200/samplerange), text = str(samplemean), tags="samprop")
 
     if RBsample.get() == 1:
-        window.create_rectangle(shiftx-115,shifty,shiftx-110,shifty-5, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-105,shifty,shiftx-100,shifty-5, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-95,shifty,shiftx-90,shifty-5, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-85,shifty,shiftx-80,shifty-5, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-75,shifty,shiftx-70,shifty-5, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-115,shifty-10,shiftx-110,shifty-15, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-105,shifty-10,shiftx-100,shifty-15, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-95,shifty-10,shiftx-90,shifty-15, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-85,shifty-10,shiftx-80,shifty-15, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-75,shifty-10,shiftx-70,shifty-15, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-115,shifty-20,shiftx-110,shifty-25, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-105,shifty-20,shiftx-100,shifty-25, fill = "black", tags="samprop")
+        window.create_rectangle(shiftx-115,shifty,shiftx-110,shifty-5, fill = pixcolor, tags="samprop")
+        window.create_rectangle(shiftx-105,shifty,shiftx-100,shifty-5, fill = pixcolor, tags="samprop")
+        window.create_rectangle(shiftx-95,shifty,shiftx-90,shifty-5, fill = pixcolor, tags="samprop")
+        window.create_rectangle(shiftx-85,shifty,shiftx-80,shifty-5, fill = pixcolor, tags="samprop")
+        window.create_rectangle(shiftx-75,shifty,shiftx-70,shifty-5, fill = pixcolor, tags="samprop")
+        window.create_rectangle(shiftx-115,shifty-10,shiftx-110,shifty-15, fill = pixcolor, tags="samprop")
+        window.create_rectangle(shiftx-105,shifty-10,shiftx-100,shifty-15, fill = pixcolor, tags="samprop")
+        window.create_rectangle(shiftx-95,shifty-10,shiftx-90,shifty-15, fill = pixcolor, tags="samprop")
+        window.create_rectangle(shiftx-85,shifty-10,shiftx-80,shifty-15, fill = pixcolor, tags="samprop")
+        window.create_rectangle(shiftx-75,shifty-10,shiftx-70,shifty-15, fill = pixcolor, tags="samprop")
+        window.create_rectangle(shiftx-115,shifty-20,shiftx-110,shifty-25, fill = pixcolor, tags="samprop")
+        window.create_rectangle(shiftx-105,shifty-20,shiftx-100,shifty-25, fill = pixcolor, tags="samprop")
         window.create_rectangle(shiftx-95,shifty-20,shiftx-90,shifty-25, fill = "orange", tags="samprop")
-        window.create_rectangle(shiftx-85,shifty-20,shiftx-80,shifty-25, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-75,shifty-20,shiftx-70,shifty-25, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-115,shifty-30,shiftx-110,shifty-35, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-105,shifty-30,shiftx-100,shifty-35, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-95,shifty-30,shiftx-90,shifty-35, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-85,shifty-30,shiftx-80,shifty-35, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-75,shifty-30,shiftx-70,shifty-35, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-115,shifty-40,shiftx-110,shifty-45, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-105,shifty-40,shiftx-100,shifty-45, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-95,shifty-40,shiftx-90,shifty-45, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-85,shifty-40,shiftx-80,shifty-45, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-75,shifty-40,shiftx-70,shifty-45, fill = "black", tags="samprop")
+        window.create_rectangle(shiftx-85,shifty-20,shiftx-80,shifty-25, fill = pixcolor, tags="samprop")
+        window.create_rectangle(shiftx-75,shifty-20,shiftx-70,shifty-25, fill = pixcolor, tags="samprop")
+        window.create_rectangle(shiftx-115,shifty-30,shiftx-110,shifty-35, fill = pixcolor, tags="samprop")
+        window.create_rectangle(shiftx-105,shifty-30,shiftx-100,shifty-35, fill = pixcolor, tags="samprop")
+        window.create_rectangle(shiftx-95,shifty-30,shiftx-90,shifty-35, fill = pixcolor, tags="samprop")
+        window.create_rectangle(shiftx-85,shifty-30,shiftx-80,shifty-35, fill = pixcolor, tags="samprop")
+        window.create_rectangle(shiftx-75,shifty-30,shiftx-70,shifty-35, fill = pixcolor, tags="samprop")
+        window.create_rectangle(shiftx-115,shifty-40,shiftx-110,shifty-45, fill = pixcolor, tags="samprop")
+        window.create_rectangle(shiftx-105,shifty-40,shiftx-100,shifty-45, fill = pixcolor, tags="samprop")
+        window.create_rectangle(shiftx-95,shifty-40,shiftx-90,shifty-45, fill = pixcolor, tags="samprop")
+        window.create_rectangle(shiftx-85,shifty-40,shiftx-80,shifty-45, fill = pixcolor, tags="samprop")
+        window.create_rectangle(shiftx-75,shifty-40,shiftx-70,shifty-45, fill = pixcolor, tags="samprop")
     else:
-        window.create_rectangle(shiftx-110,shifty-35,shiftx-105,shifty-40, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-100,shifty-35,shiftx-95,shifty-40, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-90,shifty-35,shiftx-85,shifty-40, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-80,shifty-35,shiftx-75,shifty-40, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-105,shifty-30,shiftx-100,shifty-35, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-95,shifty-30,shiftx-90,shifty-35, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-85,shifty-30,shiftx-80,shifty-35, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-110,shifty-25,shiftx-105,shifty-30, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-100,shifty-25,shiftx-95,shifty-30, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-90,shifty-25,shiftx-85,shifty-30, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-80,shifty-25,shiftx-75,shifty-30, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-105,shifty-20,shiftx-100,shifty-25, fill = "black", tags="samprop")
+        if pixcolor == 'green':
+            color1 = 'green'
+            color2 = 'green'
+        if pixcolor == 'blue':
+            color1 = 'blue'
+            color2 = 'red'
+        if pixcolor == 'red':
+            color1 = 'red'
+            color2 = 'blue'
+        window.create_rectangle(shiftx-110,shifty-35,shiftx-105,shifty-40, fill = color2, tags="samprop")
+        window.create_rectangle(shiftx-100,shifty-35,shiftx-95,shifty-40, fill = color2, tags="samprop")
+        window.create_rectangle(shiftx-90,shifty-35,shiftx-85,shifty-40, fill = color2, tags="samprop")
+        window.create_rectangle(shiftx-80,shifty-35,shiftx-75,shifty-40, fill = color2, tags="samprop")
+        window.create_rectangle(shiftx-105,shifty-30,shiftx-100,shifty-35, fill = color1, tags="samprop")
+        window.create_rectangle(shiftx-95,shifty-30,shiftx-90,shifty-35, fill = color1, tags="samprop")
+        window.create_rectangle(shiftx-85,shifty-30,shiftx-80,shifty-35, fill = color1, tags="samprop")
+        window.create_rectangle(shiftx-110,shifty-25,shiftx-105,shifty-30, fill = color2, tags="samprop")
+        window.create_rectangle(shiftx-100,shifty-25,shiftx-95,shifty-30, fill = color2, tags="samprop")
+        window.create_rectangle(shiftx-90,shifty-25,shiftx-85,shifty-30, fill = color2, tags="samprop")
+        window.create_rectangle(shiftx-80,shifty-25,shiftx-75,shifty-30, fill = color2, tags="samprop")
+        window.create_rectangle(shiftx-105,shifty-20,shiftx-100,shifty-25, fill = color1, tags="samprop")
         window.create_rectangle(shiftx-95,shifty-20,shiftx-90,shifty-25, fill = "orange", tags="samprop")
-        window.create_rectangle(shiftx-85,shifty-20,shiftx-80,shifty-25, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-110,shifty-15,shiftx-105,shifty-20, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-100,shifty-15,shiftx-95,shifty-20, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-90,shifty-15,shiftx-85,shifty-20, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-80,shifty-15,shiftx-75,shifty-20, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-105,shifty-10,shiftx-100,shifty-15, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-95,shifty-10,shiftx-90,shifty-15, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-85,shifty-10,shiftx-80,shifty-15, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-110,shifty-5,shiftx-105,shifty-10, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-100,shifty-5,shiftx-95,shifty-10, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-90,shifty-5,shiftx-85,shifty-10, fill = "black", tags="samprop")
-        window.create_rectangle(shiftx-80,shifty-5,shiftx-75,shifty-10, fill = "black", tags="samprop")
+        window.create_rectangle(shiftx-85,shifty-20,shiftx-80,shifty-25, fill = color1, tags="samprop")
+        window.create_rectangle(shiftx-110,shifty-15,shiftx-105,shifty-20, fill = color2, tags="samprop")
+        window.create_rectangle(shiftx-100,shifty-15,shiftx-95,shifty-20, fill = color2, tags="samprop")
+        window.create_rectangle(shiftx-90,shifty-15,shiftx-85,shifty-20, fill = color2, tags="samprop")
+        window.create_rectangle(shiftx-80,shifty-15,shiftx-75,shifty-20, fill = color2, tags="samprop")
+        window.create_rectangle(shiftx-105,shifty-10,shiftx-100,shifty-15, fill = color1, tags="samprop")
+        window.create_rectangle(shiftx-95,shifty-10,shiftx-90,shifty-15, fill = color1, tags="samprop")
+        window.create_rectangle(shiftx-85,shifty-10,shiftx-80,shifty-15, fill = color1, tags="samprop")
+        window.create_rectangle(shiftx-110,shifty-5,shiftx-105,shifty-10, fill = color2, tags="samprop")
+        window.create_rectangle(shiftx-100,shifty-5,shiftx-95,shifty-10, fill = color2, tags="samprop")
+        window.create_rectangle(shiftx-90,shifty-5,shiftx-85,shifty-10, fill = color2, tags="samprop")
+        window.create_rectangle(shiftx-80,shifty-5,shiftx-75,shifty-10, fill = color2, tags="samprop")
 
 
 def clearwindow():
