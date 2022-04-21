@@ -1709,6 +1709,74 @@ def selectsample():
         window.create_rectangle(shiftx-80,shifty-5,shiftx-75,shifty-10, fill = color2, tags="samprop")
 
 
+def wav2RGB(wavelength):
+    w = int(wavelength)
+
+    # colour
+    if w >= 380 and w < 440:
+        R = -(w - 440.) / (440. - 350.)
+        G = 0.0
+        B = 1.0
+    elif w >= 440 and w < 490:
+        R = 0.0
+        G = (w - 440.) / (490. - 440.)
+        B = 1.0
+    elif w >= 490 and w < 510:
+        R = 0.0
+        G = 1.0
+        B = -(w - 510.) / (510. - 490.)
+    elif w >= 510 and w < 580:
+        R = (w - 510.) / (580. - 510.)
+        G = 1.0
+        B = 0.0
+    elif w >= 580 and w < 645:
+        R = 1.0
+        G = -(w - 645.) / (645. - 580.)
+        B = 0.0
+    elif w >= 645 and w <= 780:
+        R = 1.0
+        G = 0.0
+        B = 0.0
+    else:
+        R = 0.0
+        G = 0.0
+        B = 0.0
+
+    # intensity correction
+    if w >= 380 and w < 420:
+        SSS = 0.3 + 0.7*(w - 350) / (420 - 350)
+    elif w >= 420 and w <= 700:
+        SSS = 1.0
+    elif w > 700 and w <= 780:
+        SSS = 0.3 + 0.7*(780 - w) / (780 - 700)
+    else:
+        SSS = 0.0
+    SSS *= 255
+
+    return [int(SSS*R), int(SSS*G), int(SSS*B)]
+
+
+pixelrlabel = tk.Label(master=frame3, text='Wavelength\nto RGB', bg="grey")
+pixelrlabel.place(x=635, y=3)
+wlengthentry = tk.Entry(master=frame3, justify=CENTER, width=5)
+wlengthentry.place(x=708, y=13)
+
+
+def rgbtohex(r,g,b):
+    return f'#{r:02x}{g:02x}{b:02x}'
+
+
+def wlengcolor():
+    wleng = int(wlengthentry.get())
+    rgb = wav2RGB(wleng)
+    print(rgb[0], rgb[1], rgb[2])
+    print(rgbtohex(r = rgb[0], g = rgb[1], b = rgb[2]))
+    hexcolor = rgbtohex(r = rgb[0], g = rgb[1], b = rgb[2])
+    window.create_rectangle(0,0,xx - 153, yy - 150, fill = hexcolor, tags="samprop")
+
+wlength_button = ttk.Button(master=frame3, text='>', command=wlengcolor, width=1)
+wlength_button.place(x=746, y=10)
+
 def clearwindow():
     fitentry1.delete(0, 'end')
     fitentry2.delete(0, 'end')
