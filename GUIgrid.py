@@ -158,6 +158,37 @@ def select_phasefile():
         else:
             showinfo(title='Open a File', message='Not a Valid Phase Curve File ' + filename)
 
+window = tk.Canvas(width=xx - 153, height=yy - 150, bg="light grey")  # yy*0.9-80
+frame2 = tk.Frame(master=root, width=150, height=yy - 146, bg="grey")  # yy*0.9-76
+frame3 = tk.Frame(master=root, width=xx - 149, height=93, bg="grey")  # yy*0.1
+frame4 = tk.Frame(master=root, width=150, height=93, bg="grey")  # y*0.1
+
+window.grid(row=0, column=0, sticky=S)
+frame2.grid(row=0, column=1, sticky=S)
+frame3.grid(row=1, column=0, sticky=E)
+frame4.grid(row=1, column=1, sticky=W)
+
+pixelrlabel = tk.Label(master=frame3, text='Row', bg="grey")
+pixelrlabel.place(x=280, y=3)
+
+pixelclabel = tk.Label(master=frame3, text='Col.', bg="grey")
+pixelclabel.place(x=328, y=3)
+
+# entryText1 = IntVar()
+# entryText2 = IntVar()
+
+rdefault = IntVar()
+cdefault = IntVar()
+
+#
+#
+pixelrentry = tk.Spinbox(master=frame3, justify=CENTER, from_=0, to=10000, textvariable=rdefault,
+                         increment=1, width=5)
+pixelrentry.place(x=273, y=21)
+pixelcentry = tk.Spinbox(master=frame3, justify=CENTER, from_=0, to=10000, textvariable=cdefault,
+                         increment=1, width=5)
+pixelcentry.place(x=321, y=21)
+
 
 def select_rawfile():
     if fopened != []:
@@ -272,7 +303,22 @@ def select_rawfile():
             # the picture's white balance as determined by the camera
             # window.create_text(20, 200,
             # text=f'Daylight White Balance:  {raw.daylight_whitebalance}', anchor=tk.W)
-            # the camera's daylight white balance
+            # the camera's daylight white balance=
+            # rdef=raw.sizes.height//2-1
+            # cdef=raw.sizes.width//2-1
+            rdefault.set(raw.sizes.height//2-1)
+            cdefault.set(raw.sizes.width//2-1)
+            # pixelrentry = tk.Spinbox(master=frame3, justify=CENTER, from_= 0, to=raw.sizes.height, textvariable=str(rdef), increment=1, width=5)
+            # pixelrentry.place(x=273, y=21)
+            #
+            # pixelcentry = tk.Spinbox(master=frame3, justify=CENTER, from_= 0, to=raw.sizes.width, textvariable=str(cdef), increment=1, width=5)
+            # pixelcentry.place(x=321, y=21)
+
+            # pixelrentry.insert(0, raw.sizes.height//2-1)
+            # pixelcentry.insert(0, raw.sizes.width//2-1)
+            # entryText1.set(raw.sizes.height//2-1)
+            # entryText2.set(raw.sizes.width//2-1)
+
             protocol = open("protocol.txt", "a")
             protocol.write('RAW file selected: ' + raw_filename + '\n')
             protocol.close()
@@ -296,15 +342,6 @@ def selectmultipleraws():
         T.insert(END, '\n' + 'Multiple RAW: ' + str(len(raw_filenames)) + ' RAW Files Opened')
         T.see(END)
 
-window = tk.Canvas(width=xx - 153, height=yy - 150, bg="light grey")  # yy*0.9-80
-frame2 = tk.Frame(master=root, width=150, height=yy - 146, bg="grey")  # yy*0.9-76
-frame3 = tk.Frame(master=root, width=xx - 149, height=93, bg="grey")  # yy*0.1
-frame4 = tk.Frame(master=root, width=150, height=93, bg="grey")  # y*0.1
-
-window.grid(row=0, column=0, sticky=S)
-frame2.grid(row=0, column=1, sticky=S)
-frame3.grid(row=1, column=0, sticky=E)
-frame4.grid(row=1, column=1, sticky=W)
 
 RBsample = IntVar()
 checkboxRBsample = tk.Checkbutton(master=frame3, text=' R/B sample',
@@ -670,6 +707,8 @@ def pixelprop():
     window.delete("square")
     if pixelrentry.get() == '' or pixelcentry.get() == '':
         showinfo(title='Error', message='No Pixel Coordinates to Check')
+    if rawopen == []:
+        showinfo(title='Error', message='No RAW File to Check')
     else:
         path = rawselected
         rawfile = rawpy.imread(path)
@@ -926,7 +965,7 @@ checklinearity_button = ttk.Button(master=frame3, text='Check Linearity', comman
 checklinearity_button.place(x=510, y=40)
 
 checktemperature_button = ttk.Button(master=frame3, text='Sensor Temp. (°C)', command=checktemperature, width=18)
-checktemperature_button.place(x=640, y=40)
+checktemperature_button.place(x=648, y=40)
 
 rawmaxmin_button = ttk.Button(master=frame3, text='Max./Min. ADU', command=adumaxmin, width=15)
 rawmaxmin_button.place(x=24, y=40)
@@ -965,29 +1004,17 @@ adumaxbutton.place(x=140, y=47)
 clearsquaresbutton = ttk.Button(master=frame3, text='Clear', command=clearsquares, width=8)
 clearsquaresbutton.place(x=274, y=47)
 
-adulimitentry1 = tk.Entry(master=frame3, justify=CENTER, width=8)
+adulimitentry1 = tk.Spinbox(master=frame3, justify=CENTER, width=7)
 adulimitentry1.place(x=205, y=21)
 
-adulimitentry2 = tk.Entry(master=frame3, justify=CENTER, width=8)
+adulimitentry2 = tk.Spinbox(master=frame3, justify=CENTER, width=7)
 adulimitentry2.place(x=205, y=50)
-
-pixelrlabel = tk.Label(master=frame3, text='Row', bg="grey")
-pixelrlabel.place(x=280, y=3)
-
-pixelclabel = tk.Label(master=frame3, text='Col.', bg="grey")
-pixelclabel.place(x=328, y=3)
-
-pixelrentry = tk.Entry(master=frame3, justify=CENTER, width=6)
-pixelrentry.place(x=273, y=21)
-
-pixelcentry = tk.Entry(master=frame3, justify=CENTER, width=6)
-pixelcentry.place(x=321, y=21)
 
 adulimitlabel = tk.Label(master=frame3, text='Col. Index/ADU', bg="grey")
 adulimitlabel.place(x=409, y=-1)
 
 pixelpropbutton = ttk.Button(master=frame3, text='>>', command=pixelprop, width=3)
-pixelpropbutton.place(x=371, y=18)
+pixelpropbutton.place(x=375, y=18)
 
 pixpropblacklabel = tk.Label(master=frame3, text='', bg="black", bd=3, width=11)
 pixpropblacklabel.place(x=410, y=19)
@@ -1758,8 +1785,6 @@ def wav2RGB(wavelength):
 
 pixelrlabel = tk.Label(master=frame3, text='Wavelength\nto RGB', bg="grey")
 pixelrlabel.place(x=635, y=3)
-wlengthentry = tk.Entry(master=frame3, justify=CENTER, width=5)
-wlengthentry.place(x=708, y=13)
 
 
 def rgbtohex(r,g,b):
@@ -1772,10 +1797,14 @@ def wlengcolor():
     print(rgb[0], rgb[1], rgb[2])
     print(rgbtohex(r = rgb[0], g = rgb[1], b = rgb[2]))
     hexcolor = rgbtohex(r = rgb[0], g = rgb[1], b = rgb[2])
-    window.create_rectangle(0,0,xx - 153, yy - 150, fill = hexcolor, tags="samprop")
+    window.create_rectangle(0,0,xx - 150, yy - 147, fill = hexcolor, tags="samprop")
+
+wlengthentry = tk.Spinbox(master=frame3, from_=380, to=780, increment=1,
+                          command=wlengcolor, justify=CENTER, width=5)
+wlengthentry.place(x=708, y=13)
 
 wlength_button = ttk.Button(master=frame3, text='>', command=wlengcolor, width=1)
-wlength_button.place(x=746, y=10)
+wlength_button.place(x=760, y=10)
 
 def clearwindow():
     fitentry1.delete(0, 'end')
