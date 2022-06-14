@@ -361,12 +361,14 @@ def channelextract():
         # for j in range (0,len(raw_filenames)):
         for j in range(0, 1):
             with rawpy.imread(raw_filenames[j]) as raw:
-                # print(raw.raw_image_visible[0][0])
-                # print(raw.raw_image_visible[0][1])
                 print('Width:', len(raw.raw_image_visible[0]))
                 print('Height', len(raw.raw_image_visible))
+                print(raw.raw_image_visible[0][0])
+                print(raw.raw_image_visible[0][len(raw.raw_image_visible[0])-1])
+                print(raw.raw_image_visible[len(raw.raw_image_visible)-1][0])
+                print(raw.raw_image_visible[len(raw.raw_image_visible)-1][len(raw.raw_image_visible[0])-1])
+                # print(raw.raw_image_visible[0][1])
                 print(raw.raw_image_visible)
-
 
 
 def checklinearity():
