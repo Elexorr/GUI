@@ -359,23 +359,44 @@ def channelextract():
     else:
         window.delete("all")
         print('start')
-        # for j in range (0,len(raw_filenames)):
-        for j in range(0, 1):
+        for j in range (0,len(raw_filenames)):
+        # for j in range(0, 1):
             with rawpy.imread(raw_filenames[j]) as raw:
-                print('Width:', len(raw.raw_image_visible[0]))
-                print('Height', len(raw.raw_image_visible))
-                print(raw.raw_image_visible[0][0])
-                print(raw.raw_image_visible[0][len(raw.raw_image_visible[0])-1])
-                print(raw.raw_image_visible[len(raw.raw_image_visible)-1][0])
-                print(raw.raw_image_visible[len(raw.raw_image_visible)-1][len(raw.raw_image_visible[0])-1])
+                # print('Width:', len(raw.raw_image_visible[0]))
+                # print('Height', len(raw.raw_image_visible))
+                oddx = []
+                evenx = []
+                for i in range(0, len(raw.raw_image_visible[0])-1, 2):
+                    oddx.append(i)
+                    evenx.append(i+1)
+                oddy = []
+                eveny = []
+                for i in range(0, len(raw.raw_image_visible)-1, 2):
+                    oddy.append(i)
+                    eveny.append(i+1)
+                # print(oddx)
+                # print(evenx)
+                # print(raw.raw_image_visible[0][0])
+                # print(raw.raw_image_visible[0][len(raw.raw_image_visible[0])-1])
+                # print(raw.raw_image_visible[len(raw.raw_image_visible)-1][0])
+                # print(raw.raw_image_visible[len(raw.raw_image_visible)-1][len(raw.raw_image_visible[0])-1])
                 # print(raw.raw_image_visible[0][1])
                 # print(raw.raw_image_visible)
                 npraw = np.array(raw.raw_image_visible)
                 hdu = fits.PrimaryHDU(npraw)
-                hdu.writeto(raw_filenames[j]+'.fits')
+                hdu.writeto(raw_filenames[j].rsplit('.', 1)[0]+'.fits', overwrite=True)
                 # print(npraw)
-                # print(npraw[0][0])
-                # print(npraw[1][1])
+                nprawblue=np.delete(npraw, oddx, 1) #vymazavanie NEPARNYCH stlpcov
+                nprawbluefinal=np.delete(nprawblue, oddy, 0) #vymazavanie NEPARNYCH stlpcov
+                hdur = fits.PrimaryHDU(nprawbluefinal)
+                hdur.writeto(raw_filenames[j].rsplit('.', 1)[0]+'-B'+'.fits', overwrite=True)
+                nprawred=np.delete(npraw, evenx, 1) #vymazavanie PARNYCH stlpcov
+                nprawredfinal=np.delete(nprawred, eveny, 0) #vymazavanie PARNYCH stlpcov
+                hdub = fits.PrimaryHDU(nprawredfinal)
+                hdub.writeto(raw_filenames[j].rsplit('.', 1)[0]+'-R'+'.fits', overwrite=True)
+                # print(npraw)
+                # print(nprawredfinal)
+                # print(nprawbluefinal)
 
 
 def checklinearity():
