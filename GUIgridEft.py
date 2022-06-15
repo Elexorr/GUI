@@ -9,6 +9,7 @@ from tkinter.messagebox import showinfo
 from astropy.modeling import models, fitting
 # from astropy.modeling.models import Sine1D
 from astropy.time import Time
+from astropy.io import fits
 from datetime import date, datetime
 import numpy as np
 from fractions import Fraction
@@ -370,9 +371,11 @@ def channelextract():
                 # print(raw.raw_image_visible[0][1])
                 # print(raw.raw_image_visible)
                 npraw = np.array(raw.raw_image_visible)
-                print(npraw)
-                print(npraw[0][0])
-                print(npraw[1][1])
+                hdu = fits.PrimaryHDU(npraw)
+                hdu.writeto(raw_filenames[j]+'.fits')
+                # print(npraw)
+                # print(npraw[0][0])
+                # print(npraw[1][1])
 
 
 def checklinearity():
