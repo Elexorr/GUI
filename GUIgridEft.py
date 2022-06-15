@@ -368,7 +368,11 @@ def channelextract():
                 print(raw.raw_image_visible[len(raw.raw_image_visible)-1][0])
                 print(raw.raw_image_visible[len(raw.raw_image_visible)-1][len(raw.raw_image_visible[0])-1])
                 # print(raw.raw_image_visible[0][1])
-                print(raw.raw_image_visible)
+                # print(raw.raw_image_visible)
+                npraw = np.array(raw.raw_image_visible)
+                print(npraw)
+                print(npraw[0][0])
+                print(npraw[1][1])
 
 
 def checklinearity():
