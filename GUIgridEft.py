@@ -391,28 +391,28 @@ def channelextract():
                 # print(raw.raw_image_visible[0][1])
                 # print(raw.raw_image_visible)
                 npraw = np.array(raw.raw_image_visible)
-                hdu = fits.PrimaryHDU(npraw)
                 if Gray.get() == 1:
+                    hdu = fits.PrimaryHDU(npraw)
                     hdu.writeto(raw_filenames[j].rsplit('.', 1)[0]+'.fits', overwrite=True)
                 if Blue.get() == 1:
                     nprawblue=np.delete(npraw, oddx, 1) #deleting odd columns
                     nprawbluefinal=np.delete(nprawblue, oddy, 0) #deleting odd rows
-                    hdur = fits.PrimaryHDU(nprawbluefinal)
-                    hdur.writeto(raw_filenames[j].rsplit('.', 1)[0]+'-B'+'.fits', overwrite=True)
+                    hdub = fits.PrimaryHDU(nprawbluefinal)
+                    hdub.writeto(raw_filenames[j].rsplit('.', 1)[0]+'-B'+'.fits', overwrite=True)
                 if Red.get() == 1:
                     nprawred=np.delete(npraw, evenx, 1) #vdeleting even columns
                     nprawredfinal=np.delete(nprawred, eveny, 0) #deleting even rows
-                    hdub = fits.PrimaryHDU(nprawredfinal)
-                    hdub.writeto(raw_filenames[j].rsplit('.', 1)[0]+'-R'+'.fits', overwrite=True)
+                    hdur = fits.PrimaryHDU(nprawredfinal)
+                    hdur.writeto(raw_filenames[j].rsplit('.', 1)[0]+'-R'+'.fits', overwrite=True)
                 nprawg1 = np.delete(npraw, oddx, 1) #deleting odd columns
                 nprawg1final = np.delete(nprawg1, eveny, 0) #deleting even rows
-                hdug1 = fits.PrimaryHDU(nprawg1final)
                 if Green1 == 1:
-                    hdug1.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G1' + '.fits', overwrite=True)
+                    hdug1 = fits.PrimaryHDU(nprawg1final)
+                    hdug1.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G' + '.fits', overwrite=True)
                 nprawg2 = np.delete(npraw, evenx, 1) #deleting even columns
                 nprawg2final = np.delete(nprawg2, oddy, 0) #deleting even rows
-                hdug2 = fits.PrimaryHDU(nprawg2final)
                 if Green2 == 1:
+                    hdug2 = fits.PrimaryHDU(nprawg2final)
                     hdug2.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G2' + '.fits', overwrite=True)
                 if GpG == 1:
                     nprawgplus = (nprawg1final + nprawg2final)
@@ -437,27 +437,35 @@ def ChannelWindow():
     FitWindow.title("Channels")
     FitWindow.geometry("400x200+500+500")
     FitWindow.wm_attributes("-topmost", 1)
+
     checkboxGray = tk.Checkbutton(master=FitWindow, text='Grayscale',
                                       variable=Gray, onvalue=1, offvalue=0, bg="grey")
     checkboxGray.place(x=300, y=10)
+
     checkboxR = tk.Checkbutton(master=FitWindow, text='R',
                                       variable=Red, onvalue=1, offvalue=0, bg="grey")
     checkboxR.place(x=300, y=30)
+
     checkboxG1 = tk.Checkbutton(master=FitWindow, text='G1',
                                       variable=Green1, onvalue=1, offvalue=0, bg="grey")
     checkboxG1.place(x=300, y=50)
+
     checkboxG2 = tk.Checkbutton(master=FitWindow, text='G2',
                                       variable=Green2, onvalue=1, offvalue=0, bg="grey")
     checkboxG2.place(x=300, y=70)
+
     checkboxGpG = tk.Checkbutton(master=FitWindow, text='G1+G2',
                                       variable=GpG, onvalue=1, offvalue=0, bg="grey")
     checkboxGpG.place(x=300, y=90)
+
     checkboxGavG = tk.Checkbutton(master=FitWindow, text='(G1+G2)/2',
                                       variable=GavG, onvalue=1, offvalue=0, bg="grey")
     checkboxGavG.place(x=300, y=110)
+
     checkboxB = tk.Checkbutton(master=FitWindow, text='B ',
                                       variable=Blue, onvalue=1, offvalue=0, bg="grey")
     checkboxB.place(x=300, y=130)
+
     extbutton = ttk.Button(master=FitWindow, text='Extract', command=channelextract, width=12)
     extbutton.place(x=300, y=170)
 
