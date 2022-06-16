@@ -393,7 +393,7 @@ def channelextract():
                 npraw = np.array(raw.raw_image_visible)
                 if Gray.get() == 1:
                     hdu = fits.PrimaryHDU(npraw)
-                    hdu.writeto(raw_filenames[j].rsplit('.', 1)[0]+'.fits', overwrite=True)
+                    hdu.writeto(raw_filenames[j].rsplit('.', 1)[0]+'-Gray'+'.fits', overwrite=True)
                 if Blue.get() == 1:
                     nprawblue=np.delete(npraw, oddx, 1) #deleting odd columns
                     nprawbluefinal=np.delete(nprawblue, oddy, 0) #deleting odd rows
@@ -406,22 +406,23 @@ def channelextract():
                     hdur.writeto(raw_filenames[j].rsplit('.', 1)[0]+'-R'+'.fits', overwrite=True)
                 nprawg1 = np.delete(npraw, oddx, 1) #deleting odd columns
                 nprawg1final = np.delete(nprawg1, eveny, 0) #deleting even rows
-                if Green1 == 1:
+                if Green1.get() == 1:
+                    print('g1')
                     hdug1 = fits.PrimaryHDU(nprawg1final)
-                    hdug1.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G' + '.fits', overwrite=True)
+                    hdug1.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G1' + '.fits', overwrite=True)
                 nprawg2 = np.delete(npraw, evenx, 1) #deleting even columns
                 nprawg2final = np.delete(nprawg2, oddy, 0) #deleting even rows
-                if Green2 == 1:
+                if Green2.get() == 1:
                     hdug2 = fits.PrimaryHDU(nprawg2final)
                     hdug2.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G2' + '.fits', overwrite=True)
-                if GpG == 1:
+                if GpG.get() == 1:
                     nprawgplus = (nprawg1final + nprawg2final)
                     hdug = fits.PrimaryHDU(nprawgplus)
-                    hdug.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G+G' + '.fits', overwrite=True)
-                if GavG == 1:
+                    hdug.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-(G+G)' + '.fits', overwrite=True)
+                if GavG.get() == 1:
                     nprawgaver = (nprawg1final + nprawg2final)//2
                     hdug = fits.PrimaryHDU(nprawgaver)
-                    hdug.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-(G+G)/2' + '.fits', overwrite=True)
+                    hdug.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G(average)' + '.fits', overwrite=True)
                 # print(npraw)
                 # print(nprawredfinal)
                 # print(nprawbluefinal)
@@ -431,43 +432,58 @@ def channelextract():
         T.insert(END, '\n' + 'Multiple RAW: ' + str(len(raw_filenames)) + ' RAW Files Divided To Color Channels')
         T.see(END)
 
+FitWindowCount = 0
+
+def FitWindowOnclose():
+    global FitWindow
+    global FitWindowCount
+    FitWindow.destroy()
+    FitWindowCount = 0
 
 def ChannelWindow():
-    FitWindow = Toplevel(root, bg='grey')
-    FitWindow.title("Channels")
-    FitWindow.geometry("400x200+500+500")
-    FitWindow.wm_attributes("-topmost", 1)
+    if mrawopen == []:
+        showinfo(title='Error', message='No Multiple RAW to Check')
+    else:
+        global FitWindow
+        global FitWindowCount
+        if FitWindowCount == 0:
+            FitWindowCount = 1
+            FitWindow = Toplevel(root, bg='grey')
+            FitWindow.title("FITS Files Extractor")
+            FitWindow.geometry("400x200+500+500")
+            FitWindow.protocol("WM_DELETE_WINDOW", FitWindowOnclose)
+            FitWindow.wm_attributes("-topmost", 1)
 
-    checkboxGray = tk.Checkbutton(master=FitWindow, text='Grayscale',
-                                      variable=Gray, onvalue=1, offvalue=0, bg="grey")
-    checkboxGray.place(x=300, y=10)
+            checkboxGray = tk.Checkbutton(master=FitWindow, text='Grayscale',
+                                              variable=Gray, onvalue=1, offvalue=0, bg="grey")
+            checkboxGray.place(x=300, y=10)
 
-    checkboxR = tk.Checkbutton(master=FitWindow, text='R',
-                                      variable=Red, onvalue=1, offvalue=0, bg="grey")
-    checkboxR.place(x=300, y=30)
+            checkboxR = tk.Checkbutton(master=FitWindow, text='R',
+                                              variable=Red, onvalue=1, offvalue=0, bg="grey")
+            checkboxR.place(x=300, y=30)
 
-    checkboxG1 = tk.Checkbutton(master=FitWindow, text='G1',
-                                      variable=Green1, onvalue=1, offvalue=0, bg="grey")
-    checkboxG1.place(x=300, y=50)
+            checkboxG1 = tk.Checkbutton(master=FitWindow, text='G1',
+                                              variable=Green1, onvalue=1, offvalue=0, bg="grey")
+            checkboxG1.place(x=300, y=50)
 
-    checkboxG2 = tk.Checkbutton(master=FitWindow, text='G2',
-                                      variable=Green2, onvalue=1, offvalue=0, bg="grey")
-    checkboxG2.place(x=300, y=70)
+            checkboxG2 = tk.Checkbutton(master=FitWindow, text='G2',
+                                              variable=Green2, onvalue=1, offvalue=0, bg="grey")
+            checkboxG2.place(x=300, y=70)
 
-    checkboxGpG = tk.Checkbutton(master=FitWindow, text='G1+G2',
-                                      variable=GpG, onvalue=1, offvalue=0, bg="grey")
-    checkboxGpG.place(x=300, y=90)
+            checkboxGpG = tk.Checkbutton(master=FitWindow, text='G1+G2',
+                                              variable=GpG, onvalue=1, offvalue=0, bg="grey")
+            checkboxGpG.place(x=300, y=90)
 
-    checkboxGavG = tk.Checkbutton(master=FitWindow, text='(G1+G2)/2',
-                                      variable=GavG, onvalue=1, offvalue=0, bg="grey")
-    checkboxGavG.place(x=300, y=110)
+            checkboxGavG = tk.Checkbutton(master=FitWindow, text='(G1+G2)/2',
+                                              variable=GavG, onvalue=1, offvalue=0, bg="grey")
+            checkboxGavG.place(x=300, y=110)
 
-    checkboxB = tk.Checkbutton(master=FitWindow, text='B ',
-                                      variable=Blue, onvalue=1, offvalue=0, bg="grey")
-    checkboxB.place(x=300, y=130)
+            checkboxB = tk.Checkbutton(master=FitWindow, text='B ',
+                                              variable=Blue, onvalue=1, offvalue=0, bg="grey")
+            checkboxB.place(x=300, y=130)
 
-    extbutton = ttk.Button(master=FitWindow, text='Extract', command=channelextract, width=12)
-    extbutton.place(x=300, y=170)
+            extbutton = ttk.Button(master=FitWindow, text='Extract', command=channelextract, width=12)
+            extbutton.place(x=305, y=170)
 
 
 def checklinearity():
