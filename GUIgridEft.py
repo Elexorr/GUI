@@ -349,6 +349,14 @@ checkboxRBsample = tk.Checkbutton(master=frame3, text=' R/B sample',
                                variable=RBsample, onvalue=1, offvalue=0, bg="grey")
 checkboxRBsample.place(x=405, y=45)
 
+Gray = IntVar()
+Red = IntVar()
+Green1 = IntVar()
+Green2 = IntVar()
+Blue = IntVar()
+GpG = IntVar()
+GavG = IntVar()
+
 
 def channelextract():
     # print(mrawopen)
@@ -384,19 +392,74 @@ def channelextract():
                 # print(raw.raw_image_visible)
                 npraw = np.array(raw.raw_image_visible)
                 hdu = fits.PrimaryHDU(npraw)
-                hdu.writeto(raw_filenames[j].rsplit('.', 1)[0]+'.fits', overwrite=True)
-                # print(npraw)
-                nprawblue=np.delete(npraw, oddx, 1) #vymazavanie NEPARNYCH stlpcov
-                nprawbluefinal=np.delete(nprawblue, oddy, 0) #vymazavanie NEPARNYCH stlpcov
-                hdur = fits.PrimaryHDU(nprawbluefinal)
-                hdur.writeto(raw_filenames[j].rsplit('.', 1)[0]+'-B'+'.fits', overwrite=True)
-                nprawred=np.delete(npraw, evenx, 1) #vymazavanie PARNYCH stlpcov
-                nprawredfinal=np.delete(nprawred, eveny, 0) #vymazavanie PARNYCH stlpcov
-                hdub = fits.PrimaryHDU(nprawredfinal)
-                hdub.writeto(raw_filenames[j].rsplit('.', 1)[0]+'-R'+'.fits', overwrite=True)
+                if Gray.get() == 1:
+                    hdu.writeto(raw_filenames[j].rsplit('.', 1)[0]+'.fits', overwrite=True)
+                if Blue.get() == 1:
+                    nprawblue=np.delete(npraw, oddx, 1) #deleting odd columns
+                    nprawbluefinal=np.delete(nprawblue, oddy, 0) #deleting odd rows
+                    hdur = fits.PrimaryHDU(nprawbluefinal)
+                    hdur.writeto(raw_filenames[j].rsplit('.', 1)[0]+'-B'+'.fits', overwrite=True)
+                if Red.get() == 1:
+                    nprawred=np.delete(npraw, evenx, 1) #vdeleting even columns
+                    nprawredfinal=np.delete(nprawred, eveny, 0) #deleting even rows
+                    hdub = fits.PrimaryHDU(nprawredfinal)
+                    hdub.writeto(raw_filenames[j].rsplit('.', 1)[0]+'-R'+'.fits', overwrite=True)
+                nprawg1 = np.delete(npraw, oddx, 1) #deleting odd columns
+                nprawg1final = np.delete(nprawg1, eveny, 0) #deleting even rows
+                hdug1 = fits.PrimaryHDU(nprawg1final)
+                if Green1 == 1:
+                    hdug1.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G1' + '.fits', overwrite=True)
+                nprawg2 = np.delete(npraw, evenx, 1) #deleting even columns
+                nprawg2final = np.delete(nprawg2, oddy, 0) #deleting even rows
+                hdug2 = fits.PrimaryHDU(nprawg2final)
+                if Green2 == 1:
+                    hdug2.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G2' + '.fits', overwrite=True)
+                if GpG == 1:
+                    nprawgplus = (nprawg1final + nprawg2final)
+                    hdug = fits.PrimaryHDU(nprawgplus)
+                    hdug.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G+G' + '.fits', overwrite=True)
+                if GavG == 1:
+                    nprawgaver = (nprawg1final + nprawg2final)//2
+                    hdug = fits.PrimaryHDU(nprawgaver)
+                    hdug.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-(G+G)/2' + '.fits', overwrite=True)
                 # print(npraw)
                 # print(nprawredfinal)
                 # print(nprawbluefinal)
+                # print(nprawg1final)
+                # print(nprawg2final)
+                # print(nprawg)
+        T.insert(END, '\n' + 'Multiple RAW: ' + str(len(raw_filenames)) + ' RAW Files Divided To Color Channels')
+        T.see(END)
+
+
+def ChannelWindow():
+    FitWindow = Toplevel(root, bg='grey')
+    FitWindow.title("Channels")
+    FitWindow.geometry("400x200+500+500")
+    FitWindow.wm_attributes("-topmost", 1)
+    checkboxGray = tk.Checkbutton(master=FitWindow, text='Grayscale',
+                                      variable=Gray, onvalue=1, offvalue=0, bg="grey")
+    checkboxGray.place(x=300, y=10)
+    checkboxR = tk.Checkbutton(master=FitWindow, text='R',
+                                      variable=Red, onvalue=1, offvalue=0, bg="grey")
+    checkboxR.place(x=300, y=30)
+    checkboxG1 = tk.Checkbutton(master=FitWindow, text='G1',
+                                      variable=Green1, onvalue=1, offvalue=0, bg="grey")
+    checkboxG1.place(x=300, y=50)
+    checkboxG2 = tk.Checkbutton(master=FitWindow, text='G2',
+                                      variable=Green2, onvalue=1, offvalue=0, bg="grey")
+    checkboxG2.place(x=300, y=70)
+    checkboxGpG = tk.Checkbutton(master=FitWindow, text='G1+G2',
+                                      variable=GpG, onvalue=1, offvalue=0, bg="grey")
+    checkboxGpG.place(x=300, y=90)
+    checkboxGavG = tk.Checkbutton(master=FitWindow, text='(G1+G2)/2',
+                                      variable=GavG, onvalue=1, offvalue=0, bg="grey")
+    checkboxGavG.place(x=300, y=110)
+    checkboxB = tk.Checkbutton(master=FitWindow, text='B ',
+                                      variable=Blue, onvalue=1, offvalue=0, bg="grey")
+    checkboxB.place(x=300, y=130)
+    extbutton = ttk.Button(master=FitWindow, text='Extract', command=channelextract, width=12)
+    extbutton.place(x=300, y=170)
 
 
 def checklinearity():
@@ -1011,11 +1074,14 @@ openraw_button.place(x=24, y=10)
 openmultiraw_button = ttk.Button(master=frame3, text='Open Multiple RAW', command=selectmultipleraws, width=18)
 openmultiraw_button.place(x=510, y=10)
 
-checklinearity_button = ttk.Button(master=frame3, text='Check Linearity', command=checklinearity, width=18)
-checklinearity_button.place(x=510, y=40)
+fits_button = ttk.Button(master=frame3, text='Extract FITS', command=ChannelWindow, width=12)
+fits_button.place(x=510, y=40)
 
-checktemperature_button = ttk.Button(master=frame3, text='Sensor Temp. (°C)', command=checktemperature, width=18)
-checktemperature_button.place(x=648, y=40)
+checklinearity_button = ttk.Button(master=frame3, text='Linearity', command=checklinearity, width=12)
+checklinearity_button.place(x=602, y=40)
+
+checktemperature_button = ttk.Button(master=frame3, text='Temp. (°C)', command=checktemperature, width=12)
+checktemperature_button.place(x=694, y=40)
 
 rawmaxmin_button = ttk.Button(master=frame3, text='Max./Min. ADU', command=adumaxmin, width=15)
 rawmaxmin_button.place(x=24, y=40)
@@ -1153,7 +1219,6 @@ tclabel.place(x=10, y=495)
 VTClabel = tk.Label(master=frame2, text='V(comp)         TC', bg="grey")
 VTClabel.place(x=19, y=515)
 
-
 vcompentry = tk.Entry(master=frame2, justify=CENTER, width=7)
 vcompentry.insert(0, vcompdefault)
 vcompentry.place(x=21, y=535)
@@ -1217,9 +1282,6 @@ def transformation():
 
 tcbutton = ttk.Button(master=frame2, text='Transform', command=transformation, width=15)
 tcbutton.place(x=24, y=600)
-
-tcbutton = ttk.Button(master=frame2, text='Extract', command=channelextract, width=15)
-tcbutton.place(x=24, y=650)
 
 
 def fitprocessing():
