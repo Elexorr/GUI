@@ -441,18 +441,54 @@ def FitWindowOnclose():
     FitWindowCount = 0
 
 def ChannelWindow():
-    if mrawopen == []:
-        showinfo(title='Error', message='No Multiple RAW to Check')
-    else:
+    # if mrawopen == []:
+    #     showinfo(title='Error', message='No Multiple RAW to Check')
+    # else:
         global FitWindow
         global FitWindowCount
         if FitWindowCount == 0:
             FitWindowCount = 1
             FitWindow = Toplevel(root, bg='grey')
+
             FitWindow.title("FITS Files Extractor")
             FitWindow.geometry("400x200+500+500")
             FitWindow.protocol("WM_DELETE_WINDOW", FitWindowOnclose)
             FitWindow.wm_attributes("-topmost", 1)
+
+            OBSERVERlabel = tk.Label(master=FitWindow, text='OBSERVER', bg="grey")
+            OBSERVERlabel.place(x=10, y=20)
+            OBSERVERentry = tk.Entry(master=FitWindow, justify=LEFT, width=20)
+            OBSERVERentry.place(x=100, y=20)
+
+            TELESCOPlabel = tk.Label(master=FitWindow, text='TELESCOP', bg="grey")
+            TELESCOPlabel.place(x=10, y=45)
+            TELESCOPentry = tk.Entry(master=FitWindow, justify=LEFT, width=20)
+            TELESCOPentry.place(x=100, y=45)
+
+            INSTRUMElabel = tk.Label(master=FitWindow, text='INSTRUME', bg="grey")
+            INSTRUMElabel.place(x=10, y=70)
+            INSTRUMEentry = tk.Entry(master=FitWindow, justify=LEFT, width=20)
+            INSTRUMEentry.place(x=100, y=70)
+
+            SITElabel = tk.Label(master=FitWindow, text='SITE', bg="grey")
+            SITElabel.place(x=10, y=95)
+            SITEentry = tk.Entry(master=FitWindow, justify=LEFT, width=20)
+            SITEentry.place(x=100, y=95)
+
+            OBSLATlabel = tk.Label(master=FitWindow, text='OBS-LAT', bg="grey")
+            OBSLATlabel.place(x=10, y=120)
+            OBSLATentry = tk.Entry(master=FitWindow, justify=LEFT, width=20)
+            OBSLATentry.place(x=100, y=120)
+
+            OBSLONGlabel = tk.Label(master=FitWindow, text='OBS-LONG', bg="grey")
+            OBSLONGlabel.place(x=10, y=145)
+            OBSLONGentry = tk.Entry(master=FitWindow, justify=LEFT, width=20)
+            OBSLONGentry.place(x=100, y=145)
+
+            OBJECTlabel = tk.Label(master=FitWindow, text='OBJECT', bg="grey")
+            OBJECTlabel.place(x=10, y=170)
+            OBJECTentry1 = tk.Entry(master=FitWindow, justify=LEFT, width=20)
+            OBJECTentry1.place(x=100, y=170)
 
             checkboxGray = tk.Checkbutton(master=FitWindow, text='Grayscale',
                                               variable=Gray, onvalue=1, offvalue=0, bg="grey")
@@ -470,7 +506,7 @@ def ChannelWindow():
                                               variable=Green2, onvalue=1, offvalue=0, bg="grey")
             checkboxG2.place(x=300, y=70)
 
-            checkboxGpG = tk.Checkbutton(master=FitWindow, text='G1+G2',
+            checkboxGpG = tk.Checkbutton(master=FitWindow, text='(G1+G2)',
                                               variable=GpG, onvalue=1, offvalue=0, bg="grey")
             checkboxGpG.place(x=300, y=90)
 
@@ -483,7 +519,7 @@ def ChannelWindow():
             checkboxB.place(x=300, y=130)
 
             extbutton = ttk.Button(master=FitWindow, text='Extract', command=channelextract, width=12)
-            extbutton.place(x=305, y=170)
+            extbutton.place(x=305, y=165)
 
 
 def checklinearity():
