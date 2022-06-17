@@ -358,79 +358,82 @@ GpG = IntVar()
 GavG = IntVar()
 
 
-def channelextract():
-    # print(mrawopen)
-    if mrawopen == []:
-        showinfo(title='Error', message='No Multiple RAW to Check')
-    elif pixelrentry.get() == '' or pixelcentry.get() == '':
-        showinfo(title='Error', message='No Pixel Coordinates to Check')
-    else:
-        window.delete("all")
-        print('start')
-        for j in range (0,len(raw_filenames)):
-        # for j in range(0, 1):
-            with rawpy.imread(raw_filenames[j]) as raw:
-                # print('Width:', len(raw.raw_image_visible[0]))
-                # print('Height', len(raw.raw_image_visible))
-                oddx = []
-                evenx = []
-                for i in range(0, len(raw.raw_image_visible[0])-1, 2):
-                    oddx.append(i)
-                    evenx.append(i+1)
-                oddy = []
-                eveny = []
-                for i in range(0, len(raw.raw_image_visible)-1, 2):
-                    oddy.append(i)
-                    eveny.append(i+1)
-                # print(oddx)
-                # print(evenx)
-                # print(raw.raw_image_visible[0][0])
-                # print(raw.raw_image_visible[0][len(raw.raw_image_visible[0])-1])
-                # print(raw.raw_image_visible[len(raw.raw_image_visible)-1][0])
-                # print(raw.raw_image_visible[len(raw.raw_image_visible)-1][len(raw.raw_image_visible[0])-1])
-                # print(raw.raw_image_visible[0][1])
-                # print(raw.raw_image_visible)
-                npraw = np.array(raw.raw_image_visible)
-                if Gray.get() == 1:
-                    hdu = fits.PrimaryHDU(npraw)
-                    hdu.writeto(raw_filenames[j].rsplit('.', 1)[0]+'-Gray'+'.fits', overwrite=True)
-                if Blue.get() == 1:
-                    nprawblue=np.delete(npraw, oddx, 1) #deleting odd columns
-                    nprawbluefinal=np.delete(nprawblue, oddy, 0) #deleting odd rows
-                    hdub = fits.PrimaryHDU(nprawbluefinal)
-                    hdub.writeto(raw_filenames[j].rsplit('.', 1)[0]+'-B'+'.fits', overwrite=True)
-                if Red.get() == 1:
-                    nprawred=np.delete(npraw, evenx, 1) #vdeleting even columns
-                    nprawredfinal=np.delete(nprawred, eveny, 0) #deleting even rows
-                    hdur = fits.PrimaryHDU(nprawredfinal)
-                    hdur.writeto(raw_filenames[j].rsplit('.', 1)[0]+'-R'+'.fits', overwrite=True)
-                nprawg1 = np.delete(npraw, oddx, 1) #deleting odd columns
-                nprawg1final = np.delete(nprawg1, eveny, 0) #deleting even rows
-                if Green1.get() == 1:
-                    print('g1')
-                    hdug1 = fits.PrimaryHDU(nprawg1final)
-                    hdug1.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G1' + '.fits', overwrite=True)
-                nprawg2 = np.delete(npraw, evenx, 1) #deleting even columns
-                nprawg2final = np.delete(nprawg2, oddy, 0) #deleting even rows
-                if Green2.get() == 1:
-                    hdug2 = fits.PrimaryHDU(nprawg2final)
-                    hdug2.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G2' + '.fits', overwrite=True)
-                if GpG.get() == 1:
-                    nprawgplus = (nprawg1final + nprawg2final)
-                    hdug = fits.PrimaryHDU(nprawgplus)
-                    hdug.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-(G+G)' + '.fits', overwrite=True)
-                if GavG.get() == 1:
-                    nprawgaver = (nprawg1final + nprawg2final)//2
-                    hdug = fits.PrimaryHDU(nprawgaver)
-                    hdug.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G(average)' + '.fits', overwrite=True)
-                # print(npraw)
-                # print(nprawredfinal)
-                # print(nprawbluefinal)
-                # print(nprawg1final)
-                # print(nprawg2final)
-                # print(nprawg)
-        T.insert(END, '\n' + 'Multiple RAW: ' + str(len(raw_filenames)) + ' RAW Files Divided To Color Channels')
-        T.see(END)
+# def channelextract():
+#     # print(mrawopen)
+#     if mrawopen == []:
+#         showinfo(title='Error', message='No Multiple RAW to Check')
+#     elif pixelrentry.get() == '' or pixelcentry.get() == '':
+#         showinfo(title='Error', message='No Pixel Coordinates to Check')
+#     else:
+#         window.delete("all")
+#         print('start')
+#         for j in range (0,len(raw_filenames)):
+#         # for j in range(0, 1):
+#             with rawpy.imread(raw_filenames[j]) as raw:
+#                 # print('Width:', len(raw.raw_image_visible[0]))
+#                 # print('Height', len(raw.raw_image_visible))
+#                 oddx = []
+#                 evenx = []
+#                 for i in range(0, len(raw.raw_image_visible[0])-1, 2):
+#                     oddx.append(i)
+#                     evenx.append(i+1)
+#                 oddy = []
+#                 eveny = []
+#                 for i in range(0, len(raw.raw_image_visible)-1, 2):
+#                     oddy.append(i)
+#                     eveny.append(i+1)
+#                 # print(oddx)
+#                 # print(evenx)
+#                 # print(raw.raw_image_visible[0][0])
+#                 # print(raw.raw_image_visible[0][len(raw.raw_image_visible[0])-1])
+#                 # print(raw.raw_image_visible[len(raw.raw_image_visible)-1][0])
+#                 # print(raw.raw_image_visible[len(raw.raw_image_visible)-1][len(raw.raw_image_visible[0])-1])
+#                 # print(raw.raw_image_visible[0][1])
+#                 # print(raw.raw_image_visible)
+#                 npraw = np.array(raw.raw_image_visible)
+#                 if Gray.get() == 1:
+#                     hdu = fits.PrimaryHDU(npraw)
+#                     hdu.writeto(raw_filenames[j].rsplit('.', 1)[0]+'-Gray'+'.fits', overwrite=True)
+#                     # fits.setval(raw_filenames[j].rsplit('.', 1)[0]+'-Gray'+'.fits','OBJECT', value='M31')
+#                     # fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits', 'OBJECT', value=ChannelWindow.obj)
+#
+#                 if Blue.get() == 1:
+#                     nprawblue=np.delete(npraw, oddx, 1) #deleting odd columns
+#                     nprawbluefinal=np.delete(nprawblue, oddy, 0) #deleting odd rows
+#                     hdub = fits.PrimaryHDU(nprawbluefinal)
+#                     hdub.writeto(raw_filenames[j].rsplit('.', 1)[0]+'-B'+'.fits', overwrite=True)
+#                 if Red.get() == 1:
+#                     nprawred=np.delete(npraw, evenx, 1) #vdeleting even columns
+#                     nprawredfinal=np.delete(nprawred, eveny, 0) #deleting even rows
+#                     hdur = fits.PrimaryHDU(nprawredfinal)
+#                     hdur.writeto(raw_filenames[j].rsplit('.', 1)[0]+'-R'+'.fits', overwrite=True)
+#                 nprawg1 = np.delete(npraw, oddx, 1) #deleting odd columns
+#                 nprawg1final = np.delete(nprawg1, eveny, 0) #deleting even rows
+#                 if Green1.get() == 1:
+#                     print('g1')
+#                     hdug1 = fits.PrimaryHDU(nprawg1final)
+#                     hdug1.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G1' + '.fits', overwrite=True)
+#                 nprawg2 = np.delete(npraw, evenx, 1) #deleting even columns
+#                 nprawg2final = np.delete(nprawg2, oddy, 0) #deleting even rows
+#                 if Green2.get() == 1:
+#                     hdug2 = fits.PrimaryHDU(nprawg2final)
+#                     hdug2.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G2' + '.fits', overwrite=True)
+#                 if GpG.get() == 1:
+#                     nprawgplus = (nprawg1final + nprawg2final)
+#                     hdug = fits.PrimaryHDU(nprawgplus)
+#                     hdug.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-(G+G)' + '.fits', overwrite=True)
+#                 if GavG.get() == 1:
+#                     nprawgaver = (nprawg1final + nprawg2final)//2
+#                     hdug = fits.PrimaryHDU(nprawgaver)
+#                     hdug.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G(average)' + '.fits', overwrite=True)
+#                 # print(npraw)
+#                 # print(nprawredfinal)
+#                 # print(nprawbluefinal)
+#                 # print(nprawg1final)
+#                 # print(nprawg2final)
+#                 # print(nprawg)
+#         T.insert(END, '\n' + 'Multiple RAW: ' + str(len(raw_filenames)) + ' RAW Files Divided To Color Channels')
+#         T.see(END)
 
 FitWindowCount = 0
 
@@ -440,86 +443,193 @@ def FitWindowOnclose():
     FitWindow.destroy()
     FitWindowCount = 0
 
+
 def ChannelWindow():
-    # if mrawopen == []:
+          # if mrawopen == []:
     #     showinfo(title='Error', message='No Multiple RAW to Check')
     # else:
         global FitWindow
         global FitWindowCount
+        imtypes = ["Object", "Dark", "Flat", "Bias",]
         if FitWindowCount == 0:
             FitWindowCount = 1
             FitWindow = Toplevel(root, bg='grey')
 
             FitWindow.title("FITS Files Extractor")
-            FitWindow.geometry("400x200+500+500")
+            FitWindow.geometry("400x225+500+475")
             FitWindow.protocol("WM_DELETE_WINDOW", FitWindowOnclose)
             FitWindow.wm_attributes("-topmost", 1)
 
+            otype = StringVar()
+            otype.set(imtypes[0])
+
+            IMAGETYPlabel = tk.Label(master=FitWindow, text='IMAGETYP', bg="grey")
+            IMAGETYPlabel.place(x=10, y=15)
+
+            ImTypeSelection = OptionMenu(FitWindow, otype, *imtypes)
+            ImTypeSelection.place(x=101, y=8)
+
             OBSERVERlabel = tk.Label(master=FitWindow, text='OBSERVER', bg="grey")
-            OBSERVERlabel.place(x=10, y=20)
+            OBSERVERlabel.place(x=10, y=45)
             OBSERVERentry = tk.Entry(master=FitWindow, justify=LEFT, width=20)
-            OBSERVERentry.place(x=100, y=20)
+            OBSERVERentry.place(x=100, y=45)
 
             TELESCOPlabel = tk.Label(master=FitWindow, text='TELESCOP', bg="grey")
-            TELESCOPlabel.place(x=10, y=45)
+            TELESCOPlabel.place(x=10, y=70)
             TELESCOPentry = tk.Entry(master=FitWindow, justify=LEFT, width=20)
-            TELESCOPentry.place(x=100, y=45)
+            TELESCOPentry.place(x=100, y=70)
 
             INSTRUMElabel = tk.Label(master=FitWindow, text='INSTRUME', bg="grey")
-            INSTRUMElabel.place(x=10, y=70)
+            INSTRUMElabel.place(x=10, y=95)
             INSTRUMEentry = tk.Entry(master=FitWindow, justify=LEFT, width=20)
-            INSTRUMEentry.place(x=100, y=70)
+            INSTRUMEentry.place(x=100, y=95)
 
             SITElabel = tk.Label(master=FitWindow, text='SITE', bg="grey")
-            SITElabel.place(x=10, y=95)
+            SITElabel.place(x=10, y=120)
             SITEentry = tk.Entry(master=FitWindow, justify=LEFT, width=20)
-            SITEentry.place(x=100, y=95)
+            SITEentry.place(x=100, y=120)
 
             OBSLATlabel = tk.Label(master=FitWindow, text='OBS-LAT', bg="grey")
-            OBSLATlabel.place(x=10, y=120)
+            OBSLATlabel.place(x=10, y=145)
             OBSLATentry = tk.Entry(master=FitWindow, justify=LEFT, width=20)
-            OBSLATentry.place(x=100, y=120)
+            OBSLATentry.place(x=100, y=145)
 
             OBSLONGlabel = tk.Label(master=FitWindow, text='OBS-LONG', bg="grey")
-            OBSLONGlabel.place(x=10, y=145)
+            OBSLONGlabel.place(x=10, y=170)
             OBSLONGentry = tk.Entry(master=FitWindow, justify=LEFT, width=20)
-            OBSLONGentry.place(x=100, y=145)
+            OBSLONGentry.place(x=100, y=170)
 
             OBJECTlabel = tk.Label(master=FitWindow, text='OBJECT', bg="grey")
-            OBJECTlabel.place(x=10, y=170)
-            OBJECTentry1 = tk.Entry(master=FitWindow, justify=LEFT, width=20)
-            OBJECTentry1.place(x=100, y=170)
+            OBJECTlabel.place(x=10, y=195)
+            OBJECTentry = tk.Entry(master=FitWindow, justify=LEFT, width=20)
+            OBJECTentry.place(x=100, y=195)
 
             checkboxGray = tk.Checkbutton(master=FitWindow, text='Grayscale',
                                               variable=Gray, onvalue=1, offvalue=0, bg="grey")
-            checkboxGray.place(x=300, y=10)
+            checkboxGray.place(x=300, y=35)
 
             checkboxR = tk.Checkbutton(master=FitWindow, text='R',
                                               variable=Red, onvalue=1, offvalue=0, bg="grey")
-            checkboxR.place(x=300, y=30)
+            checkboxR.place(x=300, y=55)
 
             checkboxG1 = tk.Checkbutton(master=FitWindow, text='G1',
                                               variable=Green1, onvalue=1, offvalue=0, bg="grey")
-            checkboxG1.place(x=300, y=50)
+            checkboxG1.place(x=300, y=75)
 
             checkboxG2 = tk.Checkbutton(master=FitWindow, text='G2',
                                               variable=Green2, onvalue=1, offvalue=0, bg="grey")
-            checkboxG2.place(x=300, y=70)
+            checkboxG2.place(x=300, y=95)
 
             checkboxGpG = tk.Checkbutton(master=FitWindow, text='(G1+G2)',
                                               variable=GpG, onvalue=1, offvalue=0, bg="grey")
-            checkboxGpG.place(x=300, y=90)
+            checkboxGpG.place(x=300, y=115)
 
             checkboxGavG = tk.Checkbutton(master=FitWindow, text='(G1+G2)/2',
                                               variable=GavG, onvalue=1, offvalue=0, bg="grey")
-            checkboxGavG.place(x=300, y=110)
+            checkboxGavG.place(x=300, y=135)
 
             checkboxB = tk.Checkbutton(master=FitWindow, text='B ',
                                               variable=Blue, onvalue=1, offvalue=0, bg="grey")
-            checkboxB.place(x=300, y=130)
+            checkboxB.place(x=300, y=155)
+
+            # getbutton = ttk.Button(master=FitWindow, text='Load', command=test, width=5)
+            # getbutton.place(x=250, y=165)
+
+            def channelextract():
+                # print(mrawopen)
+                if mrawopen == []:
+                    showinfo(title='Error', message='No Multiple RAW to Check')
+                elif pixelrentry.get() == '' or pixelcentry.get() == '':
+                    showinfo(title='Error', message='No Pixel Coordinates to Check')
+                else:
+                    window.delete("all")
+                    print('start')
+                    for j in range(0, len(raw_filenames)):
+                        # for j in range(0, 1):
+                        with rawpy.imread(raw_filenames[j]) as raw:
+                            # print('Width:', len(raw.raw_image_visible[0]))
+                            # print('Height', len(raw.raw_image_visible))
+                            oddx = []
+                            evenx = []
+                            for i in range(0, len(raw.raw_image_visible[0]) - 1, 2):
+                                oddx.append(i)
+                                evenx.append(i + 1)
+                            oddy = []
+                            eveny = []
+                            for i in range(0, len(raw.raw_image_visible) - 1, 2):
+                                oddy.append(i)
+                                eveny.append(i + 1)
+                            # print(oddx)
+                            # print(evenx)
+                            # print(raw.raw_image_visible[0][0])
+                            # print(raw.raw_image_visible[0][len(raw.raw_image_visible[0])-1])
+                            # print(raw.raw_image_visible[len(raw.raw_image_visible)-1][0])
+                            # print(raw.raw_image_visible[len(raw.raw_image_visible)-1][len(raw.raw_image_visible[0])-1])
+                            # print(raw.raw_image_visible[0][1])
+                            # print(raw.raw_image_visible)
+                            npraw = np.array(raw.raw_image_visible)
+                            if Gray.get() == 1:
+                                hdu = fits.PrimaryHDU(npraw)
+                                hdu.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits', overwrite=True)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
+                                            'IMAGETYP', value=otype.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
+                                            'FILTER', value='Clear')
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
+                                            'OBSERVER', value=OBSERVERentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
+                                            'TELESCOP', value=TELESCOPentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
+                                            'INSTRUME', value=INSTRUMEentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
+                                            'SITE', value=SITEentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
+                                            'OBS-LAT', value=OBSLATentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
+                                            'OBS-LON', value=OBSLONGentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
+                                            'OBJECT', value=OBJECTentry.get())
+                            if Blue.get() == 1:
+                                nprawblue = np.delete(npraw, oddx, 1)  # deleting odd columns
+                                nprawbluefinal = np.delete(nprawblue, oddy, 0)  # deleting odd rows
+                                hdub = fits.PrimaryHDU(nprawbluefinal)
+                                hdub.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-B' + '.fits', overwrite=True)
+                            if Red.get() == 1:
+                                nprawred = np.delete(npraw, evenx, 1)  # vdeleting even columns
+                                nprawredfinal = np.delete(nprawred, eveny, 0)  # deleting even rows
+                                hdur = fits.PrimaryHDU(nprawredfinal)
+                                hdur.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-R' + '.fits', overwrite=True)
+                            nprawg1 = np.delete(npraw, oddx, 1)  # deleting odd columns
+                            nprawg1final = np.delete(nprawg1, eveny, 0)  # deleting even rows
+                            if Green1.get() == 1:
+                                hdug1 = fits.PrimaryHDU(nprawg1final)
+                                hdug1.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G1' + '.fits', overwrite=True)
+                            nprawg2 = np.delete(npraw, evenx, 1)  # deleting even columns
+                            nprawg2final = np.delete(nprawg2, oddy, 0)  # deleting even rows
+                            if Green2.get() == 1:
+                                hdug2 = fits.PrimaryHDU(nprawg2final)
+                                hdug2.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G2' + '.fits', overwrite=True)
+                            if GpG.get() == 1:
+                                nprawgplus = (nprawg1final + nprawg2final)
+                                hdug = fits.PrimaryHDU(nprawgplus)
+                                hdug.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-(G+G)' + '.fits', overwrite=True)
+                            if GavG.get() == 1:
+                                nprawgaver = (nprawg1final + nprawg2final) // 2
+                                hdug = fits.PrimaryHDU(nprawgaver)
+                                hdug.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G(average)' + '.fits',
+                                             overwrite=True)
+                            # print(npraw)
+                            # print(nprawredfinal)
+                            # print(nprawbluefinal)
+                            # print(nprawg1final)
+                            # print(nprawg2final)
+                            # print(nprawg)
+                    T.insert(END,
+                             '\n' + 'Multiple RAW: ' + str(len(raw_filenames)) + ' RAW Files Divided To Color Channels')
+                    T.see(END)
 
             extbutton = ttk.Button(master=FitWindow, text='Extract', command=channelextract, width=12)
-            extbutton.place(x=305, y=165)
+            extbutton.place(x=305, y=190)
 
 
 def checklinearity():
