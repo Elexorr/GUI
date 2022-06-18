@@ -445,9 +445,9 @@ def FitWindowOnclose():
 
 
 def ChannelWindow():
-          # if mrawopen == []:
-    #     showinfo(title='Error', message='No Multiple RAW to Check')
-    # else:
+    if mrawopen == []:
+        showinfo(title='Error', message='No Multiple RAW to Check')
+    else:
         global FitWindow
         global FitWindowCount
         imtypes = ["Object", "Dark", "Flat", "Bias",]
@@ -535,8 +535,6 @@ def ChannelWindow():
                                               variable=Blue, onvalue=1, offvalue=0, bg="grey")
             checkboxB.place(x=300, y=155)
 
-            # getbutton = ttk.Button(master=FitWindow, text='Load', command=test, width=5)
-            # getbutton.place(x=250, y=165)
 
             def channelextract():
                 # print(mrawopen)
@@ -548,7 +546,14 @@ def ChannelWindow():
                     window.delete("all")
                     print('start')
                     for j in range(0, len(raw_filenames)):
-                        # for j in range(0, 1):
+                        with exiftool.ExifToolHelper() as et:
+                            metadata = et.get_metadata(raw_filenames[j])
+                            metastring = str(metadata)
+                            tempposition = metastring.index("CameraTemperature")
+                            if metastring[tempposition + 21] == ',':
+                                temperature = int(metastring[tempposition + 19:tempposition + 21])
+                            else:
+                                temperature = int(metastring[tempposition + 19:tempposition + 22])
                         with rawpy.imread(raw_filenames[j]) as raw:
                             # print('Width:', len(raw.raw_image_visible[0]))
                             # print('Height', len(raw.raw_image_visible))
@@ -562,23 +567,22 @@ def ChannelWindow():
                             for i in range(0, len(raw.raw_image_visible) - 1, 2):
                                 oddy.append(i)
                                 eveny.append(i + 1)
-
                             f = open(raw_filenames[j], 'rb')
                             tags = exifread.process_file(f)
                             f.close()
                             data = list(tags.items())
                             an_array = np.array(data)
                             for i in range(0, len(an_array) - 1):
+                                if an_array[i][0] == 'EXIF ISOSpeedRatings':
+                                    ISOspeed = int(str(an_array[i][1]))
+                                    print(ISOspeed)
                                 if an_array[i][0] == 'EXIF ExposureTime':
-                                    # print(an_array)
                                     time = str(an_array[i][1])
                                     timetime = float(sum(Fraction(time) for time in time.split()))
                                     timetime = round(timetime, 4)
                                 if an_array[i][0] == 'EXIF DateTimeOriginal':
-                                    # print(an_array)
                                     dtime = str(an_array[i][1])
                                     datime = (dtime[0:4]+"-"+dtime[5:7]+"-"+dtime[8:10]+"T"+dtime[11:19])
-                                    # print(datime)
                             # print(oddx)
                             # print(evenx)
                             # print(raw.raw_image_visible[0][0])
@@ -596,7 +600,11 @@ def ChannelWindow():
                                 fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
                                             'EXPTIME', value=timetime)
                                 fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
+                                            'ISOSPEED', value=ISOspeed)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
                                             'DATE-OBS', value=datime)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
+                                            'CCD-TEMP', value=temperature)
                                 fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
                                             'FILTER', value='Clear')
                                 fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
@@ -618,30 +626,186 @@ def ChannelWindow():
                                 nprawbluefinal = np.delete(nprawblue, oddy, 0)  # deleting odd rows
                                 hdub = fits.PrimaryHDU(nprawbluefinal)
                                 hdub.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-B' + '.fits', overwrite=True)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-B' + '.fits',
+                                            'IMAGETYP', value=ImTypeSelection.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-B' + '.fits',
+                                            'EXPTIME', value=timetime)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-B' + '.fits',
+                                            'ISOSPEED', value=ISOspeed)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-B' + '.fits',
+                                            'DATE-OBS', value=datime)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-B' + '.fits',
+                                            'CCD-TEMP', value=temperature)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-B' + '.fits',
+                                            'FILTER', value='B')
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-B' + '.fits',
+                                            'OBSERVER', value=OBSERVERentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-B' + '.fits',
+                                            'TELESCOP', value=TELESCOPentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-B' + '.fits',
+                                            'INSTRUME', value=INSTRUMEentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-B' + '.fits',
+                                            'SITE', value=SITEentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-B' + '.fits',
+                                            'OBS-LAT', value=OBSLATentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-B' + '.fits',
+                                            'OBS-LON', value=OBSLONGentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-B' + '.fits',
+                                            'OBJECT', value=OBJECTentry.get())
                             if Red.get() == 1:
                                 nprawred = np.delete(npraw, evenx, 1)  # vdeleting even columns
                                 nprawredfinal = np.delete(nprawred, eveny, 0)  # deleting even rows
                                 hdur = fits.PrimaryHDU(nprawredfinal)
                                 hdur.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-R' + '.fits', overwrite=True)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-R' + '.fits',
+                                            'IMAGETYP', value=ImTypeSelection.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-R' + '.fits',
+                                            'EXPTIME', value=timetime)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-R' + '.fits',
+                                            'ISOSPEED', value=ISOspeed)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-R' + '.fits',
+                                            'DATE-OBS', value=datime)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-R' + '.fits',
+                                            'CCD-TEMP', value=temperature)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-R' + '.fits',
+                                            'FILTER', value='R')
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-R' + '.fits',
+                                            'OBSERVER', value=OBSERVERentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-R' + '.fits',
+                                            'TELESCOP', value=TELESCOPentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-R' + '.fits',
+                                            'INSTRUME', value=INSTRUMEentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-R' + '.fits',
+                                            'SITE', value=SITEentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-R' + '.fits',
+                                            'OBS-LAT', value=OBSLATentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-R' + '.fits',
+                                            'OBS-LON', value=OBSLONGentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-R' + '.fits',
+                                            'OBJECT', value=OBJECTentry.get())
                             nprawg1 = np.delete(npraw, oddx, 1)  # deleting odd columns
                             nprawg1final = np.delete(nprawg1, eveny, 0)  # deleting even rows
                             if Green1.get() == 1:
                                 hdug1 = fits.PrimaryHDU(nprawg1final)
                                 hdug1.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G1' + '.fits', overwrite=True)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G1' + '.fits',
+                                            'IMAGETYP', value=ImTypeSelection.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G1' + '.fits',
+                                            'EXPTIME', value=timetime)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G1' + '.fits',
+                                            'ISOSPEED', value=ISOspeed)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G1' + '.fits',
+                                            'DATE-OBS', value=datime)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G1' + '.fits',
+                                            'CCD-TEMP', value=temperature)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G1' + '.fits',
+                                            'FILTER', value='G1')
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G1' + '.fits',
+                                            'OBSERVER', value=OBSERVERentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G1' + '.fits',
+                                            'TELESCOP', value=TELESCOPentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G1' + '.fits',
+                                            'INSTRUME', value=INSTRUMEentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G1' + '.fits',
+                                            'SITE', value=SITEentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G1' + '.fits',
+                                            'OBS-LAT', value=OBSLATentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G1' + '.fits',
+                                            'OBS-LON', value=OBSLONGentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G1' + '.fits',
+                                            'OBJECT', value=OBJECTentry.get())
                             nprawg2 = np.delete(npraw, evenx, 1)  # deleting even columns
                             nprawg2final = np.delete(nprawg2, oddy, 0)  # deleting even rows
                             if Green2.get() == 1:
                                 hdug2 = fits.PrimaryHDU(nprawg2final)
                                 hdug2.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G2' + '.fits', overwrite=True)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G2' + '.fits',
+                                            'IMAGETYP', value=ImTypeSelection.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G2' + '.fits',
+                                            'EXPTIME', value=timetime)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G2' + '.fits',
+                                            'ISOSPEED', value=ISOspeed)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G2' + '.fits',
+                                            'DATE-OBS', value=datime)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G2' + '.fits',
+                                            'CCD-TEMP', value=temperature)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G2' + '.fits',
+                                            'FILTER', value='G2')
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G2' + '.fits',
+                                            'OBSERVER', value=OBSERVERentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G2' + '.fits',
+                                            'TELESCOP', value=TELESCOPentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G2' + '.fits',
+                                            'INSTRUME', value=INSTRUMEentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G2' + '.fits',
+                                            'SITE', value=SITEentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G2' + '.fits',
+                                            'OBS-LAT', value=OBSLATentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G2' + '.fits',
+                                            'OBS-LON', value=OBSLONGentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G2' + '.fits',
+                                            'OBJECT', value=OBJECTentry.get())
                             if GpG.get() == 1:
                                 nprawgplus = (nprawg1final + nprawg2final)
                                 hdug = fits.PrimaryHDU(nprawgplus)
                                 hdug.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-(G+G)' + '.fits', overwrite=True)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-(G+G)' + '.fits',
+                                            'IMAGETYP', value=ImTypeSelection.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-(G+G)' + '.fits',
+                                            'EXPTIME', value=timetime)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-(G+G)' + '.fits',
+                                            'ISOSPEED', value=ISOspeed)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-(G+G)' + '.fits',
+                                            'DATE-OBS', value=datime)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-(G+G)' + '.fits',
+                                            'CCD-TEMP', value=temperature)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-(G+G)' + '.fits',
+                                            'FILTER', value='G+G')
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-(G+G)' + '.fits',
+                                            'OBSERVER', value=OBSERVERentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-(G+G)' + '.fits',
+                                            'TELESCOP', value=TELESCOPentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-(G+G)' + '.fits',
+                                            'INSTRUME', value=INSTRUMEentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-(G+G)' + '.fits',
+                                            'SITE', value=SITEentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-(G+G)' + '.fits',
+                                            'OBS-LAT', value=OBSLATentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-(G+G)' + '.fits',
+                                            'OBS-LON', value=OBSLONGentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-(G+G)' + '.fits',
+                                            'OBJECT', value=OBJECTentry.get())
                             if GavG.get() == 1:
                                 nprawgaver = (nprawg1final + nprawg2final) // 2
                                 hdug = fits.PrimaryHDU(nprawgaver)
                                 hdug.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G(average)' + '.fits',
                                              overwrite=True)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G(average)' + '.fits',
+                                            'IMAGETYP', value=ImTypeSelection.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G(average)' + '.fits',
+                                            'EXPTIME', value=timetime)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G(average)' + '.fits',
+                                            'ISOSPEED', value=ISOspeed)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G(average)' + '.fits',
+                                            'DATE-OBS', value=datime)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G(average)' + '.fits',
+                                            'CCD-TEMP', value=temperature)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G(average)' + '.fits',
+                                            'FILTER', value='(G+G)/2')
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G(average)' + '.fits',
+                                            'OBSERVER', value=OBSERVERentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G(average)' + '.fits',
+                                            'TELESCOP', value=TELESCOPentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G(average)' + '.fits',
+                                            'INSTRUME', value=INSTRUMEentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G(average)' + '.fits',
+                                            'SITE', value=SITEentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G(average)' + '.fits',
+                                            'OBS-LAT', value=OBSLATentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G(average)' + '.fits',
+                                            'OBS-LON', value=OBSLONGentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G(average)' + '.fits',
+                                            'OBJECT', value=OBJECTentry.get())
                             # print(npraw)
                             # print(nprawredfinal)
                             # print(nprawbluefinal)
