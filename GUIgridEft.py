@@ -464,44 +464,47 @@ def ChannelWindow():
             otype.set(imtypes[0])
 
             IMAGETYPlabel = tk.Label(master=FitWindow, text='IMAGETYP', bg="grey")
-            IMAGETYPlabel.place(x=10, y=15)
+            IMAGETYPlabel.place(x=10, y=20)
 
-            ImTypeSelection = OptionMenu(FitWindow, otype, *imtypes)
-            ImTypeSelection.place(x=101, y=8)
+            # ImTypeSelection = OptionMenu(FitWindow, otype, *imtypes)
+            # ImTypeSelection.place(x=101, y=8)
+
+            ImTypeSelection = ttk.Combobox(FitWindow, value = imtypes)
+            ImTypeSelection.place(x=100, y=19)
 
             OBSERVERlabel = tk.Label(master=FitWindow, text='OBSERVER', bg="grey")
             OBSERVERlabel.place(x=10, y=45)
-            OBSERVERentry = tk.Entry(master=FitWindow, justify=LEFT, width=20)
+            OBSERVERentry = tk.Entry(master=FitWindow, justify=LEFT, width=23)
             OBSERVERentry.place(x=100, y=45)
 
             TELESCOPlabel = tk.Label(master=FitWindow, text='TELESCOP', bg="grey")
             TELESCOPlabel.place(x=10, y=70)
-            TELESCOPentry = tk.Entry(master=FitWindow, justify=LEFT, width=20)
+            TELESCOPentry = tk.Entry(master=FitWindow, justify=LEFT, width=23)
             TELESCOPentry.place(x=100, y=70)
 
             INSTRUMElabel = tk.Label(master=FitWindow, text='INSTRUME', bg="grey")
             INSTRUMElabel.place(x=10, y=95)
-            INSTRUMEentry = tk.Entry(master=FitWindow, justify=LEFT, width=20)
+            INSTRUMEentry = tk.Entry(master=FitWindow, justify=LEFT, width=23)
             INSTRUMEentry.place(x=100, y=95)
 
             SITElabel = tk.Label(master=FitWindow, text='SITE', bg="grey")
             SITElabel.place(x=10, y=120)
-            SITEentry = tk.Entry(master=FitWindow, justify=LEFT, width=20)
+            SITEentry = tk.Entry(master=FitWindow, justify=LEFT, width=23)
             SITEentry.place(x=100, y=120)
 
             OBSLATlabel = tk.Label(master=FitWindow, text='OBS-LAT', bg="grey")
             OBSLATlabel.place(x=10, y=145)
-            OBSLATentry = tk.Entry(master=FitWindow, justify=LEFT, width=20)
+            OBSLATentry = tk.Entry(master=FitWindow, justify=LEFT, width=23)
             OBSLATentry.place(x=100, y=145)
 
             OBSLONGlabel = tk.Label(master=FitWindow, text='OBS-LONG', bg="grey")
             OBSLONGlabel.place(x=10, y=170)
-            OBSLONGentry = tk.Entry(master=FitWindow, justify=LEFT, width=20)
+            OBSLONGentry = tk.Entry(master=FitWindow, justify=LEFT, width=23)
             OBSLONGentry.place(x=100, y=170)
 
             OBJECTlabel = tk.Label(master=FitWindow, text='OBJECT', bg="grey")
             OBJECTlabel.place(x=10, y=195)
-            OBJECTentry = tk.Entry(master=FitWindow, justify=LEFT, width=20)
+            OBJECTentry = tk.Entry(master=FitWindow, justify=LEFT, width=23)
             OBJECTentry.place(x=100, y=195)
 
             checkboxGray = tk.Checkbutton(master=FitWindow, text='Grayscale',
@@ -572,7 +575,8 @@ def ChannelWindow():
                                 hdu = fits.PrimaryHDU(npraw)
                                 hdu.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits', overwrite=True)
                                 fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
-                                            'IMAGETYP', value=otype.get())
+                                            'IMAGETYP', value=ImTypeSelection.get())
+                                            # 'IMAGETYP', value=otype.get())
                                 fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
                                             'FILTER', value='Clear')
                                 fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
