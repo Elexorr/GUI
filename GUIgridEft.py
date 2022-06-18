@@ -562,6 +562,23 @@ def ChannelWindow():
                             for i in range(0, len(raw.raw_image_visible) - 1, 2):
                                 oddy.append(i)
                                 eveny.append(i + 1)
+
+                            f = open(raw_filenames[j], 'rb')
+                            tags = exifread.process_file(f)
+                            f.close()
+                            data = list(tags.items())
+                            an_array = np.array(data)
+                            for i in range(0, len(an_array) - 1):
+                                if an_array[i][0] == 'EXIF ExposureTime':
+                                    # print(an_array)
+                                    time = str(an_array[i][1])
+                                    timetime = float(sum(Fraction(time) for time in time.split()))
+                                    timetime = round(timetime, 4)
+                                if an_array[i][0] == 'EXIF DateTimeOriginal':
+                                    # print(an_array)
+                                    dtime = str(an_array[i][1])
+                                    datime = (dtime[0:4]+"-"+dtime[5:7]+"-"+dtime[8:10]+"T"+dtime[11:19])
+                                    # print(datime)
                             # print(oddx)
                             # print(evenx)
                             # print(raw.raw_image_visible[0][0])
@@ -576,7 +593,10 @@ def ChannelWindow():
                                 hdu.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits', overwrite=True)
                                 fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
                                             'IMAGETYP', value=ImTypeSelection.get())
-                                            # 'IMAGETYP', value=otype.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
+                                            'EXPTIME', value=timetime)
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
+                                            'DATE-OBS', value=datime)
                                 fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
                                             'FILTER', value='Clear')
                                 fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
