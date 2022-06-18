@@ -537,7 +537,6 @@ def ChannelWindow():
 
 
             def channelextract():
-                # print(mrawopen)
                 if mrawopen == []:
                     showinfo(title='Error', message='No Multiple RAW to Check')
                 elif pixelrentry.get() == '' or pixelcentry.get() == '':
@@ -575,7 +574,6 @@ def ChannelWindow():
                             for i in range(0, len(an_array) - 1):
                                 if an_array[i][0] == 'EXIF ISOSpeedRatings':
                                     ISOspeed = int(str(an_array[i][1]))
-                                    print(ISOspeed)
                                 if an_array[i][0] == 'EXIF ExposureTime':
                                     time = str(an_array[i][1])
                                     timetime = float(sum(Fraction(time) for time in time.split()))
@@ -583,14 +581,6 @@ def ChannelWindow():
                                 if an_array[i][0] == 'EXIF DateTimeOriginal':
                                     dtime = str(an_array[i][1])
                                     datime = (dtime[0:4]+"-"+dtime[5:7]+"-"+dtime[8:10]+"T"+dtime[11:19])
-                            # print(oddx)
-                            # print(evenx)
-                            # print(raw.raw_image_visible[0][0])
-                            # print(raw.raw_image_visible[0][len(raw.raw_image_visible[0])-1])
-                            # print(raw.raw_image_visible[len(raw.raw_image_visible)-1][0])
-                            # print(raw.raw_image_visible[len(raw.raw_image_visible)-1][len(raw.raw_image_visible[0])-1])
-                            # print(raw.raw_image_visible[0][1])
-                            # print(raw.raw_image_visible)
                             npraw = np.array(raw.raw_image_visible)
                             if Gray.get() == 1:
                                 hdu = fits.PrimaryHDU(npraw)
@@ -806,12 +796,6 @@ def ChannelWindow():
                                             'OBS-LON', value=OBSLONGentry.get())
                                 fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G(average)' + '.fits',
                                             'OBJECT', value=OBJECTentry.get())
-                            # print(npraw)
-                            # print(nprawredfinal)
-                            # print(nprawbluefinal)
-                            # print(nprawg1final)
-                            # print(nprawg2final)
-                            # print(nprawg)
                     T.insert(END,
                              '\n' + 'Multiple RAW: ' + str(len(raw_filenames)) + ' RAW Files Divided To Color Channels')
                     T.see(END)
