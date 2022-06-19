@@ -12,6 +12,7 @@ from astropy.time import Time
 from astropy.io import fits
 from datetime import date, datetime
 import numpy as np
+import pathlib
 from fractions import Fraction
 # from scipy.optimize import curve_fit
 # from matplotlib import pyplot as plt
@@ -357,84 +358,6 @@ Blue = IntVar()
 GpG = IntVar()
 GavG = IntVar()
 
-
-# def channelextract():
-#     # print(mrawopen)
-#     if mrawopen == []:
-#         showinfo(title='Error', message='No Multiple RAW to Check')
-#     elif pixelrentry.get() == '' or pixelcentry.get() == '':
-#         showinfo(title='Error', message='No Pixel Coordinates to Check')
-#     else:
-#         window.delete("all")
-#         print('start')
-#         for j in range (0,len(raw_filenames)):
-#         # for j in range(0, 1):
-#             with rawpy.imread(raw_filenames[j]) as raw:
-#                 # print('Width:', len(raw.raw_image_visible[0]))
-#                 # print('Height', len(raw.raw_image_visible))
-#                 oddx = []
-#                 evenx = []
-#                 for i in range(0, len(raw.raw_image_visible[0])-1, 2):
-#                     oddx.append(i)
-#                     evenx.append(i+1)
-#                 oddy = []
-#                 eveny = []
-#                 for i in range(0, len(raw.raw_image_visible)-1, 2):
-#                     oddy.append(i)
-#                     eveny.append(i+1)
-#                 # print(oddx)
-#                 # print(evenx)
-#                 # print(raw.raw_image_visible[0][0])
-#                 # print(raw.raw_image_visible[0][len(raw.raw_image_visible[0])-1])
-#                 # print(raw.raw_image_visible[len(raw.raw_image_visible)-1][0])
-#                 # print(raw.raw_image_visible[len(raw.raw_image_visible)-1][len(raw.raw_image_visible[0])-1])
-#                 # print(raw.raw_image_visible[0][1])
-#                 # print(raw.raw_image_visible)
-#                 npraw = np.array(raw.raw_image_visible)
-#                 if Gray.get() == 1:
-#                     hdu = fits.PrimaryHDU(npraw)
-#                     hdu.writeto(raw_filenames[j].rsplit('.', 1)[0]+'-Gray'+'.fits', overwrite=True)
-#                     # fits.setval(raw_filenames[j].rsplit('.', 1)[0]+'-Gray'+'.fits','OBJECT', value='M31')
-#                     # fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits', 'OBJECT', value=ChannelWindow.obj)
-#
-#                 if Blue.get() == 1:
-#                     nprawblue=np.delete(npraw, oddx, 1) #deleting odd columns
-#                     nprawbluefinal=np.delete(nprawblue, oddy, 0) #deleting odd rows
-#                     hdub = fits.PrimaryHDU(nprawbluefinal)
-#                     hdub.writeto(raw_filenames[j].rsplit('.', 1)[0]+'-B'+'.fits', overwrite=True)
-#                 if Red.get() == 1:
-#                     nprawred=np.delete(npraw, evenx, 1) #vdeleting even columns
-#                     nprawredfinal=np.delete(nprawred, eveny, 0) #deleting even rows
-#                     hdur = fits.PrimaryHDU(nprawredfinal)
-#                     hdur.writeto(raw_filenames[j].rsplit('.', 1)[0]+'-R'+'.fits', overwrite=True)
-#                 nprawg1 = np.delete(npraw, oddx, 1) #deleting odd columns
-#                 nprawg1final = np.delete(nprawg1, eveny, 0) #deleting even rows
-#                 if Green1.get() == 1:
-#                     print('g1')
-#                     hdug1 = fits.PrimaryHDU(nprawg1final)
-#                     hdug1.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G1' + '.fits', overwrite=True)
-#                 nprawg2 = np.delete(npraw, evenx, 1) #deleting even columns
-#                 nprawg2final = np.delete(nprawg2, oddy, 0) #deleting even rows
-#                 if Green2.get() == 1:
-#                     hdug2 = fits.PrimaryHDU(nprawg2final)
-#                     hdug2.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G2' + '.fits', overwrite=True)
-#                 if GpG.get() == 1:
-#                     nprawgplus = (nprawg1final + nprawg2final)
-#                     hdug = fits.PrimaryHDU(nprawgplus)
-#                     hdug.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-(G+G)' + '.fits', overwrite=True)
-#                 if GavG.get() == 1:
-#                     nprawgaver = (nprawg1final + nprawg2final)//2
-#                     hdug = fits.PrimaryHDU(nprawgaver)
-#                     hdug.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-G(average)' + '.fits', overwrite=True)
-#                 # print(npraw)
-#                 # print(nprawredfinal)
-#                 # print(nprawbluefinal)
-#                 # print(nprawg1final)
-#                 # print(nprawg2final)
-#                 # print(nprawg)
-#         T.insert(END, '\n' + 'Multiple RAW: ' + str(len(raw_filenames)) + ' RAW Files Divided To Color Channels')
-#         T.see(END)
-
 FitWindowCount = 0
 
 def FitWindowOnclose():
@@ -445,9 +368,9 @@ def FitWindowOnclose():
 
 
 def ChannelWindow():
-    if mrawopen == []:
-        showinfo(title='Error', message='No Multiple RAW to Check')
-    else:
+    # if mrawopen == []:
+    #     showinfo(title='Error', message='No Multiple RAW to Check')
+    # else:
         global FitWindow
         global FitWindowCount
         imtypes = ["Object", "Dark", "Flat", "Bias",]
@@ -456,7 +379,7 @@ def ChannelWindow():
             FitWindow = Toplevel(root, bg='grey')
 
             FitWindow.title("FITS Files Extractor")
-            FitWindow.geometry("400x225+500+475")
+            FitWindow.geometry("400x300+500+400")
             FitWindow.protocol("WM_DELETE_WINDOW", FitWindowOnclose)
             FitWindow.wm_attributes("-topmost", 1)
 
@@ -475,6 +398,9 @@ def ChannelWindow():
                 ObsLatDefault = fitvalues[5][0:len(fitvalues[5]) - 1]
                 ObsLongDefault = fitvalues[6][0:len(fitvalues[6]) - 1]
                 ObjectDefault = fitvalues[7][0:len(fitvalues[7]) - 1]
+                FocallenDefault = fitvalues[8][0:len(fitvalues[8]) - 1]
+                RaDefault = fitvalues[9][0:len(fitvalues[9]) - 1]
+                DecDefault = fitvalues[10][0:len(fitvalues[10]) - 1]
                 tcsettings.close()
 
             IMAGETYPlabel = tk.Label(master=FitWindow, text='IMAGETYP', bg="grey")
@@ -521,6 +447,21 @@ def ChannelWindow():
             OBJECTentry = tk.Entry(master=FitWindow, justify=LEFT, width=23)
             OBJECTentry.place(x=100, y=195)
 
+            FOCALLENlabel = tk.Label(master=FitWindow, text='FOCALLEN', bg="grey")
+            FOCALLENlabel.place(x=10, y=220)
+            FOCALLENentry = tk.Entry(master=FitWindow, justify=LEFT, width=23)
+            FOCALLENentry.place(x=100, y=220)
+
+            RAlabel = tk.Label(master=FitWindow, text='RA', bg="grey")
+            RAlabel.place(x=10, y=245)
+            RAentry = tk.Entry(master=FitWindow, justify=LEFT, width=23)
+            RAentry.place(x=100, y=245)
+
+            DEClabel = tk.Label(master=FitWindow, text='DEC', bg="grey")
+            DEClabel.place(x=10, y=270)
+            DECentry = tk.Entry(master=FitWindow, justify=LEFT, width=23)
+            DECentry.place(x=100, y=270)
+
             if file_exists == True:
                 ImTypeSelection.insert(0, ImTypeDefault)
                 OBSERVERentry.insert(0, ObserverDefault)
@@ -530,6 +471,9 @@ def ChannelWindow():
                 OBSLATentry.insert(0, ObsLatDefault)
                 OBSLONGentry.insert(0, ObsLongDefault)
                 OBJECTentry.insert(0, ObjectDefault)
+                FOCALLENentry.insert(0, FocallenDefault)
+                RAentry.insert(0, RaDefault)
+                DECentry.insert(0, DecDefault)
 
             checkboxGray = tk.Checkbutton(master=FitWindow, text='Grayscale',
                                               variable=Gray, onvalue=1, offvalue=0, bg="grey")
@@ -568,7 +512,16 @@ def ChannelWindow():
                 else:
                     window.delete("all")
                     print('start')
-
+                    curdir = os.path.dirname(os.path.abspath(raw_filenames[0]))
+                    print(curdir)
+                    print(raw_filenames[0])
+                    # print(os.path.basename(raw_filenames[0]))
+                    if Gray.get() == 1:
+                        os.mkdir(curdir+'/Grayscale')
+                    if Blue.get() == 1:
+                        os.mkdir(curdir+'/Blue/')
+                    if Red.get() == 1:
+                        os.mkdir(curdir+'/Red/')
                     for j in range(0, len(raw_filenames)):
                         with exiftool.ExifToolHelper() as et:
                             metadata = et.get_metadata(raw_filenames[j])
@@ -605,37 +558,28 @@ def ChannelWindow():
                                     timetime = round(timetime, 4)
                                 if an_array[i][0] == 'EXIF DateTimeOriginal':
                                     dtime = str(an_array[i][1])
-                                    datime = (dtime[0:4]+"-"+dtime[5:7]+"-"+dtime[8:10]+"T"+dtime[11:19])
+                                    datime = (dtime[0:4]+"-"+dtime[5:7]+"-"+dtime[8:10]+"T"+dtime[11:19]+".000")
                             npraw = np.array(raw.raw_image_visible)
                             if Gray.get() == 1:
                                 hdu = fits.PrimaryHDU(npraw)
-                                hdu.writeto(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits', overwrite=True)
-                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
-                                            'IMAGETYP', value=ImTypeSelection.get())
-                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
-                                            'EXPTIME', value=timetime)
-                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
-                                            'ISOSPEED', value=ISOspeed)
-                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
-                                            'DATE-OBS', value=datime)
-                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
-                                            'CCD-TEMP', value=temperature)
-                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
-                                            'FILTER', value='Clear')
-                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
-                                            'OBSERVER', value=OBSERVERentry.get())
-                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
-                                            'TELESCOP', value=TELESCOPentry.get())
-                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
-                                            'INSTRUME', value=INSTRUMEentry.get())
-                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
-                                            'SITE', value=SITEentry.get())
-                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
-                                            'OBS-LAT', value=OBSLATentry.get())
-                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
-                                            'OBS-LON', value=OBSLONGentry.get())
-                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-Gray' + '.fits',
-                                            'OBJECT', value=OBJECTentry.get())
+                                Grayfile = (curdir+'/Grayscale/'+os.path.basename(raw_filenames[j]).rsplit('.', 1)[0] + '-Gray' + '.fits')
+                                hdu.writeto(Grayfile, overwrite=True)
+                                fits.setval(Grayfile, 'IMAGETYP', value=ImTypeSelection.get())
+                                fits.setval(Grayfile, 'EXPTIME', value=timetime)
+                                fits.setval(Grayfile, 'ISOSPEED', value=ISOspeed)
+                                fits.setval(Grayfile, 'DATE-OBS', value=datime)
+                                fits.setval(Grayfile, 'CCD-TEMP', value=temperature)
+                                fits.setval(Grayfile, 'FILTER', value='Clear')
+                                fits.setval(Grayfile, 'OBSERVER', value=OBSERVERentry.get())
+                                fits.setval(Grayfile, 'TELESCOP', value=TELESCOPentry.get())
+                                fits.setval(Grayfile, 'INSTRUME', value=INSTRUMEentry.get())
+                                fits.setval(Grayfile, 'SITE', value=SITEentry.get())
+                                fits.setval(Grayfile, 'OBS-LAT', value=float(OBSLATentry.get()))
+                                fits.setval(Grayfile, 'OBS-LON', value=float(OBSLONGentry.get()))
+                                fits.setval(Grayfile, 'OBJECT', value=OBJECTentry.get())
+                                fits.setval(Grayfile, 'FOCALLEN', value=int(FOCALLENentry.get()))
+                                fits.setval(Grayfile, 'RA', value=RAentry.get())
+                                fits.setval(Grayfile, 'DEC', value=DECentry.get())
                             if Blue.get() == 1:
                                 nprawblue = np.delete(npraw, oddx, 1)  # deleting odd columns
                                 nprawbluefinal = np.delete(nprawblue, oddy, 0)  # deleting odd rows
@@ -667,6 +611,12 @@ def ChannelWindow():
                                             'OBS-LON', value=OBSLONGentry.get())
                                 fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-B' + '.fits',
                                             'OBJECT', value=OBJECTentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-B' + '.fits',
+                                            'FOCALLEN', value=int(FOCALLENentry.get()))
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-B' + '.fits',
+                                            'RA', value=RAentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-B' + '.fits',
+                                            'DEC', value=DECentry.get())
                             if Red.get() == 1:
                                 nprawred = np.delete(npraw, evenx, 1)  # vdeleting even columns
                                 nprawredfinal = np.delete(nprawred, eveny, 0)  # deleting even rows
@@ -698,6 +648,12 @@ def ChannelWindow():
                                             'OBS-LON', value=OBSLONGentry.get())
                                 fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-R' + '.fits',
                                             'OBJECT', value=OBJECTentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-R' + '.fits',
+                                            'FOCALLEN', value=int(FOCALLENentry.get()))
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-R' + '.fits',
+                                            'RA', value=RAentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-R' + '.fits',
+                                            'DEC', value=DECentry.get())
                             nprawg1 = np.delete(npraw, oddx, 1)  # deleting odd columns
                             nprawg1final = np.delete(nprawg1, eveny, 0)  # deleting even rows
                             if Green1.get() == 1:
@@ -729,6 +685,12 @@ def ChannelWindow():
                                             'OBS-LON', value=OBSLONGentry.get())
                                 fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G1' + '.fits',
                                             'OBJECT', value=OBJECTentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G1' + '.fits',
+                                            'FOCALLEN', value=int(FOCALLENentry.get()))
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G1' + '.fits',
+                                            'RA', value=RAentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G1' + '.fits',
+                                            'DEC', value=DECentry.get())
                             nprawg2 = np.delete(npraw, evenx, 1)  # deleting even columns
                             nprawg2final = np.delete(nprawg2, oddy, 0)  # deleting even rows
                             if Green2.get() == 1:
@@ -760,6 +722,12 @@ def ChannelWindow():
                                             'OBS-LON', value=OBSLONGentry.get())
                                 fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G2' + '.fits',
                                             'OBJECT', value=OBJECTentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G2' + '.fits',
+                                            'FOCALLEN', value=int(FOCALLENentry.get()))
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G2' + '.fits',
+                                            'RA', value=RAentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G2' + '.fits',
+                                            'DEC', value=DECentry.get())
                             if GpG.get() == 1:
                                 nprawgplus = (nprawg1final + nprawg2final)
                                 hdug = fits.PrimaryHDU(nprawgplus)
@@ -790,6 +758,12 @@ def ChannelWindow():
                                             'OBS-LON', value=OBSLONGentry.get())
                                 fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-(G+G)' + '.fits',
                                             'OBJECT', value=OBJECTentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-(G+G)' + '.fits',
+                                            'FOCALLEN', value=int(FOCALLENentry.get()))
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-(G+G)' + '.fits',
+                                            'RA', value=RAentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-(G+G)' + '.fits',
+                                            'DEC', value=DECentry.get())
                             if GavG.get() == 1:
                                 nprawgaver = (nprawg1final + nprawg2final) // 2
                                 hdug = fits.PrimaryHDU(nprawgaver)
@@ -821,6 +795,12 @@ def ChannelWindow():
                                             'OBS-LON', value=OBSLONGentry.get())
                                 fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G(average)' + '.fits',
                                             'OBJECT', value=OBJECTentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G(average)' + '.fits',
+                                            'FOCALLEN', value=int(FOCALLENentry.get()))
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G(average)' + '.fits',
+                                            'RA', value=RAentry.get())
+                                fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G(average)' + '.fits',
+                                            'DEC', value=DECentry.get())
                     open('fitsheader.cfg', 'w').close()
                     fitsettings = open('fitsheader.cfg', 'w')
                     fitsettings.write(ImTypeSelection.get() + '\n')
@@ -831,6 +811,9 @@ def ChannelWindow():
                     fitsettings.write(OBSLATentry.get() + '\n')
                     fitsettings.write(OBSLONGentry.get() + '\n')
                     fitsettings.write(OBJECTentry.get() + '\n')
+                    fitsettings.write(FOCALLENentry.get() + '\n')
+                    fitsettings.write(RAentry.get() + '\n')
+                    fitsettings.write(DECentry.get() + '\n')
                     fitsettings.close()
                     T.insert(END,
                              '\n' + 'Multiple RAW: ' + str(len(raw_filenames)) + ' RAW Files Divided To Color Channels')
