@@ -463,6 +463,20 @@ def ChannelWindow():
             otype = StringVar()
             otype.set(imtypes[0])
 
+            file_exists = os.path.exists('fitsheader.cfg')
+            if file_exists == True:
+                fitsettings = open('fitsheader.cfg', 'r')
+                fitvalues = fitsettings.readlines()
+                ImTypeDefault = fitvalues[0][0:len(fitvalues[0]) - 1]
+                ObserverDefault = fitvalues[1][0:len(fitvalues[1]) - 1]
+                TelescopDefault = fitvalues[2][0:len(fitvalues[2]) - 1]
+                InstrumeDefault = fitvalues[3][0:len(fitvalues[3]) - 1]
+                SiteDefault = fitvalues[4][0:len(fitvalues[4]) - 1]
+                ObsLatDefault = fitvalues[5][0:len(fitvalues[5]) - 1]
+                ObsLongDefault = fitvalues[6][0:len(fitvalues[6]) - 1]
+                ObjectDefault = fitvalues[7][0:len(fitvalues[7]) - 1]
+                tcsettings.close()
+
             IMAGETYPlabel = tk.Label(master=FitWindow, text='IMAGETYP', bg="grey")
             IMAGETYPlabel.place(x=10, y=20)
 
@@ -507,6 +521,16 @@ def ChannelWindow():
             OBJECTentry = tk.Entry(master=FitWindow, justify=LEFT, width=23)
             OBJECTentry.place(x=100, y=195)
 
+            if file_exists == True:
+                ImTypeSelection.insert(0, ImTypeDefault)
+                OBSERVERentry.insert(0, ObserverDefault)
+                TELESCOPentry.insert(0, TelescopDefault)
+                INSTRUMEentry.insert(0, InstrumeDefault)
+                SITEentry.insert(0, SiteDefault)
+                OBSLATentry.insert(0, ObsLatDefault)
+                OBSLONGentry.insert(0, ObsLongDefault)
+                OBJECTentry.insert(0, ObjectDefault)
+
             checkboxGray = tk.Checkbutton(master=FitWindow, text='Grayscale',
                                               variable=Gray, onvalue=1, offvalue=0, bg="grey")
             checkboxGray.place(x=300, y=35)
@@ -544,6 +568,7 @@ def ChannelWindow():
                 else:
                     window.delete("all")
                     print('start')
+
                     for j in range(0, len(raw_filenames)):
                         with exiftool.ExifToolHelper() as et:
                             metadata = et.get_metadata(raw_filenames[j])
@@ -796,6 +821,17 @@ def ChannelWindow():
                                             'OBS-LON', value=OBSLONGentry.get())
                                 fits.setval(raw_filenames[j].rsplit('.', 1)[0] + '-G(average)' + '.fits',
                                             'OBJECT', value=OBJECTentry.get())
+                    open('fitsheader.cfg', 'w').close()
+                    fitsettings = open('fitsheader.cfg', 'w')
+                    fitsettings.write(ImTypeSelection.get() + '\n')
+                    fitsettings.write(OBSERVERentry.get() + '\n')
+                    fitsettings.write(TELESCOPentry.get() + '\n')
+                    fitsettings.write(INSTRUMEentry.get() + '\n')
+                    fitsettings.write(SITEentry.get() + '\n')
+                    fitsettings.write(OBSLATentry.get() + '\n')
+                    fitsettings.write(OBSLONGentry.get() + '\n')
+                    fitsettings.write(OBJECTentry.get() + '\n')
+                    fitsettings.close()
                     T.insert(END,
                              '\n' + 'Multiple RAW: ' + str(len(raw_filenames)) + ' RAW Files Divided To Color Channels')
                     T.see(END)
