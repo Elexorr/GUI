@@ -17,7 +17,7 @@ from fractions import Fraction
 # from scipy.optimize import curve_fit
 # from matplotlib import pyplot as plt
 
-import os
+import sys, os
 from io import BytesIO
 import rawpy
 from PIL import ImageTk, Image
@@ -513,13 +513,13 @@ def ChannelWindow():
                     window.delete("all")
                     # print('start')
                     curdir = os.path.dirname(raw_filenames[0])
-                    # print(curdir)
+                    print(curdir)
                     # print(raw_filenames[0])
                     # print(os.path.basename(raw_filenames[0]))
                     path = (curdir+'/Grayscale/')
-                    # print(path)
+                    print(path)
                     isDir = os.path.isdir(path)
-                    # print(isDir)
+                    print(isDir)
                     if isDir == False:
                         if Gray.get() == 1:
                             os.mkdir(curdir+'/Grayscale/')
@@ -764,7 +764,8 @@ def ChannelWindow():
 
             def save():
                 files = [('Preset Files', '*.ltp')]
-                file = asksaveasfile(filetypes=files, defaultextension=files, parent = FitWindow)
+                file = asksaveasfile(title='Save Preset', filetypes=files,
+                                     initialdir=os.path.dirname(sys.argv[0]), defaultextension=files, parent = FitWindow)
                 if file != None:
                     print(file)
                     presetfile = open(file.name, 'w')
@@ -781,10 +782,41 @@ def ChannelWindow():
                     presetfile.write(DECentry.get() + '\n')
                     presetfile.close()
 
+            def load():
+                files = [('Preset Files', '*.ltp')]
+                file = fd.askopenfilename(title='Load Preset', defaultextension=files,
+                                              initialdir=os.path.dirname(sys.argv[0]), filetypes=files, parent = FitWindow)
+                if file != None:
+                    if file != '':
+                        presetfile = open(file)
+                        loadedpreset = presetfile.readlines()
+                        ImTypeSelection.set(loadedpreset[0][0:len(loadedpreset[0]) - 1])
+                        OBSERVERentry.delete(0, END)
+                        OBSERVERentry.insert(0, loadedpreset[1][0:len(loadedpreset[1]) - 1])
+                        TELESCOPentry.delete(0, END)
+                        TELESCOPentry.insert(0, loadedpreset[2][0:len(loadedpreset[2]) - 1])
+                        INSTRUMEentry.delete(0, END)
+                        INSTRUMEentry.insert(0, loadedpreset[3][0:len(loadedpreset[3]) - 1])
+                        SITEentry.delete(0, END)
+                        SITEentry.insert(0, loadedpreset[4][0:len(loadedpreset[4]) - 1])
+                        OBSLATentry.delete(0, END)
+                        OBSLATentry.insert(0, loadedpreset[5][0:len(loadedpreset[5]) - 1])
+                        OBSLONGentry.delete(0, END)
+                        OBSLONGentry.insert(0, loadedpreset[6][0:len(loadedpreset[6]) - 1])
+                        OBJECTentry.delete(0, END)
+                        OBJECTentry.insert(0, loadedpreset[7][0:len(loadedpreset[7]) - 1])
+                        FOCALLENentry.delete(0, END)
+                        FOCALLENentry.insert(0, loadedpreset[8][0:len(loadedpreset[8]) - 1])
+                        RAentry.delete(0, END)
+                        RAentry.insert(0, loadedpreset[9][0:len(loadedpreset[9]) - 1])
+                        DECentry.delete(0, END)
+                        DECentry.insert(0, loadedpreset[10][0:len(loadedpreset[10]) - 1])
+                        presetfile.close()
+
             savebutton = ttk.Button(master=FitWindow, text='Save', command = lambda : save(), width=12)
             savebutton.place(x=305, y=234)
 
-            loadbutton = ttk.Button(master=FitWindow, text='Load', command=channelextract, width=12)
+            loadbutton = ttk.Button(master=FitWindow, text='Load', command = lambda : load(), width=12)
             loadbutton.place(x=305, y=264)
 
 
