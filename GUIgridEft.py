@@ -6,13 +6,13 @@ import exifread
 import exiftool
 from tkinter import filedialog as fd
 from tkinter.messagebox import showinfo
+from tkinter.filedialog import asksaveasfile
 from astropy.modeling import models, fitting
 # from astropy.modeling.models import Sine1D
 from astropy.time import Time
 from astropy.io import fits
 from datetime import date, datetime
 import numpy as np
-import pathlib
 from fractions import Fraction
 # from scipy.optimize import curve_fit
 # from matplotlib import pyplot as plt
@@ -477,31 +477,31 @@ def ChannelWindow():
 
             checkboxGray = tk.Checkbutton(master=FitWindow, text='Grayscale',
                                               variable=Gray, onvalue=1, offvalue=0, bg="grey")
-            checkboxGray.place(x=300, y=35)
+            checkboxGray.place(x=300, y=15)
 
             checkboxR = tk.Checkbutton(master=FitWindow, text='R',
                                               variable=Red, onvalue=1, offvalue=0, bg="grey")
-            checkboxR.place(x=300, y=55)
+            checkboxR.place(x=300, y=35)
 
             checkboxG1 = tk.Checkbutton(master=FitWindow, text='G1',
                                               variable=Green1, onvalue=1, offvalue=0, bg="grey")
-            checkboxG1.place(x=300, y=75)
+            checkboxG1.place(x=300, y=55)
 
             checkboxG2 = tk.Checkbutton(master=FitWindow, text='G2',
                                               variable=Green2, onvalue=1, offvalue=0, bg="grey")
-            checkboxG2.place(x=300, y=95)
+            checkboxG2.place(x=300, y=75)
 
             checkboxGpG = tk.Checkbutton(master=FitWindow, text='(G1+G2)',
                                               variable=GpG, onvalue=1, offvalue=0, bg="grey")
-            checkboxGpG.place(x=300, y=115)
+            checkboxGpG.place(x=300, y=95)
 
             checkboxGavG = tk.Checkbutton(master=FitWindow, text='(G1+G2)/2',
                                               variable=GavG, onvalue=1, offvalue=0, bg="grey")
-            checkboxGavG.place(x=300, y=135)
+            checkboxGavG.place(x=300, y=115)
 
             checkboxB = tk.Checkbutton(master=FitWindow, text='B ',
                                               variable=Blue, onvalue=1, offvalue=0, bg="grey")
-            checkboxB.place(x=300, y=155)
+            checkboxB.place(x=300, y=135)
 
 
             def channelextract():
@@ -512,36 +512,39 @@ def ChannelWindow():
                 else:
                     window.delete("all")
                     # print('start')
-                    curdir = os.path.dirname(os.path.abspath(raw_filenames[0]))
-                    # print(curdir)
+                    curdir = os.path.dirname(raw_filenames[0])
+                    print(curdir)
                     # print(raw_filenames[0])
                     # print(os.path.basename(raw_filenames[0]))
-                    isFile = os.path.isfile(curdir+'/Grayscale/')
-                    if isFile == False:
+                    path = (curdir+'/Grayscale/')
+                    print(path)
+                    isDir = os.path.isdir(path)
+                    print(isDir)
+                    if isDir == False:
                         if Gray.get() == 1:
-                            os.mkdir(curdir+'/Grayscale')
-                    isFile = os.path.isfile(curdir+'/Blue/')
-                    if isFile == False:
+                            os.mkdir(curdir+'/Grayscale/')
+                    isDir = os.path.isdir(curdir+'/Blue/')
+                    if isDir == False:
                         if Blue.get() == 1:
                             os.mkdir(curdir+'/Blue/')
-                    isFile = os.path.isfile(curdir + '/Red/')
-                    if isFile == False:
+                    isDir = os.path.isdir(curdir + '/Red/')
+                    if isDir == False:
                         if Red.get() == 1:
                             os.mkdir(curdir+'/Red/')
-                    isFile = os.path.isfile(curdir + '/Green1/')
-                    if isFile == False:
+                    isDir = os.path.isdir(curdir + '/Green1/')
+                    if isDir == False:
                         if Green1.get() == 1:
                             os.mkdir(curdir + '/Green1/')
-                    isFile = os.path.isfile(curdir + '/Green2/')
-                    if isFile == False:
+                    isDir = os.path.isdir(curdir + '/Green2/')
+                    if isDir == False:
                         if Green2.get() == 1:
                             os.mkdir(curdir + '/Green2/')
-                    isFile = os.path.isfile(curdir + '/Gsum/')
-                    if isFile == False:
+                    isDir = os.path.isdir(curdir + '/Gsum/')
+                    if isDir == False:
                         if GpG.get() == 1:
                             os.mkdir(curdir + '/Gsum/')
-                    isFile = os.path.isfile(curdir + '/Gaverage/')
-                    if isFile == False:
+                    isDir = os.path.isdir(curdir + '/Gaverage/')
+                    if isDir == False:
                         if GavG.get() == 1:
                             os.mkdir(curdir + '/Gaverage/')
 
@@ -739,7 +742,7 @@ def ChannelWindow():
                                 fits.setval(GavGfile, 'FOCALLEN', value=int(FOCALLENentry.get()))
                                 fits.setval(GavGfile, 'RA', value=RAentry.get())
                                 fits.setval(GavGfile, 'DEC', value=DECentry.get())
-                    open('fitsheader.cfg', 'w').close()
+                    # open('fitsheader.cfg', 'w').close()
                     fitsettings = open('fitsheader.cfg', 'w')
                     fitsettings.write(ImTypeSelection.get() + '\n')
                     fitsettings.write(OBSERVERentry.get() + '\n')
@@ -758,7 +761,31 @@ def ChannelWindow():
                     T.see(END)
 
             extbutton = ttk.Button(master=FitWindow, text='Extract', command=channelextract, width=12)
-            extbutton.place(x=305, y=190)
+            extbutton.place(x=305, y=170)
+
+            def save():
+                files = [('Preset Files', '*.ltp')]
+                file = asksaveasfile(filetypes=files, defaultextension=files)
+                # open('file', 'w').close()
+                # fitsettings = open('fitsheader.cfg', 'w')
+                # fitsettings.write(ImTypeSelection.get() + '\n')
+                # fitsettings.write(OBSERVERentry.get() + '\n')
+                # fitsettings.write(TELESCOPentry.get() + '\n')
+                # fitsettings.write(INSTRUMEentry.get() + '\n')
+                # fitsettings.write(SITEentry.get() + '\n')
+                # fitsettings.write(OBSLATentry.get() + '\n')
+                # fitsettings.write(OBSLONGentry.get() + '\n')
+                # fitsettings.write(OBJECTentry.get() + '\n')
+                # fitsettings.write(FOCALLENentry.get() + '\n')
+                # fitsettings.write(RAentry.get() + '\n')
+                # fitsettings.write(DECentry.get() + '\n')
+                # fitsettings.close()
+
+            savebutton = ttk.Button(master=FitWindow, text='Save', command = lambda : save(), width=12)
+            savebutton.place(x=305, y=234)
+
+            loadbutton = ttk.Button(master=FitWindow, text='Load', command=channelextract, width=12)
+            loadbutton.place(x=305, y=264)
 
 
 def checklinearity():
