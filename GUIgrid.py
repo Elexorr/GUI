@@ -6,16 +6,18 @@ import exifread
 import exiftool
 from tkinter import filedialog as fd
 from tkinter.messagebox import showinfo
+from tkinter.filedialog import asksaveasfile
 from astropy.modeling import models, fitting
 # from astropy.modeling.models import Sine1D
 from astropy.time import Time
+from astropy.io import fits
 from datetime import date, datetime
 import numpy as np
 from fractions import Fraction
 # from scipy.optimize import curve_fit
 # from matplotlib import pyplot as plt
 
-import os
+import sys, os
 from io import BytesIO
 import rawpy
 from PIL import ImageTk, Image
@@ -332,7 +334,7 @@ def selectmultipleraws():
     global raw_filenames
     # raw_filenames = fd.askopenfilenames(title='Open multiple files', initialdir='/', filetypes=filetypes)
     raw_filenames = fd.askopenfilenames(title='Open Multiple RAW', initialdir='/', filetypes=[('RAW files', '*.CRW *.CR2 *CR3 *.NEF *.ARW')])
-    print(raw_filenames)
+    # print(raw_filenames)
     if len(raw_filenames) > 1:
         mrawopen.append('1')
         # showinfo(title='Open Multiple RAW', message= str(len(raw_filenames)) + ' RAW Files Opened')
@@ -347,6 +349,475 @@ RBsample = IntVar()
 checkboxRBsample = tk.Checkbutton(master=frame3, text=' R/B sample',
                                variable=RBsample, onvalue=1, offvalue=0, bg="grey")
 checkboxRBsample.place(x=405, y=45)
+
+Gray = IntVar()
+Red = IntVar()
+Green1 = IntVar()
+Green2 = IntVar()
+Blue = IntVar()
+GpG = IntVar()
+GavG = IntVar()
+
+FitWindowCount = 0
+
+def FitWindowOnclose():
+    global FitWindow
+    global FitWindowCount
+    FitWindow.destroy()
+    FitWindowCount = 0
+
+
+def ChannelWindow():
+    # if mrawopen == []:
+    #     showinfo(title='Error', message='No Multiple RAW to Check')
+    # else:
+        global FitWindow
+        global FitWindowCount
+        imtypes = ["Object", "Dark", "Flat", "Bias",]
+        if FitWindowCount == 0:
+            FitWindowCount = 1
+            FitWindow = Toplevel(root, bg='grey')
+
+            FitWindow.title("FITS Files Extractor")
+            FitWindow.geometry("400x300+500+400")
+            FitWindow.protocol("WM_DELETE_WINDOW", FitWindowOnclose)
+            FitWindow.wm_attributes("-topmost", 1)
+
+            otype = StringVar()
+            otype.set(imtypes[0])
+
+            file_exists = os.path.exists('fitsheader.cfg')
+            if file_exists == True:
+                fitsettings = open('fitsheader.cfg', 'r')
+                fitvalues = fitsettings.readlines()
+                ImTypeDefault = fitvalues[0][0:len(fitvalues[0]) - 1]
+                ObserverDefault = fitvalues[1][0:len(fitvalues[1]) - 1]
+                TelescopDefault = fitvalues[2][0:len(fitvalues[2]) - 1]
+                InstrumeDefault = fitvalues[3][0:len(fitvalues[3]) - 1]
+                SiteDefault = fitvalues[4][0:len(fitvalues[4]) - 1]
+                ObsLatDefault = fitvalues[5][0:len(fitvalues[5]) - 1]
+                ObsLongDefault = fitvalues[6][0:len(fitvalues[6]) - 1]
+                ObjectDefault = fitvalues[7][0:len(fitvalues[7]) - 1]
+                FocallenDefault = fitvalues[8][0:len(fitvalues[8]) - 1]
+                RaDefault = fitvalues[9][0:len(fitvalues[9]) - 1]
+                DecDefault = fitvalues[10][0:len(fitvalues[10]) - 1]
+                tcsettings.close()
+
+            IMAGETYPlabel = tk.Label(master=FitWindow, text='IMAGETYP', bg="grey")
+            IMAGETYPlabel.place(x=10, y=20)
+
+            # ImTypeSelection = OptionMenu(FitWindow, otype, *imtypes)
+            # ImTypeSelection.place(x=101, y=8)
+
+            ImTypeSelection = ttk.Combobox(FitWindow, value = imtypes)
+            ImTypeSelection.place(x=100, y=19)
+
+            OBSERVERlabel = tk.Label(master=FitWindow, text='OBSERVER', bg="grey")
+            OBSERVERlabel.place(x=10, y=45)
+            OBSERVERentry = tk.Entry(master=FitWindow, justify=LEFT, width=23)
+            OBSERVERentry.place(x=100, y=45)
+
+            TELESCOPlabel = tk.Label(master=FitWindow, text='TELESCOP', bg="grey")
+            TELESCOPlabel.place(x=10, y=70)
+            TELESCOPentry = tk.Entry(master=FitWindow, justify=LEFT, width=23)
+            TELESCOPentry.place(x=100, y=70)
+
+            INSTRUMElabel = tk.Label(master=FitWindow, text='INSTRUME', bg="grey")
+            INSTRUMElabel.place(x=10, y=95)
+            INSTRUMEentry = tk.Entry(master=FitWindow, justify=LEFT, width=23)
+            INSTRUMEentry.place(x=100, y=95)
+
+            SITElabel = tk.Label(master=FitWindow, text='SITE', bg="grey")
+            SITElabel.place(x=10, y=120)
+            SITEentry = tk.Entry(master=FitWindow, justify=LEFT, width=23)
+            SITEentry.place(x=100, y=120)
+
+            OBSLATlabel = tk.Label(master=FitWindow, text='OBS-LAT', bg="grey")
+            OBSLATlabel.place(x=10, y=145)
+            OBSLATentry = tk.Entry(master=FitWindow, justify=LEFT, width=23)
+            OBSLATentry.place(x=100, y=145)
+
+            OBSLONGlabel = tk.Label(master=FitWindow, text='OBS-LONG', bg="grey")
+            OBSLONGlabel.place(x=10, y=170)
+            OBSLONGentry = tk.Entry(master=FitWindow, justify=LEFT, width=23)
+            OBSLONGentry.place(x=100, y=170)
+
+            OBJECTlabel = tk.Label(master=FitWindow, text='OBJECT', bg="grey")
+            OBJECTlabel.place(x=10, y=195)
+            OBJECTentry = tk.Entry(master=FitWindow, justify=LEFT, width=23)
+            OBJECTentry.place(x=100, y=195)
+
+            FOCALLENlabel = tk.Label(master=FitWindow, text='FOCALLEN', bg="grey")
+            FOCALLENlabel.place(x=10, y=220)
+            FOCALLENentry = tk.Entry(master=FitWindow, justify=LEFT, width=23)
+            FOCALLENentry.place(x=100, y=220)
+
+            RAlabel = tk.Label(master=FitWindow, text='RA', bg="grey")
+            RAlabel.place(x=10, y=245)
+            RAentry = tk.Entry(master=FitWindow, justify=LEFT, width=23)
+            RAentry.place(x=100, y=245)
+
+            DEClabel = tk.Label(master=FitWindow, text='DEC', bg="grey")
+            DEClabel.place(x=10, y=270)
+            DECentry = tk.Entry(master=FitWindow, justify=LEFT, width=23)
+            DECentry.place(x=100, y=270)
+
+            if file_exists == True:
+                ImTypeSelection.insert(0, ImTypeDefault)
+                OBSERVERentry.insert(0, ObserverDefault)
+                TELESCOPentry.insert(0, TelescopDefault)
+                INSTRUMEentry.insert(0, InstrumeDefault)
+                SITEentry.insert(0, SiteDefault)
+                OBSLATentry.insert(0, ObsLatDefault)
+                OBSLONGentry.insert(0, ObsLongDefault)
+                OBJECTentry.insert(0, ObjectDefault)
+                FOCALLENentry.insert(0, FocallenDefault)
+                RAentry.insert(0, RaDefault)
+                DECentry.insert(0, DecDefault)
+
+            checkboxGray = tk.Checkbutton(master=FitWindow, text='Grayscale',
+                                              variable=Gray, onvalue=1, offvalue=0, bg="grey")
+            checkboxGray.place(x=300, y=15)
+
+            checkboxR = tk.Checkbutton(master=FitWindow, text='R',
+                                              variable=Red, onvalue=1, offvalue=0, bg="grey")
+            checkboxR.place(x=300, y=35)
+
+            checkboxG1 = tk.Checkbutton(master=FitWindow, text='G1',
+                                              variable=Green1, onvalue=1, offvalue=0, bg="grey")
+            checkboxG1.place(x=300, y=55)
+
+            checkboxG2 = tk.Checkbutton(master=FitWindow, text='G2',
+                                              variable=Green2, onvalue=1, offvalue=0, bg="grey")
+            checkboxG2.place(x=300, y=75)
+
+            checkboxGpG = tk.Checkbutton(master=FitWindow, text='(G1+G2)',
+                                              variable=GpG, onvalue=1, offvalue=0, bg="grey")
+            checkboxGpG.place(x=300, y=95)
+
+            checkboxGavG = tk.Checkbutton(master=FitWindow, text='(G1+G2)/2',
+                                              variable=GavG, onvalue=1, offvalue=0, bg="grey")
+            checkboxGavG.place(x=300, y=115)
+
+            checkboxB = tk.Checkbutton(master=FitWindow, text='B ',
+                                              variable=Blue, onvalue=1, offvalue=0, bg="grey")
+            checkboxB.place(x=300, y=135)
+
+
+            def channelextract():
+                if mrawopen == []:
+                    showinfo(title='Error', message='No Multiple RAW to Check')
+                elif pixelrentry.get() == '' or pixelcentry.get() == '':
+                    showinfo(title='Error', message='No Pixel Coordinates to Check')
+                else:
+                    window.delete("all")
+                    # print('start')
+                    curdir = os.path.dirname(raw_filenames[0])
+                    print(curdir)
+                    # print(raw_filenames[0])
+                    # print(os.path.basename(raw_filenames[0]))
+                    path = (curdir+'/Grayscale/')
+                    print(path)
+                    isDir = os.path.isdir(path)
+                    print(isDir)
+                    if isDir == False:
+                        if Gray.get() == 1:
+                            os.mkdir(curdir+'/Grayscale/')
+                    isDir = os.path.isdir(curdir+'/Blue/')
+                    if isDir == False:
+                        if Blue.get() == 1:
+                            os.mkdir(curdir+'/Blue/')
+                    isDir = os.path.isdir(curdir + '/Red/')
+                    if isDir == False:
+                        if Red.get() == 1:
+                            os.mkdir(curdir+'/Red/')
+                    isDir = os.path.isdir(curdir + '/Green1/')
+                    if isDir == False:
+                        if Green1.get() == 1:
+                            os.mkdir(curdir + '/Green1/')
+                    isDir = os.path.isdir(curdir + '/Green2/')
+                    if isDir == False:
+                        if Green2.get() == 1:
+                            os.mkdir(curdir + '/Green2/')
+                    isDir = os.path.isdir(curdir + '/Gsum/')
+                    if isDir == False:
+                        if GpG.get() == 1:
+                            os.mkdir(curdir + '/Gsum/')
+                    isDir = os.path.isdir(curdir + '/Gaverage/')
+                    if isDir == False:
+                        if GavG.get() == 1:
+                            os.mkdir(curdir + '/Gaverage/')
+
+                    for j in range(0, len(raw_filenames)):
+                        with exiftool.ExifToolHelper() as et:
+                            metadata = et.get_metadata(raw_filenames[j])
+                            metastring = str(metadata)
+                            tempposition = metastring.index("CameraTemperature")
+                            if metastring[tempposition + 21] == ',':
+                                temperature = int(metastring[tempposition + 19:tempposition + 21])
+                            else:
+                                temperature = int(metastring[tempposition + 19:tempposition + 22])
+                        with rawpy.imread(raw_filenames[j]) as raw:
+                            # print('Width:', len(raw.raw_image_visible[0]))
+                            # print('Height', len(raw.raw_image_visible))
+                            oddx = []
+                            evenx = []
+                            for i in range(0, len(raw.raw_image_visible[0]) - 1, 2):
+                                oddx.append(i)
+                                evenx.append(i + 1)
+                            oddy = []
+                            eveny = []
+                            for i in range(0, len(raw.raw_image_visible) - 1, 2):
+                                oddy.append(i)
+                                eveny.append(i + 1)
+                            f = open(raw_filenames[j], 'rb')
+                            tags = exifread.process_file(f)
+                            f.close()
+                            data = list(tags.items())
+                            an_array = np.array(data)
+                            for i in range(0, len(an_array) - 1):
+                                if an_array[i][0] == 'EXIF ISOSpeedRatings':
+                                    ISOspeed = int(str(an_array[i][1]))
+                                if an_array[i][0] == 'EXIF ExposureTime':
+                                    time = str(an_array[i][1])
+                                    timetime = float(sum(Fraction(time) for time in time.split()))
+                                    timetime = round(timetime, 4)
+                                if an_array[i][0] == 'EXIF DateTimeOriginal':
+                                    dtime = str(an_array[i][1])
+                                    datime = (dtime[0:4]+"-"+dtime[5:7]+"-"+dtime[8:10]+"T"+dtime[11:19]+".000")
+                            npraw = np.array(raw.raw_image_visible)
+                            if Gray.get() == 1:
+                                hdu = fits.PrimaryHDU(npraw)
+                                Grayfile = (curdir+'/Grayscale/'+os.path.basename(raw_filenames[j]).rsplit('.', 1)[0] + '-Gray' + '.fits')
+                                hdu.writeto(Grayfile, overwrite=True)
+                                fits.setval(Grayfile, 'IMAGETYP', value=ImTypeSelection.get())
+                                fits.setval(Grayfile, 'EXPTIME', value=timetime)
+                                fits.setval(Grayfile, 'ISOSPEED', value=ISOspeed)
+                                fits.setval(Grayfile, 'DATE-OBS', value=datime)
+                                fits.setval(Grayfile, 'CCD-TEMP', value=temperature)
+                                fits.setval(Grayfile, 'FILTER', value='')
+                                fits.setval(Grayfile, 'OBSERVER', value=OBSERVERentry.get())
+                                fits.setval(Grayfile, 'TELESCOP', value=TELESCOPentry.get())
+                                fits.setval(Grayfile, 'INSTRUME', value=INSTRUMEentry.get())
+                                fits.setval(Grayfile, 'SITE', value=SITEentry.get())
+                                fits.setval(Grayfile, 'OBS-LAT', value=float(OBSLATentry.get()))
+                                fits.setval(Grayfile, 'OBS-LON', value=float(OBSLONGentry.get()))
+                                fits.setval(Grayfile, 'OBJECT', value=OBJECTentry.get())
+                                fits.setval(Grayfile, 'FOCALLEN', value=int(FOCALLENentry.get()))
+                                fits.setval(Grayfile, 'RA', value=RAentry.get())
+                                fits.setval(Grayfile, 'DEC', value=DECentry.get())
+                            if Blue.get() == 1:
+                                nprawblue = np.delete(npraw, oddx, 1)  # deleting odd columns
+                                nprawbluefinal = np.delete(nprawblue, oddy, 0)  # deleting odd rows
+                                hdub = fits.PrimaryHDU(nprawbluefinal)
+                                Bluefile = (curdir + '/Blue/' + os.path.basename(raw_filenames[j]).rsplit('.', 1)[
+                                    0] + '-Blue' + '.fits')
+                                hdub.writeto(Bluefile, overwrite=True)
+                                fits.setval(Bluefile, 'IMAGETYP', value=ImTypeSelection.get())
+                                fits.setval(Bluefile, 'EXPTIME', value=timetime)
+                                fits.setval(Bluefile, 'ISOSPEED', value=ISOspeed)
+                                fits.setval(Bluefile, 'DATE-OBS', value=datime)
+                                fits.setval(Bluefile, 'CCD-TEMP', value=temperature)
+                                fits.setval(Bluefile, 'FILTER', value='Blue')
+                                fits.setval(Bluefile, 'OBSERVER', value=OBSERVERentry.get())
+                                fits.setval(Bluefile, 'TELESCOP', value=TELESCOPentry.get())
+                                fits.setval(Bluefile, 'INSTRUME', value=INSTRUMEentry.get())
+                                fits.setval(Bluefile, 'SITE', value=SITEentry.get())
+                                fits.setval(Bluefile, 'OBS-LAT', value=OBSLATentry.get())
+                                fits.setval(Bluefile, 'OBS-LON', value=OBSLONGentry.get())
+                                fits.setval(Bluefile, 'OBJECT', value=OBJECTentry.get())
+                                fits.setval(Bluefile, 'FOCALLEN', value=int(FOCALLENentry.get()))
+                                fits.setval(Bluefile, 'RA', value=RAentry.get())
+                                fits.setval(Bluefile, 'DEC', value=DECentry.get())
+                            if Red.get() == 1:
+                                nprawred = np.delete(npraw, evenx, 1)  # vdeleting even columns
+                                nprawredfinal = np.delete(nprawred, eveny, 0)  # deleting even rows
+                                hdur = fits.PrimaryHDU(nprawredfinal)
+                                Redfile = (curdir + '/Red/' + os.path.basename(raw_filenames[j]).rsplit('.', 1)[
+                                    0] + '-Red' + '.fits')
+                                hdur.writeto(Redfile, overwrite=True)
+                                fits.setval(Redfile, 'IMAGETYP', value=ImTypeSelection.get())
+                                fits.setval(Redfile, 'EXPTIME', value=timetime)
+                                fits.setval(Redfile, 'ISOSPEED', value=ISOspeed)
+                                fits.setval(Redfile, 'DATE-OBS', value=datime)
+                                fits.setval(Redfile, 'CCD-TEMP', value=temperature)
+                                fits.setval(Redfile, 'FILTER', value='Red')
+                                fits.setval(Redfile, 'OBSERVER', value=OBSERVERentry.get())
+                                fits.setval(Redfile, 'TELESCOP', value=TELESCOPentry.get())
+                                fits.setval(Redfile, 'INSTRUME', value=INSTRUMEentry.get())
+                                fits.setval(Redfile, 'SITE', value=SITEentry.get())
+                                fits.setval(Redfile, 'OBS-LAT', value=OBSLATentry.get())
+                                fits.setval(Redfile, 'OBS-LON', value=OBSLONGentry.get())
+                                fits.setval(Redfile, 'OBJECT', value=OBJECTentry.get())
+                                fits.setval(Redfile, 'FOCALLEN', value=int(FOCALLENentry.get()))
+                                fits.setval(Redfile, 'RA', value=RAentry.get())
+                                fits.setval(Redfile, 'DEC', value=DECentry.get())
+                            nprawg1 = np.delete(npraw, oddx, 1)  # deleting odd columns
+                            nprawg1final = np.delete(nprawg1, eveny, 0)  # deleting even rows
+                            if Green1.get() == 1:
+                                hdug1 = fits.PrimaryHDU(nprawg1final)
+                                Green1file = (curdir + '/Green1/' + os.path.basename(raw_filenames[j]).rsplit('.', 1)[
+                                    0] + '-G1' + '.fits')
+                                hdug1.writeto(Green1file, overwrite=True)
+                                fits.setval(Green1file, 'IMAGETYP', value=ImTypeSelection.get())
+                                fits.setval(Green1file, 'EXPTIME', value=timetime)
+                                fits.setval(Green1file, 'ISOSPEED', value=ISOspeed)
+                                fits.setval(Green1file, 'DATE-OBS', value=datime)
+                                fits.setval(Green1file, 'CCD-TEMP', value=temperature)
+                                fits.setval(Green1file, 'FILTER', value='G1')
+                                fits.setval(Green1file, 'OBSERVER', value=OBSERVERentry.get())
+                                fits.setval(Green1file, 'TELESCOP', value=TELESCOPentry.get())
+                                fits.setval(Green1file, 'INSTRUME', value=INSTRUMEentry.get())
+                                fits.setval(Green1file, 'SITE', value=SITEentry.get())
+                                fits.setval(Green1file, 'OBS-LAT', value=OBSLATentry.get())
+                                fits.setval(Green1file, 'OBS-LON', value=OBSLONGentry.get())
+                                fits.setval(Green1file, 'OBJECT', value=OBJECTentry.get())
+                                fits.setval(Green1file, 'FOCALLEN', value=int(FOCALLENentry.get()))
+                                fits.setval(Green1file, 'RA', value=RAentry.get())
+                                fits.setval(Green1file, 'DEC', value=DECentry.get())
+                            nprawg2 = np.delete(npraw, evenx, 1)  # deleting even columns
+                            nprawg2final = np.delete(nprawg2, oddy, 0)  # deleting even rows
+                            if Green2.get() == 1:
+                                hdug2 = fits.PrimaryHDU(nprawg2final)
+                                Green2file = (curdir + '/Green2/' + os.path.basename(raw_filenames[j]).rsplit('.', 1)[
+                                    0] + '-G2' + '.fits')
+                                hdug2.writeto(Green2file, overwrite=True)
+                                fits.setval(Green2file, 'IMAGETYP', value=ImTypeSelection.get())
+                                fits.setval(Green2file, 'EXPTIME', value=timetime)
+                                fits.setval(Green2file, 'ISOSPEED', value=ISOspeed)
+                                fits.setval(Green2file, 'DATE-OBS', value=datime)
+                                fits.setval(Green2file, 'CCD-TEMP', value=temperature)
+                                fits.setval(Green2file, 'FILTER', value='G2')
+                                fits.setval(Green2file, 'OBSERVER', value=OBSERVERentry.get())
+                                fits.setval(Green2file, 'TELESCOP', value=TELESCOPentry.get())
+                                fits.setval(Green2file, 'INSTRUME', value=INSTRUMEentry.get())
+                                fits.setval(Green2file, 'SITE', value=SITEentry.get())
+                                fits.setval(Green2file, 'OBS-LAT', value=OBSLATentry.get())
+                                fits.setval(Green2file, 'OBS-LON', value=OBSLONGentry.get())
+                                fits.setval(Green2file, 'OBJECT', value=OBJECTentry.get())
+                                fits.setval(Green2file, 'FOCALLEN', value=int(FOCALLENentry.get()))
+                                fits.setval(Green2file, 'RA', value=RAentry.get())
+                                fits.setval(Green2file, 'DEC', value=DECentry.get())
+                            if GpG.get() == 1:
+                                nprawgplus = (nprawg1final + nprawg2final)
+                                hdug = fits.PrimaryHDU(nprawgplus)
+                                GpGfile = (curdir + '/Gsum/' + os.path.basename(raw_filenames[j]).rsplit('.', 1)[
+                                    0] + '-(G+G)' + '.fits')
+                                hdug.writeto(GpGfile, overwrite=True)
+                                fits.setval(GpGfile, 'IMAGETYP', value=ImTypeSelection.get())
+                                fits.setval(GpGfile, 'EXPTIME', value=timetime)
+                                fits.setval(GpGfile, 'ISOSPEED', value=ISOspeed)
+                                fits.setval(GpGfile, 'DATE-OBS', value=datime)
+                                fits.setval(GpGfile, 'CCD-TEMP', value=temperature)
+                                fits.setval(GpGfile, 'FILTER', value='Green')
+                                fits.setval(GpGfile, 'OBSERVER', value=OBSERVERentry.get())
+                                fits.setval(GpGfile, 'TELESCOP', value=TELESCOPentry.get())
+                                fits.setval(GpGfile, 'INSTRUME', value=INSTRUMEentry.get())
+                                fits.setval(GpGfile, 'SITE', value=SITEentry.get())
+                                fits.setval(GpGfile, 'OBS-LAT', value=OBSLATentry.get())
+                                fits.setval(GpGfile, 'OBS-LON', value=OBSLONGentry.get())
+                                fits.setval(GpGfile, 'OBJECT', value=OBJECTentry.get())
+                                fits.setval(GpGfile, 'FOCALLEN', value=int(FOCALLENentry.get()))
+                                fits.setval(GpGfile, 'RA', value=RAentry.get())
+                                fits.setval(GpGfile, 'DEC', value=DECentry.get())
+                            if GavG.get() == 1:
+                                nprawgaver = (nprawg1final + nprawg2final) // 2
+                                hdug = fits.PrimaryHDU(nprawgaver)
+                                GavGfile = (curdir + '/Gaverage/' + os.path.basename(raw_filenames[j]).rsplit('.', 1)[
+                                    0] + '-G(average)' + '.fits')
+                                hdug.writeto(GavGfile, overwrite=True)
+                                fits.setval(GavGfile, 'IMAGETYP', value=ImTypeSelection.get())
+                                fits.setval(GavGfile, 'EXPTIME', value=timetime)
+                                fits.setval(GavGfile, 'ISOSPEED', value=ISOspeed)
+                                fits.setval(GavGfile, 'DATE-OBS', value=datime)
+                                fits.setval(GavGfile, 'CCD-TEMP', value=temperature)
+                                fits.setval(GavGfile, 'FILTER', value='(G+G)/2')
+                                fits.setval(GavGfile, 'OBSERVER', value=OBSERVERentry.get())
+                                fits.setval(GavGfile, 'TELESCOP', value=TELESCOPentry.get())
+                                fits.setval(GavGfile, 'INSTRUME', value=INSTRUMEentry.get())
+                                fits.setval(GavGfile, 'SITE', value=SITEentry.get())
+                                fits.setval(GavGfile, 'OBS-LAT', value=OBSLATentry.get())
+                                fits.setval(GavGfile, 'OBS-LON', value=OBSLONGentry.get())
+                                fits.setval(GavGfile, 'OBJECT', value=OBJECTentry.get())
+                                fits.setval(GavGfile, 'FOCALLEN', value=int(FOCALLENentry.get()))
+                                fits.setval(GavGfile, 'RA', value=RAentry.get())
+                                fits.setval(GavGfile, 'DEC', value=DECentry.get())
+                    fitsettings = open('fitsheader.cfg', 'w')
+                    fitsettings.write(ImTypeSelection.get() + '\n')
+                    fitsettings.write(OBSERVERentry.get() + '\n')
+                    fitsettings.write(TELESCOPentry.get() + '\n')
+                    fitsettings.write(INSTRUMEentry.get() + '\n')
+                    fitsettings.write(SITEentry.get() + '\n')
+                    fitsettings.write(OBSLATentry.get() + '\n')
+                    fitsettings.write(OBSLONGentry.get() + '\n')
+                    fitsettings.write(OBJECTentry.get() + '\n')
+                    fitsettings.write(FOCALLENentry.get() + '\n')
+                    fitsettings.write(RAentry.get() + '\n')
+                    fitsettings.write(DECentry.get() + '\n')
+                    fitsettings.close()
+                    T.insert(END,
+                             '\n' + 'Multiple RAW: ' + str(len(raw_filenames)) + ' RAW Files Divided To Color Channels')
+                    T.see(END)
+
+            extbutton = ttk.Button(master=FitWindow, text='Extract', command=channelextract, width=12)
+            extbutton.place(x=305, y=170)
+
+            def save():
+                files = [('Preset Files', '*.ltp')]
+                file = asksaveasfile(title='Save Preset', filetypes=files,
+                                     initialdir=os.path.dirname(sys.argv[0]), defaultextension=files, parent = FitWindow)
+                if file != None:
+                    print(file)
+                    presetfile = open(file.name, 'w')
+                    presetfile.write(ImTypeSelection.get() + '\n')
+                    presetfile.write(OBSERVERentry.get() + '\n')
+                    presetfile.write(TELESCOPentry.get() + '\n')
+                    presetfile.write(INSTRUMEentry.get() + '\n')
+                    presetfile.write(SITEentry.get() + '\n')
+                    presetfile.write(OBSLATentry.get() + '\n')
+                    presetfile.write(OBSLONGentry.get() + '\n')
+                    presetfile.write(OBJECTentry.get() + '\n')
+                    presetfile.write(FOCALLENentry.get() + '\n')
+                    presetfile.write(RAentry.get() + '\n')
+                    presetfile.write(DECentry.get() + '\n')
+                    presetfile.close()
+
+            def load():
+                files = [('Preset Files', '*.ltp')]
+                file = fd.askopenfilename(title='Load Preset', defaultextension=files,
+                                              initialdir=os.path.dirname(sys.argv[0]), filetypes=files, parent = FitWindow)
+                if file != None:
+                    if file != '':
+                        presetfile = open(file)
+                        loadedpreset = presetfile.readlines()
+                        ImTypeSelection.set(loadedpreset[0][0:len(loadedpreset[0]) - 1])
+                        OBSERVERentry.delete(0, END)
+                        OBSERVERentry.insert(0, loadedpreset[1][0:len(loadedpreset[1]) - 1])
+                        TELESCOPentry.delete(0, END)
+                        TELESCOPentry.insert(0, loadedpreset[2][0:len(loadedpreset[2]) - 1])
+                        INSTRUMEentry.delete(0, END)
+                        INSTRUMEentry.insert(0, loadedpreset[3][0:len(loadedpreset[3]) - 1])
+                        SITEentry.delete(0, END)
+                        SITEentry.insert(0, loadedpreset[4][0:len(loadedpreset[4]) - 1])
+                        OBSLATentry.delete(0, END)
+                        OBSLATentry.insert(0, loadedpreset[5][0:len(loadedpreset[5]) - 1])
+                        OBSLONGentry.delete(0, END)
+                        OBSLONGentry.insert(0, loadedpreset[6][0:len(loadedpreset[6]) - 1])
+                        OBJECTentry.delete(0, END)
+                        OBJECTentry.insert(0, loadedpreset[7][0:len(loadedpreset[7]) - 1])
+                        FOCALLENentry.delete(0, END)
+                        FOCALLENentry.insert(0, loadedpreset[8][0:len(loadedpreset[8]) - 1])
+                        RAentry.delete(0, END)
+                        RAentry.insert(0, loadedpreset[9][0:len(loadedpreset[9]) - 1])
+                        DECentry.delete(0, END)
+                        DECentry.insert(0, loadedpreset[10][0:len(loadedpreset[10]) - 1])
+                        presetfile.close()
+
+            savebutton = ttk.Button(master=FitWindow, text='Save', command = lambda : save(), width=12)
+            savebutton.place(x=305, y=234)
+
+            loadbutton = ttk.Button(master=FitWindow, text='Load', command = lambda : load(), width=12)
+            loadbutton.place(x=305, y=264)
 
 
 def checklinearity():
@@ -961,11 +1432,14 @@ openraw_button.place(x=24, y=10)
 openmultiraw_button = ttk.Button(master=frame3, text='Open Multiple RAW', command=selectmultipleraws, width=18)
 openmultiraw_button.place(x=510, y=10)
 
-checklinearity_button = ttk.Button(master=frame3, text='Check Linearity', command=checklinearity, width=18)
-checklinearity_button.place(x=510, y=40)
+fits_button = ttk.Button(master=frame3, text='Extract FITS', command=ChannelWindow, width=12)
+fits_button.place(x=510, y=40)
 
-checktemperature_button = ttk.Button(master=frame3, text='Sensor Temp. (°C)', command=checktemperature, width=18)
-checktemperature_button.place(x=648, y=40)
+checklinearity_button = ttk.Button(master=frame3, text='Linearity', command=checklinearity, width=12)
+checklinearity_button.place(x=602, y=40)
+
+checktemperature_button = ttk.Button(master=frame3, text='Temp. (°C)', command=checktemperature, width=12)
+checktemperature_button.place(x=694, y=40)
 
 rawmaxmin_button = ttk.Button(master=frame3, text='Max./Min. ADU', command=adumaxmin, width=15)
 rawmaxmin_button.place(x=24, y=40)
@@ -1102,7 +1576,6 @@ tclabel.place(x=10, y=495)
 
 VTClabel = tk.Label(master=frame2, text='V(comp)         TC', bg="grey")
 VTClabel.place(x=19, y=515)
-
 
 vcompentry = tk.Entry(master=frame2, justify=CENTER, width=7)
 vcompentry.insert(0, vcompdefault)
