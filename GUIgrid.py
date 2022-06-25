@@ -600,10 +600,25 @@ def ChannelWindow():
                                 fits.setval(Grayfile, 'TELESCOP', value=TELESCOPentry.get())
                                 fits.setval(Grayfile, 'INSTRUME', value=INSTRUMEentry.get())
                                 fits.setval(Grayfile, 'SITE', value=SITEentry.get())
-                                fits.setval(Grayfile, 'OBS-LAT', value=float(OBSLATentry.get()))
-                                fits.setval(Grayfile, 'OBS-LON', value=float(OBSLONGentry.get()))
+                                try:
+                                    float_result = float(OBSLATentry.get())
+                                except ValueError:
+                                    fits.setval(Grayfile, 'OBS-LAT', value=0.000)
+                                else:
+                                    fits.setval(Grayfile, 'OBS-LAT', value=float(OBSLATentry.get()))
+                                try:
+                                    float_result = float(OBSLONGentry.get())
+                                except ValueError:
+                                    fits.setval(Grayfile, 'OBS-LON', value=0.000)
+                                else:
+                                    fits.setval(Grayfile, 'OBS-LON', value=float(OBSLONGentry.get()))
                                 fits.setval(Grayfile, 'OBJECT', value=OBJECTentry.get())
-                                fits.setval(Grayfile, 'FOCALLEN', value=int(FOCALLENentry.get()))
+                                try:
+                                    integer_result = int(FOCALLENentry.get())
+                                except ValueError:
+                                    fits.setval(Grayfile, 'FOCALLEN', value=0)
+                                else:
+                                    fits.setval(Grayfile, 'FOCALLEN', value=int(FOCALLENentry.get()))
                                 fits.setval(Grayfile, 'RA', value=RAentry.get())
                                 fits.setval(Grayfile, 'DEC', value=DECentry.get())
                             if Blue.get() == 1:
@@ -731,7 +746,7 @@ def ChannelWindow():
                                 fits.setval(GavGfile, 'ISOSPEED', value=ISOspeed)
                                 fits.setval(GavGfile, 'DATE-OBS', value=datime)
                                 fits.setval(GavGfile, 'CCD-TEMP', value=temperature)
-                                fits.setval(GavGfile, 'FILTER', value='(G+G)/2')
+                                fits.setval(GavGfile, 'FILTER', value='Green')
                                 fits.setval(GavGfile, 'OBSERVER', value=OBSERVERentry.get())
                                 fits.setval(GavGfile, 'TELESCOP', value=TELESCOPentry.get())
                                 fits.setval(GavGfile, 'INSTRUME', value=INSTRUMEentry.get())
