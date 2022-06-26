@@ -401,7 +401,7 @@ def ChannelWindow():
                 FocallenDefault = fitvalues[8][0:len(fitvalues[8]) - 1]
                 RaDefault = fitvalues[9][0:len(fitvalues[9]) - 1]
                 DecDefault = fitvalues[10][0:len(fitvalues[10]) - 1]
-                tcsettings.close()
+                fitsettings.close()
 
             IMAGETYPlabel = tk.Label(master=FitWindow, text='IMAGETYP', bg="grey")
             IMAGETYPlabel.place(x=10, y=20)
