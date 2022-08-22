@@ -160,7 +160,7 @@ def select_phasefile():
         else:
             showinfo(title='Open a File', message='Not a Valid Phase Curve File ' + filename)
 
-window = tk.Canvas(width=xx - 153, height=yy - 150, bg="light grey")  # yy*0.9-80
+window = tk.Canvas(width=xx - 153, height=yy - 150, bg="white")  # yy*0.9-80
 frame2 = tk.Frame(master=root, width=150, height=yy - 146, bg="grey")  # yy*0.9-76
 frame3 = tk.Frame(master=root, width=xx - 149, height=93, bg="grey")  # yy*0.1
 frame4 = tk.Frame(master=root, width=150, height=93, bg="grey")  # y*0.1
